@@ -32,7 +32,6 @@ public class ChatMessage extends BaseTime {
   @Column(name="message_id", nullable = false)
   private Long messageId;
 
-  // TODO: 이렇게 해도 괜찮나?
   @ManyToOne
   @JoinColumns({
       @JoinColumn(name="user_no"),
