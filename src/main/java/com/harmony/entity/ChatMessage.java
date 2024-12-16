@@ -23,6 +23,7 @@ import lombok.ToString;
 @ToString
 @Getter
 @Builder
+@Entity
 @Table(name = "chatmessages")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
