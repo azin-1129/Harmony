@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,12 +16,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ParticipantId implements Serializable {
   // TODO: Serializable 구현이 잘 되었는가?
-
   @Column(name = "chatroom_id")
-  private Long chatroomId;
+  private UUID chatroomId;
 
-  @Column(name = "user_id")
-  private Long userId;
+  @Column(name = "user_no")
+  private Long userNo;
 
   @Override
   public boolean equals(Object o) {
@@ -33,11 +33,11 @@ public class ParticipantId implements Serializable {
 
     ParticipantId participantsId1 = (ParticipantId) o;
 
-    return (chatroomId == participantsId1.chatroomId) && (userId == participantsId1.userId);
+    return (chatroomId == participantsId1.chatroomId) && (userNo == participantsId1.userNo);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(chatroomId, userId);
+    return Objects.hash(chatroomId, userNo);
   }
 }
