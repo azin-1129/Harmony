@@ -25,12 +25,12 @@ public class ChatRoom extends BaseTime {
 
   @Id
   @GeneratedValue(strategy=GenerationType.UUID)
-  @Column(name = "chatroom_id")
+  @Column(name = "chatroom_id", nullable = false)
   private Long chatRoomId;
 
-  @Column(name = "chatroom_name", nullable = false)
+  @Column(name = "chatroom_name", nullable = false, length=30)
   private String chatRoomName;
 
-  @Column(name = "chatroom_count", nullable = false)
-  private Boolean chatRoomCount;
+  @Column(name = "chatroom_count", nullable = false, columnDefinition = "smallint")
+  private Integer chatRoomCount;
 }

@@ -44,6 +44,6 @@ public class ChatMessage extends BaseTime {
   @Column(name="message_type", nullable = false)
   private ChatMessageType messageType;
 
-  @Column(name="message", nullable = false)
+  @Column(name="message", nullable = false, length=500)
   private String message;
 }
