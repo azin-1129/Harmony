@@ -16,11 +16,11 @@ import lombok.ToString;
 
 @ToString
 @Getter
+@Builder
+@Entity
+@Table(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
-@Builder
-@Table(name = "users")
 public class User extends BaseTime {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

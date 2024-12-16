@@ -2,6 +2,7 @@ package com.harmony.entity;
 
 import com.harmony.global.BaseTime;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -22,9 +23,9 @@ import lombok.ToString;
 @ToString
 @Getter
 @Builder
+@Table(name = "chatmessages")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "chatmessages")
 public class ChatMessage extends BaseTime {
 
   @Id

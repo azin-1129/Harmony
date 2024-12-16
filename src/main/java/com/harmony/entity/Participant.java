@@ -14,11 +14,11 @@ import lombok.ToString;
 
 @ToString
 @Getter
+@Builder
+@Entity
+@Table(name = "participants")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
-@Builder
-@Table(name = "participants")
 public class Participant {
 
   @EmbeddedId
