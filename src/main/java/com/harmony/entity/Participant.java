@@ -27,13 +27,13 @@ public class Participant {
   @EmbeddedId
   private ParticipantId participantsId;
 
+  @MapsId("userId")
+  @ManyToOne
+  @JoinColumn(name="user_id")
+  private User user;
+
   @MapsId("chatroomId")
   @ManyToOne
   @JoinColumn(name="chatroom_id")
   private ChatRoom chatRoom;
-
-  @MapsId("userNo")
-  @ManyToOne
-  @JoinColumn(name="user_no")
-  private User user;
 }
