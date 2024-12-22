@@ -3,6 +3,8 @@ package com.harmony.entity;
 import com.harmony.global.BaseTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,11 +26,11 @@ import lombok.ToString;
 public class User extends BaseTime {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "user_no", nullable = false)
-  private Long userNo;
+  @Column(name = "user_id", nullable = false)
+  private Long userId;
 
-  @Column(name = "user_id", nullable = false, length=10)
-  private String userId;
+  @Column(name = "email", nullable = false, length=255)
+  private String email;
 
   @Column(name = "password", nullable = false, length=20)
   private String password;
@@ -41,4 +43,8 @@ public class User extends BaseTime {
 
   @Column(name = "withdraw", nullable = false)
   private Boolean withdraw;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name="role", nullable = false)
+  private Role role;
 }
