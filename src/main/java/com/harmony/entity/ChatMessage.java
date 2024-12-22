@@ -31,20 +31,23 @@ public class ChatMessage extends BaseTime {
 
   @Id
   @GeneratedValue(strategy= GenerationType.IDENTITY)
-  @Column(name="message_id", nullable = false)
-  private Long messageId;
+  @Column(name="chat_message_id", nullable = false)
+  private Long chatMessageId;
 
   @ManyToOne
   @JoinColumns({
-      @JoinColumn(name="user_no"),
+      @JoinColumn(name="user_id"),
       @JoinColumn(name="chatroom_id"),
   })
   private Participant participant;
 
   @Enumerated(EnumType.STRING)
-  @Column(name="message_type", nullable = false)
-  private ChatMessageType messageType;
+  @Column(name="chat_message_type", nullable = false)
+  private ChatMessageType chatMessageType;
 
-  @Column(name="message", nullable = false, length=500)
-  private String message;
+  @Column(name="chat_message", nullable = false, length=500)
+  private String chatMessage;
+
+  @Column(name="is_read", nullable=false)
+  private Boolean isRead;
 }
