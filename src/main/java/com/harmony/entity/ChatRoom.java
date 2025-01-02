@@ -9,7 +9,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,21 +26,18 @@ import lombok.ToString;
 public class ChatRoom extends BaseTime {
 
   @Id
-  @GeneratedValue(strategy=GenerationType.UUID)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "chatroom_id", nullable = false)
-  private UUID chatRoomId;
+  private Long chatRoomId;
 
   @Column(name = "chatroom_name", nullable = false, length=30)
   private String chatRoomName;
 
-  @Column(name = "chatroom_count", nullable = false, columnDefinition = "smallint(1500)")
+  @Column(name = "chatroom_count", nullable = false, columnDefinition = "smallint")
   private Integer chatRoomCount;
 
-  @Column(name = "chatroom_count_max", nullable = false, columnDefinition = "smallint(1500)")
+  @Column(name = "chatroom_count_max", nullable = false, columnDefinition = "smallint")
   private Integer chatRoomCountMax;
-
-  @Column(name="chatroom_code", nullable = true, length=20)
-  private String chatRoomCode;
 
   @Enumerated(EnumType.STRING)
   @Column(name="chatroom_type", nullable = false)
