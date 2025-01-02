@@ -1,5 +1,5 @@
 package com.harmony.entity;
 
 public enum ChatMessageType {
-  JOIN, LEAVE, SEND
+  JOIN, LEAVE, SEND, DELETED,
 }
