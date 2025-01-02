@@ -29,8 +29,11 @@ public class User extends BaseTime {
   @Column(name = "user_id", nullable = false)
   private Long userId;
 
-  @Column(name = "email", nullable = false, length=255)
+  @Column(name = "user_email", nullable = false, length=255)
   private String email;
+
+  @Column(name="user_identifier", nullable=false, length=20)
+  private String userIdentifier;
 
   @Column(name = "password", nullable = false, length=20)
   private String password;
