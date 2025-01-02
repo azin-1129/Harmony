@@ -4,7 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +18,7 @@ public class ParticipantId implements Serializable {
   private Long userId;
 
   @Column(name = "chatroom_id")
-  private UUID chatroomId;
+  private Long chatroomId;
 
   @Override
   public boolean equals(Object o) {
