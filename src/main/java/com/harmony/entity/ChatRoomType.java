@@ -1,5 +1,5 @@
 package com.harmony.entity;
 
 public enum ChatRoomType {
-  CHATROOM, OPEN_CHATROOM, OPEN_CHATROOM_CLOSED;
+  DIRECT_CHATROOM, GROUP_CHATROOM;
 }
