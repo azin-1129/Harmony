@@ -63,16 +63,6 @@ class UserServiceTest {
     verify(userRepository, times(1)).save(any(User.class));
   }
 
-  @DisplayName("로그인 테스트")
-  @Test
-  public void loginUser(){
-    // given
-
-    // when
-
-    // then
-  }
-
   @DisplayName("비밀번호 변경 테스트")
   @Test
   public void updateUserPassword(){
@@ -120,16 +110,6 @@ class UserServiceTest {
     // then
     assertThat(updatedUser).isNotNull();
     assertEquals(newProfileImageName, updatedUser.getProfileImageName());
-  }
-
-  @DisplayName("로그아웃 테스트")
-  @Test
-  public void logoutUser(){
-    // given
-
-    // when
-
-    // then
   }
 
   @DisplayName("회원탈퇴 테스트")
