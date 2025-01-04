@@ -83,12 +83,90 @@ class UserControllerTest {
     verify(userService).registerUser(any(RegisterRequestDto.class));
   }
 
-  // TODO: Update test 작성
   // 비밀번호 변경
+  @DisplayName("비밀번호 변경 테스트")
+  @Test
+  void updateUserPassword() throws Exception {
+    // given
+    Long updateUserId=1L; // @CurrentUser로 빼올 예정
+    PasswordForm passwordForm=new PasswordForm();
+    passwordForm.setNewPassword("1130");
+    passwordForm.setnewPasswordConfirm("1130"); // @Valid 사용 예정
+    String newPw=passwordForm.getNewPassword();
+
+    // stub
+    doNothing().when(userService).updatePassword(updateUserId, newPw);
+
+    // when
+    ResultActions resultActions=
+        mockMvc.perform(MockMvcRequestBuilders
+            .post("/member")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(passwordForm)));
+
+    // then
+    resultActions
+        .andExpect(status().isOk())
+        .andDo(print());
+
+    verify(userService, times(1)).updatePassword(updateUserId, newPw);
+  }
 
   // 닉네임 변경
+  @DisplayName("닉네임 변경 테스트")
+  @Test
+  void updateUserNickname() throws Exception {
+    // given
+    Long updateUserId=1L; // @CurrentUser로 빼올 예정
+    NicknameForm nicknameForm=new NicknameForm();
+    nicknameForm.setNewNickname("치즈고양이");
+    String newNickname=nicknameForm.getNewNickname();
+
+    // stub
+    doNothing().when(userService).updateNickname(updateUserId, newNickname);
+
+    // when
+    ResultActions resultActions=
+        mockMvc.perform(MockMvcRequestBuilders
+            .post("/member")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(nicknameForm)));
+
+    // then
+    resultActions
+        .andExpect(status().isOk())
+        .andDo(print());
+
+    verify(userService, times(1)).updateNickname(updateUserId, newNickname);
+  }
 
   // 프로필 사진 변경
+  @DisplayName("프로필 사진 변경 테스트")
+  @Test
+  void updateUserNickname() throws Exception {
+    // given
+    Long updateUserId=1L; // @CurrentUser로 빼올 예정
+    ProfileImageForm profileImageForm=new ProfileImageForm();
+    profileImageForm.setNewProfileImageName("black_kitten.png");
+    String newProfileImageName=profileImageForm.getNewProfileImageName();
+
+    // stub
+    doNothing().when(userService).updateProfileImageName(updateUserId, newProfileImageName);
+
+    // when
+    ResultActions resultActions=
+        mockMvc.perform(MockMvcRequestBuilders
+            .post("/member")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(profileImageForm)));
+
+    // then
+    resultActions
+        .andExpect(status().isOk())
+        .andDo(print());
+
+    verify(userService, times(1)).updateProfileImageName(updateUserId, newProfileImageName);
+  }
 
   // 회원 탈퇴
   @DisplayName("회원탈퇴 테스트")
