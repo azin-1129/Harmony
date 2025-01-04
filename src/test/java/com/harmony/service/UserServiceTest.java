@@ -57,7 +57,7 @@ class UserServiceTest {
     registerRequestDto.setRole(Role.MEMBER);
 
     // when
-    RegisterResponseDto registerResponseDto = userService.registerUser(registerRequestDto);
+    userService.registerUser(registerRequestDto);
 
     // then
     verify(userRepository, times(1)).save(any(User.class));
