@@ -80,7 +80,7 @@ class UserControllerTest {
         .andExpect(status().isCreated())
         .andDo(print());
 
-    verify(userService).registerUser(any(RegisterRequestDto.class));
+    verify(userService, times(1)).registerUser(any(RegisterRequestDto.class));
   }
 
   // 비밀번호 변경
