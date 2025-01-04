@@ -140,7 +140,7 @@ class UserControllerTest {
   // 프로필 사진 변경
   @DisplayName("프로필 사진 변경 테스트")
   @Test
-  void updateUserNickname() throws Exception {
+  void updateUserProfileImageName() throws Exception {
     // given
     Long updateUserId=1L; // @CurrentUser로 빼올 예정
     ProfileImageForm profileImageForm=new ProfileImageForm();
