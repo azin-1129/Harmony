@@ -62,11 +62,8 @@ class UserControllerTest {
     registerRequestDto.setPassword("1129");
     registerRequestDto.setRole(Role.MEMBER);
 
-    RegisterResponseDto registerResponseDto=new RegisterResponseDto();
-
     // stub
-    when(userService.registerUser(any(RegisterRequestDto.class)))
-        .thenReturn(any(RegisterResponseDto.class));
+    doNothing().when(userService).updatePassword(updateUserId, newPw);
 
     // when
     ResultActions resultActions=
