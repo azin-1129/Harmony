@@ -5,12 +5,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.harmony.dto.form.NicknameForm;
+import com.harmony.dto.form.PasswordForm;
+import com.harmony.dto.form.ProfileImageForm;
+import com.harmony.dto.request.RegisterRequestDto;
 import com.harmony.entity.Role;
 import com.harmony.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
@@ -19,11 +22,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -35,7 +38,7 @@ class UserControllerTest {
   @Autowired
   private MockMvc mockMvc;
 
-  @Mock
+  @MockitoBean
   private UserService userService;
 
   private ObjectMapper objectMapper;
@@ -55,20 +58,21 @@ class UserControllerTest {
   @Test
   void registerUser() throws Exception {
     // given
-    RegisterRequestDto registerRequestDto = new RegisterRequestDto();
-
-    registerRequestDto.setEmail("azin@naver.com");
-    registerRequestDto.setUserIdentifier("choco");
-    registerRequestDto.setPassword("1129");
-    registerRequestDto.setRole(Role.MEMBER);
+    Long userId=1L;
+    RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
+        .email("azin@naver.com")
+        .userIdentifier("choco")
+        .password("1129")
+        .role(Role.MEMBER)
+        .build();
 
     // stub
-    doNothing().when(userService).updatePassword(updateUserId, newPw);
+    doNothing().when(userService).registerUser(registerRequestDto);
 
     // when
     ResultActions resultActions=
         mockMvc.perform(MockMvcRequestBuilders
-            .post("/member")
+            .post("/user/register")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(registerRequestDto)));
 
@@ -86,18 +90,20 @@ class UserControllerTest {
   void updateUserPassword() throws Exception {
     // given
     Long updateUserId=1L; // @CurrentUser로 빼올 예정
-    PasswordForm passwordForm=new PasswordForm();
-    passwordForm.setNewPassword("1130");
-    passwordForm.setnewPasswordConfirm("1130"); // @Valid 사용 예정
+    PasswordForm passwordForm=PasswordForm.builder() // @Valid 사용 예정
+      .newPassword("1130")
+      .newPasswordConfirm("1130")
+      .build();
+
     String newPw=passwordForm.getNewPassword();
 
     // stub
-    doNothing().when(userService).updatePassword(updateUserId, newPw);
+    doNothing().when(userService).updateUserPassword(updateUserId, newPw);
 
     // when
     ResultActions resultActions=
         mockMvc.perform(MockMvcRequestBuilders
-            .post("/member")
+            .post("/user/update/password")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(passwordForm)));
 
@@ -106,7 +112,7 @@ class UserControllerTest {
         .andExpect(status().isOk())
         .andDo(print());
 
-    verify(userService, times(1)).updatePassword(updateUserId, newPw);
+    verify(userService, times(1)).updateUserPassword(updateUserId, newPw);
   }
 
   // 닉네임 변경
@@ -115,17 +121,19 @@ class UserControllerTest {
   void updateUserNickname() throws Exception {
     // given
     Long updateUserId=1L; // @CurrentUser로 빼올 예정
-    NicknameForm nicknameForm=new NicknameForm();
-    nicknameForm.setNewNickname("치즈고양이");
+    NicknameForm nicknameForm=NicknameForm.builder()
+      .newNickname("치즈고양이")
+      .build();
+
     String newNickname=nicknameForm.getNewNickname();
 
     // stub
-    doNothing().when(userService).updateNickname(updateUserId, newNickname);
+    doNothing().when(userService).updateUserNickname(updateUserId, newNickname);
 
     // when
     ResultActions resultActions=
         mockMvc.perform(MockMvcRequestBuilders
-            .post("/member")
+            .post("/user/update/nickname")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(nicknameForm)));
 
@@ -134,7 +142,7 @@ class UserControllerTest {
         .andExpect(status().isOk())
         .andDo(print());
 
-    verify(userService, times(1)).updateNickname(updateUserId, newNickname);
+    verify(userService, times(1)).updateUserNickname(updateUserId, newNickname);
   }
 
   // 프로필 사진 변경
@@ -143,17 +151,19 @@ class UserControllerTest {
   void updateUserProfileImageName() throws Exception {
     // given
     Long updateUserId=1L; // @CurrentUser로 빼올 예정
-    ProfileImageForm profileImageForm=new ProfileImageForm();
-    profileImageForm.setNewProfileImageName("black_kitten.png");
+    ProfileImageForm profileImageForm=ProfileImageForm.builder()
+      .newProfileImageName("black_kitten.png")
+      .build();
+
     String newProfileImageName=profileImageForm.getNewProfileImageName();
 
     // stub
-    doNothing().when(userService).updateProfileImageName(updateUserId, newProfileImageName);
+    doNothing().when(userService).updateUserProfileImage(updateUserId, newProfileImageName);
 
     // when
     ResultActions resultActions=
         mockMvc.perform(MockMvcRequestBuilders
-            .post("/member")
+            .post("/user/update/profile-image")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(profileImageForm)));
 
@@ -162,7 +172,7 @@ class UserControllerTest {
         .andExpect(status().isOk())
         .andDo(print());
 
-    verify(userService, times(1)).updateProfileImageName(updateUserId, newProfileImageName);
+    verify(userService, times(1)).updateUserProfileImage(updateUserId, newProfileImageName);
   }
 
   // 회원 탈퇴
@@ -178,7 +188,7 @@ class UserControllerTest {
     // when
     ResultActions resultActions=
         mockMvc.perform(MockMvcRequestBuilders
-            .delete("/member/"+userId));
+            .delete("/user/"+userId));
 
     // then
     resultActions
