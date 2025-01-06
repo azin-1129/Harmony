@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.harmony.dto.request.RegisterRequestDto;
 import com.harmony.entity.Role;
 import com.harmony.entity.User;
 import com.harmony.repository.UserRepository;
@@ -49,12 +50,12 @@ class UserServiceTest {
   @Test
   public void registerUser() {
     // given
-    RegisterRequestDto registerRequestDto = new RegisterRequestDto();
-
-    registerRequestDto.setEmail("azin@naver.com");
-    registerRequestDto.setUserIdentifier("choco");
-    registerRequestDto.setPassword("1129");
-    registerRequestDto.setRole(Role.MEMBER);
+    RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
+            .email("azin@naver.com")
+            .userIdentifier("choco")
+            .password("1129")
+            .role(Role.MEMBER)
+            .build();
 
     // when
     userService.registerUser(registerRequestDto);
@@ -67,12 +68,12 @@ class UserServiceTest {
   @Test
   public void updateUserPassword(){
     // given
-    User updateUser=userService.registerUser(user);
+    userRepository.save(user);
 
     // when
     String newPw="1130";
-    userService.updatePassword(updateUser.getUserId(), newPw);
-    User updatedUser=userRepository.findById(updateUser.getUserId()).orElse(null);
+    userService.updateUserPassword(user.getUserId(), newPw);
+    User updatedUser=userRepository.findById(user.getUserId()).orElse(null);
 
     // then
     assertThat(updatedUser).isNotNull();
@@ -83,13 +84,12 @@ class UserServiceTest {
   @Test
   public void updateUserNickname(){
     // given
-
-    User updateUser=userService.registerUser(user);
+    userRepository.save(user);
 
     // when
     String newNickname="치즈고양이";
-    userService.updateNickname(updateUser.getUserId(), newNickname);
-    User updatedUser=userRepository.findById(updateUser.getUserId()).orElse(null);
+    userService.updateUserNickname(user.getUserId(), newNickname);
+    User updatedUser=userRepository.findById(user.getUserId()).orElse(null);
 
     // then
     assertThat(updatedUser).isNotNull();
@@ -98,14 +98,14 @@ class UserServiceTest {
 
   @DisplayName("프로필 사진 변경 테스트")
   @Test
-  public void updateUserProfileImageName(){
+  public void updateUserProfileImage(){
     // given
-    User updateUser=userService.registerUser(user);
+    userRepository.save(user);
 
     // when
     String newProfileImageName="black_kitten.png";
-    userService.updateProfileImageName(updateUser.getUserId(), newProfileImageName);
-    User updatedUser=userRepository.findById(updateUser.getUserId()).orElse(null);
+    userService.updateUserProfileImage(user.getUserId(), newProfileImageName);
+    User updatedUser=userRepository.findById(user.getUserId()).orElse(null);
 
     // then
     assertThat(updatedUser).isNotNull();
