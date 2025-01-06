@@ -50,4 +50,17 @@ public class User extends BaseTime {
   @Enumerated(EnumType.STRING)
   @Column(name="role", nullable = false)
   private Role role;
+
+  // update
+  public void updatePassword(String newPassword) {
+    this.password = newPassword;
+  }
+
+  public void updateNickname(String newNickname) {
+    this.nickname = newNickname;
+  }
+
+  public void updateProfileImage(String newProfileImageName) {
+    this.profileImageName = newProfileImageName;
+  }
 }
