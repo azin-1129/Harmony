@@ -2,22 +2,23 @@ package com.harmony.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import com.harmony.dto.request.RegisterRequestDto;
 import com.harmony.entity.Role;
 import com.harmony.entity.User;
 import com.harmony.repository.UserRepository;
+import java.util.NoSuchElementException;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+@Slf4j
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserServiceTest {
@@ -29,7 +30,7 @@ class UserServiceTest {
 
   private User user;
 
-  @BeforeAll
+  @BeforeEach
   void setUp(){
     user= User.builder()
         .email("azin@naver.com")
@@ -43,6 +44,7 @@ class UserServiceTest {
   }
   @AfterEach
   void clean(){
+    log.info("🧽🧽🧽🧽clean()🧽🧽🧽🧽");
     userRepository.deleteAll();
   }
 
@@ -50,6 +52,8 @@ class UserServiceTest {
   @Test
   public void registerUser() {
     // given
+    Long exectionId=1L;
+
     RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
             .email("azin@naver.com")
             .userIdentifier("choco")
@@ -61,7 +65,8 @@ class UserServiceTest {
     userService.registerUser(registerRequestDto);
 
     // then
-    verify(userRepository, times(1)).save(any(User.class));
+    User savedUser=userRepository.findById(exectionId).get();
+    assertEquals(exectionId, savedUser.getUserId());
   }
 
   @DisplayName("비밀번호 변경 테스트")
@@ -116,12 +121,13 @@ class UserServiceTest {
   @Test
   public void deleteUser(){
     // given
+    userRepository.save(user);
     Long userId=1L;
 
     // when
     userService.deleteUser(userId);
-
     // then
-    verify(userRepository, times(1)).deleteById(userId);
+   Assertions.assertThrows(NoSuchElementException.class, () ->
+       userRepository.findById(userId).get());
   }
 }
