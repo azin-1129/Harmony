@@ -197,4 +197,52 @@ class UserControllerTest {
 
     verify(userService, times(1)).deleteUser(userId);
   }
+
+  // 예외 테스트
+
+  // 빈 칸인 경우
+  @DisplayName("회원가입 실패-빈칸 테스트")
+  @Test
+  void registerUserFailedByBlank() throws Exception {
+    // given
+    RegisterRequestDto registerRequestDto= RegisterRequestDto.builder()
+        .build();
+
+    // when
+    ResultActions resultActions=
+        mockMvc.perform(MockMvcRequestBuilders
+            .post("/user/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerRequestDto)));
+
+    // then
+    resultActions
+        .andExpect(status().isBadRequest())
+        .andDo(print());
+  }
+
+  // 기재 형식이 잘못된 경우
+  @DisplayName("회원가입 실패-기재오류 테스트")
+  @Test
+  void registerUserFailedByInvalidArgument() throws Exception {
+    // given
+    RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
+        .email("azin@naver.com")
+        .userIdentifier("choco") // 오류사항
+        .password("1129") // 오류사항
+        .role(Role.MEMBER)
+        .build();
+
+    // when
+    ResultActions resultActions =
+        mockMvc.perform(MockMvcRequestBuilders
+            .post("/user/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerRequestDto)));
+
+    // then
+    resultActions
+        .andExpect(status().isBadRequest())
+        .andDo(print());
+  }
 }
