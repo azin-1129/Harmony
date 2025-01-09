@@ -2,8 +2,12 @@ package com.harmony.service;
 
 import com.harmony.dto.request.RegisterRequestDto;
 import com.harmony.entity.User;
+import com.harmony.global.response.code.ErrorCode;
+import com.harmony.global.response.exception.EntityAlreadyExistException;
+import com.harmony.global.response.exception.EntityNotFoundException;
 import com.harmony.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,8 +19,22 @@ import org.springframework.stereotype.Service;
 public class UserService {
   private final UserRepository userRepository;
 
-  // TODO: 예외처리, 닉네임 설정
+  // TODO: 이메일, 식별자, 닉네임 중복 처리 이렇게 해도 되나?
   public void registerUser(RegisterRequestDto registerRequestDto) {
+    if(!userRepository.findByEmail(registerRequestDto.getEmail()).isEmpty()){
+      throw new EntityAlreadyExistException(
+          ErrorCode.USER_ALREADY_REGISTERED
+      );
+    } else if(!userRepository.findByUserIdentifier(registerRequestDto.getUserIdentifier()).isEmpty()){
+      throw new EntityAlreadyExistException(
+          ErrorCode.USER_ALREADY_REGISTERED
+      );
+    } else if(!userRepository.findByNickname(registerRequestDto.getNickname()).isEmpty()){
+      throw new EntityAlreadyExistException(
+          ErrorCode.USER_ALREADY_REGISTERED
+      );
+    }
+
     User user= User.builder()
       .email(registerRequestDto.getEmail())
       .userIdentifier(registerRequestDto.getUserIdentifier())
@@ -50,6 +68,14 @@ public class UserService {
 
   // 회원 탈퇴
   public void deleteUser(Long userId){
-    userRepository.deleteById(userId);
+    Optional<User> userToWithDraw=userRepository.findById(userId);
+
+    if(userToWithDraw.isEmpty()){
+      throw new EntityNotFoundException(
+          ErrorCode.USER_ALREADY_WITHDRAW
+      );
+    }
+
+    userRepository.deleteById(userToWithDraw.get().getUserId());
   }
 }
