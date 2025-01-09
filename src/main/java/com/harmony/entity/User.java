@@ -63,4 +63,8 @@ public class User extends BaseTime {
   public void updateProfileImage(String newProfileImageName) {
     this.profileImageName = newProfileImageName;
   }
+
+  public void updateWithDraw(boolean newWithdraw) {
+    this.withdraw = newWithdraw;
+  }
 }

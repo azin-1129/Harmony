@@ -17,7 +17,8 @@ public enum ErrorCode implements ResponseCode {
   // UPDATE
 
   // DELETE
-  USER_ALREADY_WITHDRAW(HttpStatus.NOT_FOUND,"이미 탈퇴한 회원입니다.");
+  USER_ALREADY_WITHDRAW(HttpStatus.NOT_FOUND,"이미 탈퇴한 회원입니다."),
+  USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다.");
 
   private final HttpStatus httpStatus;
 

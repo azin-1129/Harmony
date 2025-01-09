@@ -2,6 +2,7 @@ package com.harmony.service;
 
 import com.harmony.dto.request.RegisterRequestDto;
 import com.harmony.entity.User;
+import com.harmony.exception.UserAlreadyWithdrawException;
 import com.harmony.global.response.code.ErrorCode;
 import com.harmony.global.response.exception.EntityAlreadyExistException;
 import com.harmony.global.response.exception.EntityNotFoundException;
@@ -66,16 +67,23 @@ public class UserService {
     user.updateProfileImage(newProfileImageName);
   }
 
+  // TODO: withdraw 값 기준으로 벌크 연산
   // 회원 탈퇴
   public void deleteUser(Long userId){
     Optional<User> userToWithDraw=userRepository.findById(userId);
+    log.info("userId 기반으로 조회한 user:"+userToWithDraw.toString());
 
-    if(userToWithDraw.isEmpty()){
+    if(!userToWithDraw.isPresent()){
       throw new EntityNotFoundException(
+          ErrorCode.USER_NOT_FOUND
+      );
+    }else if(userToWithDraw.get().getWithdraw()==true){
+      throw new UserAlreadyWithdrawException(
           ErrorCode.USER_ALREADY_WITHDRAW
       );
     }
 
-    userRepository.deleteById(userToWithDraw.get().getUserId());
+    userToWithDraw.get().updateWithDraw(true);
+//    userRepository.deleteById(userToWithDraw.get().getUserId());
   }
 }
