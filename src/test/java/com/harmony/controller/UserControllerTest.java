@@ -58,11 +58,12 @@ class UserControllerTest {
   @Test
   void registerUser() throws Exception {
     // given
-    Long userId=1L;
     RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
         .email("azin@naver.com")
         .userIdentifier("choco")
-        .password("1129")
+        .nickname("초코고양이")
+        .password("azin1129!")
+        .passwordConfirm("azin1129!")
         .role(Role.MEMBER)
         .build();
 
@@ -201,7 +202,7 @@ class UserControllerTest {
   // 예외 테스트
 
   // 빈 칸인 경우
-  @DisplayName("회원가입 실패-빈칸 테스트")
+  @DisplayName("회원가입 실패-기재오류-빈칸 테스트")
   @Test
   void registerUserFailedByBlank() throws Exception {
     // given
@@ -222,14 +223,119 @@ class UserControllerTest {
   }
 
   // 기재 형식이 잘못된 경우
-  @DisplayName("회원가입 실패-기재오류 테스트")
+  @DisplayName("회원가입 실패-기재오류-비밀번호 테스트")
   @Test
-  void registerUserFailedByInvalidArgument() throws Exception {
+  void registerUserFailedByInvalidPasswordArgument() throws Exception {
     // given
     RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
         .email("azin@naver.com")
-        .userIdentifier("choco") // 오류사항
+        .userIdentifier("choco")
+        .nickname("초코고양이")
         .password("1129") // 오류사항
+        .role(Role.MEMBER)
+        .build();
+
+    // when
+    ResultActions resultActions =
+        mockMvc.perform(MockMvcRequestBuilders
+            .post("/user/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerRequestDto)));
+
+    // then
+    resultActions
+        .andExpect(status().isBadRequest())
+        .andDo(print());
+  }
+
+  @DisplayName("회원가입 실패-기재오류-비밀번호 불일치 테스트")
+  @Test
+  void registerUserFailedByFailedPasswsordConfirm() throws Exception {
+    // given
+    RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
+        .email("azin@naver.com")
+        .userIdentifier("choco")
+        .nickname("초코고양이")
+        .password("azin1129!")
+        .passwordConfirm("azin112!") // 오류사항
+        .role(Role.MEMBER)
+        .build();
+
+    // when
+    ResultActions resultActions =
+        mockMvc.perform(MockMvcRequestBuilders
+            .post("/user/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerRequestDto)));
+
+    // then
+    resultActions
+        .andExpect(status().isBadRequest())
+        .andDo(print());
+  }
+
+  @DisplayName("회원가입 실패-기재오류-비밀번호 확인 미입력 테스트")
+  @Test
+  void registerUserFailedByBlankPasswsordConfirm() throws Exception {
+    // given
+    RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
+        .email("azin@naver.com")
+        .userIdentifier("choco")
+        .nickname("초코고양이")
+        .password("azin1129!")
+        .passwordConfirm("") // 오류사항
+        .role(Role.MEMBER)
+        .build();
+
+    // when
+    ResultActions resultActions =
+        mockMvc.perform(MockMvcRequestBuilders
+            .post("/user/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerRequestDto)));
+
+    // then
+    resultActions
+        .andExpect(status().isBadRequest())
+        .andDo(print());
+  }
+
+  @DisplayName("회원가입 실패-기재오류-식별자 테스트")
+  @Test
+  void registerUserFailedByInvalidIdentifierArgument() throws Exception {
+    // given
+    RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
+        .email("azin@naver.com")
+        .userIdentifier("CHOCO") // 오류사항
+        .nickname("초코고양이")
+        .password("azin1129!")
+        .passwordConfirm("azin1129!")
+        .role(Role.MEMBER)
+        .build();
+
+    // when
+    ResultActions resultActions =
+        mockMvc.perform(MockMvcRequestBuilders
+            .post("/user/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerRequestDto)));
+
+    // then
+    resultActions
+        .andExpect(status().isBadRequest())
+        .andDo(print());
+  }
+
+  @DisplayName("회원가입 실패-기재오류-닉네임 테스트")
+  @Test
+  void registerUserFailedByInvalidNicknameArgument() throws Exception {
+    // given
+    RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
+        .email("azin@naver.com")
+        .userIdentifier("choco")
+        .nickname("초") // 오류사항
+        .password("azin1129!")
+        .passwordConfirm("azin1129!")
         .role(Role.MEMBER)
         .build();
 
