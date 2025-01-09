@@ -2,15 +2,16 @@ package com.harmony.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.harmony.dto.request.RegisterRequestDto;
 import com.harmony.entity.Role;
 import com.harmony.entity.User;
+import com.harmony.global.response.exception.EntityAlreadyExistException;
+import com.harmony.global.response.exception.EntityNotFoundException;
 import com.harmony.repository.UserRepository;
-import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ class UserServiceTest {
     user= User.builder()
         .email("azin@naver.com")
         .userIdentifier("choco")
-        .password("1129")
+        .password("azin1129!")
         .profileImageName("orange_orange_cat.png")
         .nickname("초코고양이")
         .withdraw(false)
@@ -57,7 +58,9 @@ class UserServiceTest {
     RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
             .email("azin@naver.com")
             .userIdentifier("choco")
-            .password("1129")
+            .nickname("초코고양이")
+            .password("azin1129!")
+            .passwordConfirm("azin1129!")
             .role(Role.MEMBER)
             .build();
 
@@ -82,7 +85,7 @@ class UserServiceTest {
 
     // then
     assertThat(updatedUser).isNotNull();
-    assertEquals("1130", updatedUser.getPassword());
+    assertEquals(newPw, updatedUser.getPassword());
   }
 
   @DisplayName("닉네임 변경 테스트")
@@ -98,7 +101,7 @@ class UserServiceTest {
 
     // then
     assertThat(updatedUser).isNotNull();
-    assertEquals("치즈고양이", updatedUser.getNickname());
+    assertEquals(newNickname, updatedUser.getNickname());
   }
 
   @DisplayName("프로필 사진 변경 테스트")
@@ -121,13 +124,97 @@ class UserServiceTest {
   @Test
   public void deleteUser(){
     // given
+    Long userId=1L;
     userRepository.save(user);
+
+    // when
+
+    // then
+   assertThrows(EntityNotFoundException.class, () ->
+       userService.deleteUser(userId));
+  }
+
+  // 예외 테스트
+
+  // 이미 가입한 회원인 경우
+  @DisplayName("회원가입 실패-이미 가입한 회원-닉네임 중복 테스트")
+  @Test
+  void registerUserFailedByDuplicatedNickname(){
+    // given
+    userRepository.save(user);
+
+    RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
+        .email("azin@kakao.com")
+        .userIdentifier("cherry")
+        .nickname("초코고양이") // 오류사항
+        .password("azin1129!")
+        .passwordConfirm("azin1129!")
+        .role(Role.MEMBER)
+        .build();
+
+    // when
+
+    // then
+    assertThrows(EntityAlreadyExistException.class, ()
+    -> userService.registerUser(registerRequestDto));
+  }
+
+  @DisplayName("회원가입 실패-이미 가입한 회원-식별자 중복 테스트")
+  @Test
+  void registerUserFailedByDuplicatedIdentifier(){
+    // given
+    userRepository.save(user);
+
+    RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
+        .email("azin@kakao.com")
+        .userIdentifier("choco") // 오류사항
+        .nickname("치즈고양이")
+        .password("azin1129!")
+        .passwordConfirm("azin1129!")
+        .role(Role.MEMBER)
+        .build();
+
+    // when
+
+    // then
+    assertThrows(EntityAlreadyExistException.class, ()
+        -> userService.registerUser(registerRequestDto));
+  }
+
+  @DisplayName("회원가입 실패-이미 가입한 회원-이메일 중복 테스트")
+  @Test
+  void registerUserFailedByDuplicatedEmail(){
+    // given
+    userRepository.save(user);
+
+    RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
+        .email("azin@naver.com") // 오류사항
+        .userIdentifier("choco13")
+        .nickname("치즈고양이")
+        .password("azin1129!")
+        .passwordConfirm("azin1129!")
+        .role(Role.MEMBER)
+        .build();
+
+    // when
+
+    // then
+    assertThrows(EntityAlreadyExistException.class, ()
+        -> userService.registerUser(registerRequestDto));
+  }
+
+  // TODO: WithDraw로 판단해야 함
+  // 이미 탈퇴한 회원인 경우
+  @DisplayName("회원가입 실패-이미 탈퇴한 회원 테스트")
+  @Test
+  void registerUserFailedByAlreadyDeleted(){
+    // given
     Long userId=1L;
 
     // when
-    userService.deleteUser(userId);
+
     // then
-   Assertions.assertThrows(NoSuchElementException.class, () ->
-       userRepository.findById(userId).get());
+    assertThrows(EntityNotFoundException.class, ()
+        -> userService.deleteUser(userId));
   }
 }
