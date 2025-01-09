@@ -41,7 +41,7 @@ public class User extends BaseTime {
   @Column(name = "profile_image_name", nullable = false, length=255)
   private String profileImageName;
 
-  @Column(name = "nickname", nullable = false, length=20)
+  @Column(name = "nickname", nullable = false, length=10)
   private String nickname;
 
   @Column(name = "withdraw", nullable = false)
