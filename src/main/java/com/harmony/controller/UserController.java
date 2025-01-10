@@ -40,14 +40,6 @@ public class UserController {
   // TODO: userId 처리, Password 암호화
   @PostMapping("/register")
   @Operation(summary="회원가입", description="회원가입 API")
-  @Parameters({
-      @Parameter(name="email", description="이메일", example="azin1129@naver.com"),
-      @Parameter(name="userIdentifier", description="회원 식별자 영문 소문자 또는 숫자 4~20자리", example="choco"),
-      @Parameter(name="nickname", description="닉네임 한글 2~10자리", example="초코고양이"),
-      @Parameter(name="password", description="비밀번호 영어 대소문자+숫자+특수문자 8~20자", example="azin1129!"),
-      @Parameter(name="passwordConfirm", description="비밀번호 확인", example="azin1129!"),
-      @Parameter(name="role", description="권한", example="MEMBER"),
-  })
   @ApiResponses(value={
       @ApiResponse(responseCode="201", description="회원가입 성공"),
       @ApiResponse(responseCode="400", description="입력 양식이 잘못되었습니다.")
@@ -87,9 +79,9 @@ public class UserController {
   // 비번 업뎃
   @PostMapping("update/password")
   @Operation(summary="비밀번호 변경", description="비밀번호 변경 API")
-  @Parameters({
-      @Parameter(name = "newPassword", description = "새 비밀번호", example = "azin1129?"),
-      @Parameter(name = "newPasswordConfirm", description = "새 비밀번호 확인", example = "azin1129?")
+  @ApiResponses(value={
+      @ApiResponse(responseCode="200", description="비밀번호 변경 성공"),
+      @ApiResponse(responseCode="400", description="입력 양식이 잘못되었습니다.")
   })
   public ResponseEntity<Object> updateUserPassword(@RequestBody PasswordForm passwordForm){
     // 비밀번호 불일치
@@ -109,8 +101,9 @@ public class UserController {
   // 닉넴 업뎃
   @PostMapping("update/nickname")
   @Operation(summary="닉네임 변경", description="닉네임 변경 API")
-  @Parameters({
-      @Parameter(name = "newNickname", description = "닉네임", example = "치즈고양이")
+  @ApiResponses(value={
+      @ApiResponse(responseCode="200", description="닉네임 변경 성공"),
+      @ApiResponse(responseCode="400", description="입력 양식이 잘못되었습니다.")
   })
   public ResponseEntity<Object> updateUserNickname(@RequestBody NicknameForm nicknameForm){
     userService.updateUserNickname(givenUserId, nicknameForm.getNewNickname());
@@ -123,8 +116,9 @@ public class UserController {
   // 프사 업뎃
   @PostMapping("update/profile-image")
   @Operation(summary="프로필 사진 변경", description="프로필 사진 변경 API")
-  @Parameters({
-      @Parameter(name = "newProfileImage", description = "프로필 이미지")
+  @ApiResponses(value={
+      @ApiResponse(responseCode="200", description="프로필 사진 변경 성공"),
+      @ApiResponse(responseCode="400", description="입력 양식이 잘못되었습니다.")
   })
   public ResponseEntity<Object> updateUserProfileImageName(@RequestBody ProfileImageForm profileImageForm){
     userService.updateUserProfileImage(givenUserId, profileImageForm.getNewProfileImageName());
@@ -140,6 +134,10 @@ public class UserController {
   @Operation(summary="회원탈퇴", description="회원탈퇴 API")
   @Parameters({
       @Parameter(name = "userId", description = "회원ID", example = "1")
+  })
+  @ApiResponses(value={
+      @ApiResponse(responseCode="200", description="회원탈퇴 성공"),
+      @ApiResponse(responseCode="404", description="회원탈퇴 실패")
   })
   public ResponseEntity<Object> deleteUser(@PathVariable Long userId){ // Security에서 빼올 예정
     userService.deleteUser(userId);
