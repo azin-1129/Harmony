@@ -15,6 +15,8 @@ public enum ErrorCode implements ResponseCode {
   // READ
 
   // UPDATE
+  DUPLICATED_USER_PASSWORD(HttpStatus.BAD_REQUEST, "이미 사용하고 있는 비밀번호입니다."),
+  DUPLICATED_USER_NICKNAME(HttpStatus.BAD_REQUEST, "이미 사용하고 있는 닉네임입니다."),
 
   // DELETE
   USER_ALREADY_WITHDRAW(HttpStatus.NOT_FOUND,"이미 탈퇴한 회원입니다."),

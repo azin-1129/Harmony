@@ -2,6 +2,8 @@ package com.harmony.service;
 
 import com.harmony.dto.request.RegisterRequestDto;
 import com.harmony.entity.User;
+import com.harmony.exception.DuplicatedUserNicknameException;
+import com.harmony.exception.DuplicatedUserPasswordException;
 import com.harmony.exception.UserAlreadyWithdrawException;
 import com.harmony.global.response.code.ErrorCode;
 import com.harmony.global.response.exception.EntityAlreadyExistException;
@@ -52,12 +54,22 @@ public class UserService {
   // 비번 업뎃
   public void updateUserPassword(Long userId, String newPassword) {
     User user=userRepository.findById(userId).orElse(null);
+    if(user.getPassword().equals(newPassword)){
+      throw new DuplicatedUserPasswordException(
+          ErrorCode.DUPLICATED_USER_PASSWORD
+      );
+    }
     user.updatePassword(newPassword);
   }
 
   // 닉넴 업뎃
   public void updateUserNickname(Long userId, String newNickname) {
     User user=userRepository.findById(userId).orElse(null);
+    if(user.getNickname().equals(newNickname)){
+      throw new DuplicatedUserNicknameException(
+          ErrorCode.DUPLICATED_USER_NICKNAME
+      );
+    }
     user.updateNickname(newNickname);
   }
 
