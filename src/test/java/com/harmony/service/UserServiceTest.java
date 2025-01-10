@@ -10,8 +10,8 @@ import com.harmony.entity.User;
 import com.harmony.exception.DuplicatedUserNicknameException;
 import com.harmony.exception.DuplicatedUserPasswordException;
 import com.harmony.exception.UserAlreadyWithdrawException;
-import com.harmony.global.response.exception.EntityAlreadyExistException;
 import com.harmony.global.response.exception.EntityNotFoundException;
+import com.harmony.global.response.exception.InvalidArgumentException;
 import com.harmony.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
@@ -77,7 +77,6 @@ class UserServiceTest {
 
     // then
     User savedUser=userRepository.findById(exectionId).get();
-    log.info("두번째로 회원가입한 유저:"+savedUser.getUserId());
     assertEquals(exectionId, savedUser.getUserId());
   }
 
@@ -141,8 +140,6 @@ class UserServiceTest {
 
     // when
     userService.deleteUser(userId);
-    log.info("두번째 회원을 탈퇴했습니다.");
-
     User withDrawnUser=userRepository.findById(userId).orElse(null);
 
     // then
@@ -169,7 +166,7 @@ class UserServiceTest {
     // when
 
     // then
-    assertThrows(EntityAlreadyExistException.class, ()
+    assertThrows(InvalidArgumentException.class, ()
     -> userService.registerUser(registerRequestDto));
   }
 
@@ -190,7 +187,7 @@ class UserServiceTest {
     // when
 
     // then
-    assertThrows(EntityAlreadyExistException.class, ()
+    assertThrows(InvalidArgumentException.class, ()
         -> userService.registerUser(registerRequestDto));
   }
 
@@ -211,11 +208,10 @@ class UserServiceTest {
     // when
 
     // then
-    assertThrows(EntityAlreadyExistException.class, ()
+    assertThrows(InvalidArgumentException.class, ()
         -> userService.registerUser(registerRequestDto));
   }
 
-  // TODO: WithDraw로 판단해야 함
   // 이미 탈퇴한 회원인 경우
   @DisplayName("회원탈퇴 실패-이미 탈퇴한 회원 테스트")
   @Order(9)
