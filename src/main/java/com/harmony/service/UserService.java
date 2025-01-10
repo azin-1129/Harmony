@@ -28,6 +28,7 @@ public class UserService {
     log.info("user Service 진입");
     HashMap<String, String> validateResult=new HashMap<>();
 
+    // TODO: 이거 내용 따로 뺄 수 없나?
     if(!userRepository.findByEmail(registerRequestDto.getEmail()).isEmpty()) {
       validateResult.put("email", "이 이메일은 이미 등록되어 있습니다.");
     }
@@ -38,8 +39,6 @@ public class UserService {
     if(!userRepository.findByNickname(registerRequestDto.getNickname()).isEmpty()){
       validateResult.put("nickname", "이 닉네임은 이미 등록되어 있습니다.");
     }
-
-    log.info("validateResult={}", validateResult);
 
     if(validateResult.isEmpty()) {
       User user = User.builder()
@@ -54,7 +53,6 @@ public class UserService {
 
       userRepository.save(user);
     }else{
-      log.info("회원가입 중복 오류를 반환해야 합니다.");
       throw new InvalidArgumentException(
           ErrorCode.USER_ALREADY_REGISTERED,
           validateResult
@@ -94,7 +92,6 @@ public class UserService {
   // 회원 탈퇴
   public void deleteUser(Long userId){
     Optional<User> userToWithDraw=userRepository.findById(userId);
-    log.info("userId 기반으로 조회한 user:"+userToWithDraw.toString());
 
     if(!userToWithDraw.isPresent()){
       throw new EntityNotFoundException(
@@ -107,6 +104,5 @@ public class UserService {
     }
 
     userToWithDraw.get().updateWithDraw(true);
-//    userRepository.deleteById(userToWithDraw.get().getUserId());
   }
 }
