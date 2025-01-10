@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.harmony.dto.request.RegisterRequestDto;
 import com.harmony.entity.Role;
 import com.harmony.entity.User;
+import com.harmony.exception.DuplicatedUserNicknameException;
+import com.harmony.exception.DuplicatedUserPasswordException;
 import com.harmony.exception.UserAlreadyWithdrawException;
 import com.harmony.global.response.exception.EntityAlreadyExistException;
 import com.harmony.global.response.exception.EntityNotFoundException;
@@ -21,6 +23,10 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+/**
+ * 테스트 시나리오: 1번 유저는 미리 가입해 놓은 상태. 2번 유저만 가입 후 탈퇴
+ **/
 
 @Slf4j
 @SpringBootTest
@@ -83,7 +89,7 @@ class UserServiceTest {
     Long userId=1L;
 
     // when
-    String newPw="1130";
+    String newPw="azin1129?";
     userService.updateUserPassword(userId, newPw);
     User updatedUser=userRepository.findById(userId).orElse(null);
 
@@ -214,7 +220,7 @@ class UserServiceTest {
   @DisplayName("회원탈퇴 실패-이미 탈퇴한 회원 테스트")
   @Order(9)
   @Test
-  void registerUserFailedByAlreadyDeleted(){
+  void deleteUserFailedByAlreadyDeleted(){
     // given
     Long userId=2L;
 
@@ -228,7 +234,7 @@ class UserServiceTest {
   @DisplayName("회원탈퇴 실패-존재하지 않는 회원 테스트")
   @Order(10)
   @Test
-  void registerUserFailedByAlreadyWithdraw(){
+  void deleteUserFailedByAlreadyWithdraw(){
     // given
     Long userId=3L;
 
@@ -237,5 +243,38 @@ class UserServiceTest {
     // then
     assertThrows(EntityNotFoundException.class, ()
         -> userService.deleteUser(userId));
+  }
+
+  // Update 시 예외
+
+  // 동일한 비밀번호
+  @DisplayName("비밀번호 변경 실패-기존과 동일 테스트")
+  @Order(11)
+  @Test
+  void updateUserFailedByDuplicatedPassword(){
+    // given
+    Long userId=1L;
+    String newPassword="azin1129?";
+    // when
+
+    // then
+    assertThrows(DuplicatedUserPasswordException.class, ()
+        -> userService.updateUserPassword(userId, newPassword));
+  }
+
+  // 동일한 닉네임
+  @DisplayName("닉네임 변경 실패-기존과 동일 테스트")
+  @Order(12)
+  @Test
+  void updateUserFailedByDuplicatedNickname(){
+    // given
+    Long userId=1L;
+    String newNickname="치즈고양이";
+
+    // when
+
+    // then
+    assertThrows(DuplicatedUserNicknameException.class, ()
+        -> userService.updateUserNickname(userId, newNickname));
   }
 }
