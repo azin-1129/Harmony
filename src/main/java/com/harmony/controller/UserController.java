@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +46,7 @@ public class UserController {
       @ApiResponse(responseCode="400", description="입력 양식이 잘못되었습니다.")
   })
   public ResponseEntity<Object> registerUser(@RequestBody @Valid RegisterRequestDto registerRequestDto, BindingResult bindingResult){
+    log.info("user Controller 진입");
     // TODO: Role 설정 어떻게 하지?
 
     // 입력 형식이 올바르지 않다면 에러
@@ -61,8 +63,6 @@ public class UserController {
           validatorResult
       );
     }
-
-    // 비밀번호 불일치
     if(!registerRequestDto.getPassword().equals(registerRequestDto.getPasswordConfirm())){
       return ErrorResponse.createError(
           ErrorCode.INVALID_ARGUMENT
@@ -83,7 +83,22 @@ public class UserController {
       @ApiResponse(responseCode="200", description="비밀번호 변경 성공"),
       @ApiResponse(responseCode="400", description="입력 양식이 잘못되었습니다.")
   })
-  public ResponseEntity<Object> updateUserPassword(@RequestBody PasswordForm passwordForm){
+  public ResponseEntity<Object> updateUserPassword(@RequestBody @Valid PasswordForm passwordForm, BindingResult bindingResult){
+    // 입력 형식이 올바르지 않다면 에러
+    if(bindingResult.hasErrors()){
+      Map<String, String> validatorResult=new HashMap<>();
+
+      for(FieldError error:bindingResult.getFieldErrors()){
+        String validKeyName=String.format("valid_%s",error.getField());
+        validatorResult.put(validKeyName, error.getDefaultMessage());
+      }
+
+      return ErrorResponse.createError(
+          ErrorCode.INVALID_ARGUMENT,
+          validatorResult
+      );
+    }
+
     // 비밀번호 불일치
     if(!passwordForm.getNewPassword().equals(passwordForm.getNewPasswordConfirm())){
       return ErrorResponse.createError(
@@ -105,7 +120,22 @@ public class UserController {
       @ApiResponse(responseCode="200", description="닉네임 변경 성공"),
       @ApiResponse(responseCode="400", description="입력 양식이 잘못되었습니다.")
   })
-  public ResponseEntity<Object> updateUserNickname(@RequestBody NicknameForm nicknameForm){
+  public ResponseEntity<Object> updateUserNickname(@RequestBody @Valid NicknameForm nicknameForm, BindingResult bindingResult){
+    // 입력 형식이 올바르지 않다면 에러
+    if(bindingResult.hasErrors()){
+      Map<String, String> validatorResult=new HashMap<>();
+
+      for(FieldError error:bindingResult.getFieldErrors()){
+        String validKeyName=String.format("valid_%s",error.getField());
+        validatorResult.put(validKeyName, error.getDefaultMessage());
+      }
+
+      return ErrorResponse.createError(
+          ErrorCode.INVALID_ARGUMENT,
+          validatorResult
+      );
+    }
+
     userService.updateUserNickname(givenUserId, nicknameForm.getNewNickname());
 
     return SuccessResponse.createSuccess(
@@ -120,7 +150,7 @@ public class UserController {
       @ApiResponse(responseCode="200", description="프로필 사진 변경 성공"),
       @ApiResponse(responseCode="400", description="입력 양식이 잘못되었습니다.")
   })
-  public ResponseEntity<Object> updateUserProfileImageName(@RequestBody ProfileImageForm profileImageForm){
+  public ResponseEntity<Object> updateUserProfileImageName(@RequestBody @Valid ProfileImageForm profileImageForm){
     userService.updateUserProfileImage(givenUserId, profileImageForm.getNewProfileImageName());
 
     // TODO: S3에 이미지 저장
