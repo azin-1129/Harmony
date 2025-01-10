@@ -6,10 +6,11 @@ import com.harmony.exception.DuplicatedUserNicknameException;
 import com.harmony.exception.DuplicatedUserPasswordException;
 import com.harmony.exception.UserAlreadyWithdrawException;
 import com.harmony.global.response.code.ErrorCode;
-import com.harmony.global.response.exception.EntityAlreadyExistException;
 import com.harmony.global.response.exception.EntityNotFoundException;
+import com.harmony.global.response.exception.InvalidArgumentException;
 import com.harmony.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import java.util.HashMap;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,31 +25,41 @@ public class UserService {
 
   // TODO: 이메일, 식별자, 닉네임 중복 처리 이렇게 해도 되나?
   public void registerUser(RegisterRequestDto registerRequestDto) {
-    if(!userRepository.findByEmail(registerRequestDto.getEmail()).isEmpty()){
-      throw new EntityAlreadyExistException(
-          ErrorCode.USER_ALREADY_REGISTERED
-      );
-    } else if(!userRepository.findByUserIdentifier(registerRequestDto.getUserIdentifier()).isEmpty()){
-      throw new EntityAlreadyExistException(
-          ErrorCode.USER_ALREADY_REGISTERED
-      );
-    } else if(!userRepository.findByNickname(registerRequestDto.getNickname()).isEmpty()){
-      throw new EntityAlreadyExistException(
-          ErrorCode.USER_ALREADY_REGISTERED
-      );
+    log.info("user Service 진입");
+    HashMap<String, String> validateResult=new HashMap<>();
+
+    if(!userRepository.findByEmail(registerRequestDto.getEmail()).isEmpty()) {
+      validateResult.put("email", "이 이메일은 이미 등록되어 있습니다.");
     }
 
-    User user= User.builder()
-      .email(registerRequestDto.getEmail())
-      .userIdentifier(registerRequestDto.getUserIdentifier())
-      .password(registerRequestDto.getPassword())
-      .profileImageName("")
-      .nickname("닉변요망")
-      .withdraw(false)
-      .role(registerRequestDto.getRole())
-      .build();
+    if(!userRepository.findByUserIdentifier(registerRequestDto.getUserIdentifier()).isEmpty()){
+      validateResult.put("userIdentifer", "이 식별자는 이미 등록되어 있습니다.");
+    }
+    if(!userRepository.findByNickname(registerRequestDto.getNickname()).isEmpty()){
+      validateResult.put("nickname", "이 닉네임은 이미 등록되어 있습니다.");
+    }
 
-    userRepository.save(user);
+    log.info("validateResult={}", validateResult);
+
+    if(validateResult.isEmpty()) {
+      User user = User.builder()
+          .email(registerRequestDto.getEmail())
+          .userIdentifier(registerRequestDto.getUserIdentifier())
+          .password(registerRequestDto.getPassword())
+          .profileImageName("")
+          .nickname(registerRequestDto.getNickname())
+          .withdraw(false)
+          .role(registerRequestDto.getRole())
+          .build();
+
+      userRepository.save(user);
+    }else{
+      log.info("회원가입 중복 오류를 반환해야 합니다.");
+      throw new InvalidArgumentException(
+          ErrorCode.USER_ALREADY_REGISTERED,
+          validateResult
+      );
+    }
   }
 
   // 비번 업뎃
