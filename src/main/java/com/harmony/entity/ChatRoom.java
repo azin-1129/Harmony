@@ -42,4 +42,9 @@ public class ChatRoom extends BaseTime {
   @Enumerated(EnumType.STRING)
   @Column(name="chatroom_type", nullable = false)
   private ChatRoomType chatRoomType;
+
+  // update
+  public void updateChatRoomName(String newChatRoomName) {
+    this.chatRoomName = newChatRoomName;
+  }
 }
