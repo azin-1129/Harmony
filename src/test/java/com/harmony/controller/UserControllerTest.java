@@ -17,7 +17,6 @@ import com.harmony.dto.request.RegisterRequestDto;
 import com.harmony.entity.Role;
 import com.harmony.service.UserService;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -64,7 +63,7 @@ class UserControllerTest {
         .build();
 
     // stub
-    doNothing().when(userService).registerUser(registerRequestDto);
+    doNothing().when(userService).registerUser(any(RegisterRequestDto.class));
 
     // when
     ResultActions resultActions=
@@ -88,8 +87,8 @@ class UserControllerTest {
     // given
     Long updateUserId=1L; // @CurrentUser로 빼올 예정
     PasswordForm passwordForm=PasswordForm.builder() // @Valid 사용 예정
-      .newPassword("1130")
-      .newPasswordConfirm("1130")
+      .newPassword("azin1129?")
+      .newPasswordConfirm("azin1129?")
       .build();
 
     String newPw=passwordForm.getNewPassword();
