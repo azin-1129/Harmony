@@ -45,10 +45,6 @@ class UserControllerTest {
 
   @BeforeAll
   void setUp(){
-  }
-
-  @BeforeEach
-  public void init(){
     objectMapper=new ObjectMapper();
     objectMapper.registerModule(new JavaTimeModule());
   }
