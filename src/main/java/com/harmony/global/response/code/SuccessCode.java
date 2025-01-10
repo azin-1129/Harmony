@@ -19,7 +19,20 @@ public enum SuccessCode implements ResponseCode {
   USER_UPDATE_PROFILE_IMAGE_SUCCESS(HttpStatus.OK, "프로필 사진을 변경했습니다."),
 
   // DELETE
-  USER_WITHDRAW_SUCCESS(HttpStatus.OK, "탈퇴 완료되었습니다.");
+  USER_WITHDRAW_SUCCESS(HttpStatus.OK, "탈퇴 완료되었습니다."),
+
+  // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡChatRoomㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+  // CREATE
+  PERSONAL_CHATROOM_CREATE_SUCCESS(HttpStatus.CREATED, "개인 채팅방 생성에 성공했습니다."),
+  GROUP_CHATROOM_CREATE_SUCCESS(HttpStatus.CREATED, "단체 채팅방 생성에 성공했습니다."),
+
+  // READ
+
+  // UPDATE
+  CHATROOM_NAME_UPDATE_SUCCESS(HttpStatus.OK, "채팅방 이름을 변경했습니다."),
+
+  // DELETE
+  CHATROOM_DELETE_SUCCESS(HttpStatus.OK, "채팅방 삭제 완료되었습니다.");
 
   private final HttpStatus httpStatus;
 
