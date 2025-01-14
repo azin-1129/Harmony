@@ -1,6 +1,7 @@
 package com.harmony.dto.request;
 
-import com.harmony.entity.ChatRoomType;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,8 +15,5 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PersonalChatRoomCreateRequestDto {
-  private String chatRoomName;
-  private Integer chatRoomCount;
-  private Integer chatRoomCountMax;
-  private ChatRoomType chatRoomType;
+  private String partnerIdentifier;
 }
