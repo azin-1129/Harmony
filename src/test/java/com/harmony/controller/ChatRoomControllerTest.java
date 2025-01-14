@@ -55,10 +55,7 @@ class ChatRoomControllerTest {
   void createPersonalChatRoom() throws Exception{
     // given
     PersonalChatRoomCreateRequestDto personalChatRoomCreateRequestDto=PersonalChatRoomCreateRequestDto.builder()
-        .chatRoomName("개인 채팅방") // TODO: 서로 다른 유저 이름이 보이려면?
-        .chatRoomCount(0)
-        .chatRoomCountMax(2)
-        .chatRoomType(ChatRoomType.PERSONAL_CHATROOM)
+        .partnerIdentifier("cheese")
         .build();
 
     // stub
@@ -86,9 +83,7 @@ class ChatRoomControllerTest {
     // given
     GroupChatRoomCreateRequestDto groupChatRoomCreateRequestDto=GroupChatRoomCreateRequestDto.builder()
         .chatRoomName("심심한 사람만")
-        .chatRoomCount(0)
         .chatRoomCountMax(10)
-        .chatRoomType(ChatRoomType.GROUP_CHATROOM)
         .build();
 
     // stub
@@ -168,5 +163,33 @@ class ChatRoomControllerTest {
         .andDo(print());
 
     verify(chatRoomService, times(1)).deleteChatRoom(any(Long.class));
+  }
+
+  // 예외테스트
+
+  // 단체 채팅방 생성 양식 기재 오류
+  @DisplayName("단체 채팅방 생성 실패-기재 오류 테스트")
+  @Test
+  void createGroupChatRoomFailedByInvalidArgument() throws Exception {
+    // given
+    GroupChatRoomCreateRequestDto groupChatRoomCreateRequestDto=GroupChatRoomCreateRequestDto.builder()
+        .chatRoomName("빅보!") // 오류사항
+        .chatRoomCountMax(1) // 오류사항
+        .build();
+
+    // stub
+    doNothing().when(chatRoomService).createGroupChatRoom(any(GroupChatRoomCreateRequestDto.class));
+
+    // when
+    ResultActions resultActions=
+        mockMvc.perform(MockMvcRequestBuilders
+            .post("/chatroom/create/group")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(groupChatRoomCreateRequestDto)));
+
+    // then
+    resultActions
+        .andExpect(status().isBadRequest())
+        .andDo(print());
   }
 }
