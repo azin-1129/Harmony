@@ -1,8 +1,7 @@
 package com.harmony.service;
 
 import com.harmony.dto.form.ChatRoomNameForm;
-import com.harmony.dto.request.GroupChatRoomCreateRequestDto;
-import com.harmony.dto.request.PersonalChatRoomCreateRequestDto;
+import com.harmony.dto.request.CreateAndParticipateGroupChatRoomRequestDto;
 import com.harmony.entity.ChatRoom;
 import com.harmony.entity.ChatRoomType;
 import com.harmony.global.response.code.ErrorCode;
@@ -22,9 +21,9 @@ public class ChatRoomService {
   private final ChatRoomRepository chatRoomRepository;
 
   // TODO: 하드 코딩을 환경변수로 따로 떼기
-  // TODO: 참가 처리
+  // TODO: 중복 처리는 Participants 조인해서 확인해야할 듯
   // 개인챗방 생성
-  public void createPersonalChatRoom(PersonalChatRoomCreateRequestDto personalChatRoomCreateRequestDto) {
+  public ChatRoom createPersonalChatRoom() {
     ChatRoom chatRoom = ChatRoom.builder()
         .chatRoomName("")
         .chatRoomCount(2)
@@ -33,11 +32,14 @@ public class ChatRoomService {
         .build();
 
     chatRoomRepository.save(chatRoom);
-    log.info("생성중인 개인 채팅방 id:"+chatRoom.getChatRoomId());
+
+    return chatRoom;
   }
 
   // 단체챗방 생성
-  public void createGroupChatRoom(GroupChatRoomCreateRequestDto groupChatRoomCreateRequestDto) {
+  // TODO: 만든 사람 참가 시켜야됨
+  public ChatRoom createGroupChatRoom(
+      CreateAndParticipateGroupChatRoomRequestDto groupChatRoomCreateRequestDto) {
     ChatRoom chatRoom = ChatRoom.builder()
         .chatRoomName(groupChatRoomCreateRequestDto.getChatRoomName())
         .chatRoomCount(1)
@@ -46,7 +48,12 @@ public class ChatRoomService {
         .build();
 
     chatRoomRepository.save(chatRoom);
-    log.info("생성중인 단체 채팅방 id:"+chatRoom.getChatRoomId());
+
+    return chatRoom;
+  }
+
+  public ChatRoom getChatRoomById(Long chatRoomId) {
+    return chatRoomRepository.findById(chatRoomId).get();
   }
 
   // 채팅방 이름 변경

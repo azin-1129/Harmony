@@ -60,6 +60,13 @@ public class UserService {
     }
   }
 
+  public User getUserById(Long userId){
+    return userRepository.findById(userId).get();
+  }
+
+  public User getUserByUserIdentifier(String userIdentifier) {
+    return userRepository.findByUserIdentifier(userIdentifier).get();
+  }
   // 비번 업뎃
   public void updateUserPassword(Long userId, String newPassword) {
     User user=userRepository.findById(userId).orElse(null);

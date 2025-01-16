@@ -47,4 +47,12 @@ public class ChatRoom extends BaseTime {
   public void updateChatRoomName(String newChatRoomName) {
     this.chatRoomName = newChatRoomName;
   }
+
+  public void updateChatRoomCountPositive() {
+    this.chatRoomCount+=1;
+  }
+
+  public void updateChatRoomCountNegative() {
+    this.chatRoomCount-=1;
+  }
 }
