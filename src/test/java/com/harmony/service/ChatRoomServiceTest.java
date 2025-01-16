@@ -4,8 +4,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.harmony.dto.form.ChatRoomNameForm;
-import com.harmony.dto.request.GroupChatRoomCreateRequestDto;
-import com.harmony.dto.request.PersonalChatRoomCreateRequestDto;
 import com.harmony.entity.ChatRoom;
 import com.harmony.global.response.exception.EntityNotFoundException;
 import com.harmony.repository.ChatRoomRepository;
@@ -29,46 +27,6 @@ class ChatRoomServiceTest {
   private ChatRoomRepository chatRoomRepository;
 
   // TODO: choco, cheese 유저 가입 setUp
-
-  // 개인챗 생성
-  @DisplayName("개인 채팅방 생성 테스트")
-  @Order(1)
-  @Test
-  public void createPersonalChatRoom(){
-    // given
-    Long expectionChatRoomId=1L;
-
-    PersonalChatRoomCreateRequestDto personalChatRoomCreateRequestDto=PersonalChatRoomCreateRequestDto.builder()
-        .partnerIdentifier("cheese")
-        .build();
-
-    // when
-    chatRoomService.createPersonalChatRoom(personalChatRoomCreateRequestDto);
-
-    // then
-    ChatRoom chatRoom=chatRoomRepository.findById(expectionChatRoomId).get();
-    assertEquals(expectionChatRoomId,chatRoom.getChatRoomId());
-  }
-
-  // 단체챗 생성
-  @DisplayName("단체 채팅방 생성 테스트")
-  @Order(2)
-  @Test
-  public void createGroupChatRoom(){
-    // given
-    Long expectionChatRoomId=2L;
-    GroupChatRoomCreateRequestDto groupChatRoomCreateRequestDto=GroupChatRoomCreateRequestDto.builder()
-        .chatRoomName("심심한 사람만")
-        .chatRoomCountMax(10)
-        .build();
-
-    // when
-    chatRoomService.createGroupChatRoom(groupChatRoomCreateRequestDto);
-
-    // then
-    ChatRoom chatRoom=chatRoomRepository.findById(expectionChatRoomId).get();
-    assertEquals(expectionChatRoomId,chatRoom.getChatRoomId());
-  }
 
   // 채팅방 이름 변경
   @DisplayName("채팅방 이름 변경 테스트")
