@@ -18,7 +18,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GroupChatRoomCreateRequestDto {
+public class CreateAndParticipateGroupChatRoomRequestDto {
   @NotBlank(message="채팅방 이름을 입력하세요.")
   @Pattern(regexp = "^[가-힣a-zA-Z0-9\\s]{1,30}$", message = "채팅방 이름은 영문 대소문자,한글, 숫자, 공백 1~30자리여야 합니다.")
   @Schema(description="영문 대소문자,한글, 숫자, 공백 1~30자리 채팅방 이름", defaultValue="마라탕 드실 분")
