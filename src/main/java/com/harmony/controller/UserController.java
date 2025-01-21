@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -144,6 +143,8 @@ public class UserController {
   }
 
   // 프사 업뎃
+  // TODO: 지원하지 않는 이미지 형식?
+  // TODO: 이미지 @Valid도 있나..? Dto에는 없음
   @PostMapping("update/profile-image")
   @Operation(summary="프로필 사진 변경", description="프로필 사진 변경 API")
   @ApiResponses(value={
@@ -160,17 +161,14 @@ public class UserController {
   }
 
   // 탈퇴
-  @DeleteMapping("/{userId}")
+  @DeleteMapping
   @Operation(summary="회원탈퇴", description="회원탈퇴 API")
-  @Parameters({
-      @Parameter(name = "userId", description = "회원ID", example = "1")
-  })
   @ApiResponses(value={
       @ApiResponse(responseCode="200", description="회원탈퇴 성공"),
       @ApiResponse(responseCode="404", description="회원탈퇴 실패")
   })
-  public ResponseEntity<Object> deleteUser(@PathVariable Long userId){ // Security에서 빼올 예정
-    userService.deleteUser(userId);
+  public ResponseEntity<Object> deleteUser(){ // Security에서 빼올 예정
+    userService.deleteUser(givenUserId);
 
     return SuccessResponse.createSuccess(
         SuccessCode.USER_WITHDRAW_SUCCESS
