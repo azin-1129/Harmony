@@ -24,13 +24,16 @@ public enum ErrorCode implements ResponseCode {
 
   // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡChatRoomㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
   // CREATE
-
+  CHATROOM_FULL(HttpStatus.BAD_REQUEST, "대화상대가 많아 참여할 수 없습니다. 잠시 후 다시 시도해 주세요."),
   // READ
 
   // UPDATE
 
   // DELETE
-  CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 채팅방입니다.");
+  CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 채팅방입니다."),
+
+  // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡParticipantㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+  PARTICIPANT_ALREADY_LEFT(HttpStatus.BAD_REQUEST, "이미 퇴장한 참가자입니다.");
 
   private final HttpStatus httpStatus;
 

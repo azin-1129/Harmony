@@ -52,8 +52,8 @@ public class ChatRoomService {
     return chatRoom;
   }
 
-  public ChatRoom getChatRoomById(Long chatRoomId) {
-    return chatRoomRepository.findById(chatRoomId).get();
+  public Optional<ChatRoom> getChatRoomById(Long chatRoomId) {
+    return chatRoomRepository.findById(chatRoomId);
   }
 
   // 채팅방 이름 변경

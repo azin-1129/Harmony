@@ -1,5 +1,6 @@
-package com.harmony.dto.request;
+package com.harmony.dto.response;
 
+import com.harmony.entity.ChatRoomType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +13,10 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LeaveChatRoomRequestDto {
+public class SelectParticipatedChatRoomsResponseDto {
   private Long chatRoomId;
+  private String chatRoomName;
+  private Integer chatRoomCount;
+  private Integer chatRoomCountMax;
+  private ChatRoomType chatRoomType;
 }

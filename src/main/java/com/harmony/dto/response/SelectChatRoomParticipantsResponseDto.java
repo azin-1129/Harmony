@@ -1,4 +1,4 @@
-package com.harmony.dto.request;
+package com.harmony.dto.response;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,6 +12,9 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LeaveChatRoomRequestDto {
-  private Long chatRoomId;
+public class SelectChatRoomParticipantsResponseDto {
+  private String userIdentifier;
+  private String profileImageName;
+  private String nickname;
+
 }

@@ -12,6 +12,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LeaveChatRoomRequestDto {
+public class LeaveChatRoomForceRequestDto {
   private Long chatRoomId;
+  private String userIdentifier;
 }
