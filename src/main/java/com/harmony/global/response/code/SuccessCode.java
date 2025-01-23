@@ -32,7 +32,21 @@ public enum SuccessCode implements ResponseCode {
   CHATROOM_NAME_UPDATE_SUCCESS(HttpStatus.OK, "채팅방 이름을 변경했습니다."),
 
   // DELETE
-  CHATROOM_DELETE_SUCCESS(HttpStatus.OK, "채팅방 삭제 완료되었습니다.");
+  CHATROOM_DELETE_SUCCESS(HttpStatus.OK, "채팅방 삭제 완료되었습니다."),
+
+  // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡParticipateㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+  // CREATE
+  PARTICIPATE_GROUP_CHATROOM_SUCCESS(HttpStatus.OK, "단체 채팅방 참가에 성공했습니다."),
+
+  // READ
+  PARTICIPANT_READ_SUCCESS(HttpStatus.OK, "채팅방 참가자 조회에 성공했습니다."),
+  PARTICIPATED_CHATROOM_READ_SUCCESS(HttpStatus.OK, "참가한 채팅방 목록 조회에 성공했습니다."),
+
+  // DELETE
+  LEAVE_CHATROOM_SUCCESS(HttpStatus.OK, "채팅방 퇴장에 성공했습니다."),
+  LEAVE_CHATROOM_FORCE_SUCCESS(HttpStatus.OK, "채팅방 참가자를 강퇴했습니다.");
+
+  // UPDATE
 
   private final HttpStatus httpStatus;
 
