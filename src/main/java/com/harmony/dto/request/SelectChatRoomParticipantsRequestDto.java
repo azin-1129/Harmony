@@ -1,5 +1,6 @@
 package com.harmony.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,5 +14,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SelectChatRoomParticipantsRequestDto {
+  @Schema(description = "참가자 정보를 조회할 채팅방 ID", defaultValue="2")
   private Long chatRoomId;
 }
