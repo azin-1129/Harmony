@@ -7,9 +7,10 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode implements ResponseCode {
+  INVALID_ARGUMENT(HttpStatus.BAD_REQUEST, "양식이 잘못되었습니다."),
+
   // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡUserㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
   // CREATE
-  INVALID_ARGUMENT(HttpStatus.BAD_REQUEST, "양식이 잘못되었습니다."),
   USER_ALREADY_REGISTERED(HttpStatus.BAD_REQUEST, "이미 가입한 회원입니다."),
 
   // READ
