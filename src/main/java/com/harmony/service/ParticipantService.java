@@ -146,9 +146,6 @@ public class ParticipantService {
     }
 
     // 그룹 채팅방 인원이 꽉 차서 입장할 수 없음
-    System.out.println(groupChatRoom.getChatRoomCount());
-    System.out.println(groupChatRoom.getChatRoomCountMax());
-
     if(groupChatRoom.getChatRoomCount().equals(groupChatRoom.getChatRoomCountMax())){
       throw new GroupChatRoomFullException(
           ErrorCode.CHATROOM_FULL
