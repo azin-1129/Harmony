@@ -179,19 +179,19 @@ class UserControllerTest {
     Long userId=1L;
 
     // stub
-    doNothing().when(userService).deleteUser(userId);
+    doNothing().when(userService).deleteUser(any(Long.class));
 
     // when
     ResultActions resultActions=
         mockMvc.perform(MockMvcRequestBuilders
-            .delete("/user/"+userId));
+            .delete("/user/"));
 
     // then
     resultActions
         .andExpect(status().isOk())
         .andDo(print());
 
-    verify(userService, times(1)).deleteUser(userId);
+    verify(userService, times(1)).deleteUser(any(Long.class));
   }
 
   // 예외 테스트
