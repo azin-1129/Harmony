@@ -21,25 +21,22 @@ import lombok.ToString;
 @Getter
 @Builder
 @Entity
-@Table(name = "friends")
+@Table(name = "friendships")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Friend {
+public class Friendship {
   @Id
   @GeneratedValue(strategy= GenerationType.IDENTITY)
-  @Column(name="friend_id", nullable = false)
-  private Long friendId;
+  @Column(name="friendship_id", nullable = false)
+  private Long friendshipId;
 
   @ManyToOne
-  @JoinColumn(name="from_user_id")
-  private User fromUser;
+  @JoinColumn(name="friend_id")
+  private User friend;
 
   @ManyToOne
-  @JoinColumn(name="to_user_id")
-  private User toUser;
-
-  @Column(name="is_friend", nullable=false)
-  Boolean isFriend;
+  @JoinColumn(name="user_id")
+  private User user;
 
   @Enumerated(EnumType.STRING)
   @Column(name="friend_type", nullable = false)
