@@ -8,7 +8,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -50,6 +53,15 @@ public class User extends BaseTime {
   @Enumerated(EnumType.STRING)
   @Column(name="role", nullable = false)
   private Role role;
+
+  @OneToMany(mappedBy = "user")
+  private Set<Friendship> friendships = new HashSet<>();
+
+  @OneToMany(mappedBy = "friendshipRequestSender")
+  private Set<FriendshipRequest> sentFriendshipRequests = new HashSet<>();
+
+  @OneToMany(mappedBy = "friendshipRequestReceiver")
+  private Set<FriendshipRequest> receivedFriendshipRequests = new HashSet<>();
 
   // update
   public void updatePassword(String newPassword) {
