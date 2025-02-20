@@ -1,6 +1,6 @@
 package com.harmony.service;
 
-import com.harmony.dto.request.CreateToFriendshipRequestDto;
+import com.harmony.dto.request.CreateFriendshipRequestDto;
 import com.harmony.dto.response.ReceivedFriendshipRequestResponseDto;
 import com.harmony.dto.response.SentFriendshipRequestResponseDto;
 import com.harmony.entity.FriendType;
@@ -30,24 +30,25 @@ public class FriendshipRequestService {
   private final FriendshipRepository friendshipRepository;
 
   // TODO: 친구 삭제한 이력이 있다면 그때는..? PENDING인 애들만 골라야겠지.
-  public void createFriendshipRequest(Long fromUserId, CreateToFriendshipRequestDto createToFriendshipRequestDto){
+  public void createFriendshipRequest(Long fromUserId, CreateFriendshipRequestDto createToFriendshipRequestDto){
     // from user의 identifier 뽑아내기
     // to user의 identifier?
-    String toUserIdentifier=createToFriendshipRequestDto.getToUserIdentifier();
+    String receiverIdentifier=createToFriendshipRequestDto.getReceiverIdentifier();
 
-    User fromUser=userService.getUserById(fromUserId);
-    User toUser=userService.getUserByUserIdentifier(toUserIdentifier);
+    User sender =userService.getUserById(fromUserId);
+    User receiver =userService.getUserByUserIdentifier(receiverIdentifier);
     System.out.println("유저 정보를 불러 왔습니다.");
+
     // 양쪽 요청 저장하기
     FriendshipRequest tofriendshipRequest= FriendshipRequest.builder()
-        .friendshipRequestSender(fromUser)
-        .friendshipRequestReceiver(toUser)
+        .friendshipRequestSender(sender)
+        .friendshipRequestReceiver(receiver)
         .friendshipRequestStatus(FriendshipRequestStatus.PENDING)
         .build();
 
     FriendshipRequest fromFriendshipRequest= FriendshipRequest.builder()
-        .friendshipRequestSender(toUser)
-        .friendshipRequestReceiver(fromUser)
+        .friendshipRequestSender(receiver)
+        .friendshipRequestReceiver(sender)
         .friendshipRequestStatus(FriendshipRequestStatus.PENDING)
         .build();
 
@@ -58,8 +59,8 @@ public class FriendshipRequestService {
 
     System.out.println("양쪽 요청 엔티티의 id를 생성했습니다.");
     // 친구 요청 상황 저장
-    tofriendshipRequest.setFriendshipRequestInfo(fromUser, toUser);
-    fromFriendshipRequest.setFriendshipRequestInfo(toUser, fromUser);
+    tofriendshipRequest.setFriendshipRequestInfo(sender, receiver);
+    fromFriendshipRequest.setFriendshipRequestInfo(receiver, sender);
     System.out.println("친구 요청 상황을 저장했습니다.");
   }
 
@@ -114,18 +115,20 @@ public class FriendshipRequestService {
     return receivedFriendshipRequests;
   }
 
-  public void acceptFriendshipRequest(Long toUserId, String fromUserIdentifier){
-    User fromUser=userService.getUserByUserIdentifier(fromUserIdentifier);
-    User toUser=userService.getUserById(toUserId); // 요청을 받은 유저
+  public void acceptFriendshipRequest(Long receiverId, String senderIdentifier){
+    User sender =userService.getUserByUserIdentifier(senderIdentifier);
+    User receiver =userService.getUserById(receiverId); // 요청을 받은 유저
 
     System.out.println("유저 정보를 불러왔습니다.");
 
-    System.out.println("기존 요청:"+toUser.getReceivedFriendshipRequests());
-    System.out.println("기존 요청:"+fromUser.getSentFriendshipRequests());
+    System.out.println("기존 요청:"+ receiver.getReceivedFriendshipRequests());
+    System.out.println("기존 요청:"+ sender.getSentFriendshipRequests());
 
     // 진행중인 요청의 상태를 ACCEPTED로 변경
-    FriendshipRequest toFriendshipRequest=friendshipRequestRepository.findFriendshipRequest(toUserId, fromUser.getUserId(), FriendshipRequestStatus.PENDING);
-    FriendshipRequest fromFriendshipRequest=friendshipRequestRepository.findFriendshipRequest(fromUser.getUserId(), toUserId, FriendshipRequestStatus.PENDING);
+    FriendshipRequest toFriendshipRequest=friendshipRequestRepository.findFriendshipRequest(
+        receiverId, sender.getUserId(), FriendshipRequestStatus.PENDING);
+    FriendshipRequest fromFriendshipRequest=friendshipRequestRepository.findFriendshipRequest(
+        sender.getUserId(), receiverId, FriendshipRequestStatus.PENDING);
 
     System.out.println("요청 정보를 불러 왔습니다.");
     if(toFriendshipRequest==null){
@@ -141,14 +144,14 @@ public class FriendshipRequestService {
 
     // friend에 Insert
     Friendship friendshipTo=Friendship.builder()
-        .user(toUser)
-        .friend(fromUser)
+        .user(receiver)
+        .friend(sender)
         .friendType(FriendType.FRIEND)
         .build();
 
     Friendship friendshipFrom=Friendship.builder()
-        .user(fromUser)
-        .friend(toUser)
+        .user(sender)
+        .friend(receiver)
         .friendType(FriendType.FRIEND)
         .build();
 
@@ -159,8 +162,8 @@ public class FriendshipRequestService {
 
     System.out.println("친구 엔티티의 id를 생성했습니다.");
 
-    friendshipTo.setUsers(toUser, fromUser);
-    friendshipFrom.setUsers(fromUser, toUser);
+    friendshipTo.setUsers(receiver, sender);
+    friendshipFrom.setUsers(sender, receiver);
 
     System.out.println("친구 엔티티를 추가했습니다.");
 
@@ -168,16 +171,25 @@ public class FriendshipRequestService {
     System.out.println("친구가 됐어용."+friendshipFrom);
   }
 
-  public void rejectFriendshipRequest(Long toUserId, String fromUserIdentifier){
-    User fromUser=userService.getUserByUserIdentifier(fromUserIdentifier);
-    User toUser=userService.getUserById(toUserId); // 요청을 받은 유저
+  public void rejectFriendshipRequest(Long receiverId, String senderIdentifier){
+    User sender =userService.getUserByUserIdentifier(senderIdentifier);
+    User receiver =userService.getUserById(receiverId); // 요청을 받은 유저
 
-    System.out.println("기존 요청:"+toUser.getReceivedFriendshipRequests());
-    System.out.println("기존 요청:"+fromUser.getSentFriendshipRequests());
+    System.out.println("기존 요청:"+ receiver.getReceivedFriendshipRequests());
+    System.out.println("기존 요청:"+ sender.getSentFriendshipRequests());
 
     // 진행중인 요청의 상태를 REJECTED로 변경
-    FriendshipRequest toFriendshipRequest=friendshipRequestRepository.findFriendshipRequest(toUserId, fromUser.getUserId(), FriendshipRequestStatus.PENDING);
-    FriendshipRequest fromFriendshipRequest=friendshipRequestRepository.findFriendshipRequest(fromUser.getUserId(), toUserId, FriendshipRequestStatus.PENDING);
+    FriendshipRequest toFriendshipRequest=friendshipRequestRepository.findFriendshipRequest(
+        receiverId, sender.getUserId(), FriendshipRequestStatus.PENDING);
+    FriendshipRequest fromFriendshipRequest=friendshipRequestRepository.findFriendshipRequest(
+        sender.getUserId(),
+        receiverId, FriendshipRequestStatus.PENDING);
+
+    if(toFriendshipRequest==null){
+      throw new AlreadyCanceledFriendshipRequestException(
+          ErrorCode.FRIENDSHIP_REQUEST_ALREADY_CANCELED
+      );
+    }
 
     toFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.REJECTED);
     fromFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.REJECTED);
@@ -185,16 +197,19 @@ public class FriendshipRequestService {
     System.out.println("친구 요청을 거절했습니다.");
   }
 
-  public void cancelFriendshipRequest(Long toUserId, String fromUserIdentifier){
-    User fromUser=userService.getUserByUserIdentifier(fromUserIdentifier);
-    User toUser=userService.getUserById(toUserId); // 요청을 받은 유저
+  public void cancelFriendshipRequest(Long receiverId, String senderIdentifier){
+    User sender =userService.getUserByUserIdentifier(senderIdentifier);
+    User receiver =userService.getUserById(receiverId); // 요청을 받은 유저
 
-    System.out.println("기존 요청:"+toUser.getReceivedFriendshipRequests());
-    System.out.println("기존 요청:"+fromUser.getSentFriendshipRequests());
+    System.out.println("기존 요청:"+ receiver.getReceivedFriendshipRequests());
+    System.out.println("기존 요청:"+ sender.getSentFriendshipRequests());
 
     // 진행중인 요청의 상태를 CANCELED로 변경
-    FriendshipRequest toFriendshipRequest=friendshipRequestRepository.findFriendshipRequest(toUserId, fromUser.getUserId(), FriendshipRequestStatus.PENDING);
-    FriendshipRequest fromFriendshipRequest=friendshipRequestRepository.findFriendshipRequest(fromUser.getUserId(), toUserId, FriendshipRequestStatus.PENDING);
+    FriendshipRequest toFriendshipRequest=friendshipRequestRepository.findFriendshipRequest(
+        receiverId, sender.getUserId(), FriendshipRequestStatus.PENDING);
+    FriendshipRequest fromFriendshipRequest=friendshipRequestRepository.findFriendshipRequest(
+        sender.getUserId(),
+        receiverId, FriendshipRequestStatus.PENDING);
 
     toFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.CANCELED);
     fromFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.CANCELED);
