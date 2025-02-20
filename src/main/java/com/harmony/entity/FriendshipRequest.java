@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,7 +18,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@ToString
 @Getter
 @Builder
 @Entity
@@ -30,15 +30,34 @@ public class FriendshipRequest {
   @Column(name="friendship_request_id", nullable = false)
   private Long friendshipRequestId;
 
-  @ManyToOne
+  @ManyToOne(fetch= FetchType.LAZY)
   @JoinColumn(name="from_user_id")
   private User friendshipRequestSender;
 
-  @ManyToOne
+  @ManyToOne(fetch=FetchType.LAZY)
   @JoinColumn(name="to_user_id")
   private User friendshipRequestReceiver;
 
   @Enumerated(EnumType.STRING)
   @Column(name="friendship_req_status", nullable = false)
   private FriendshipRequestStatus friendshipRequestStatus;
+
+  public void setFriendshipRequestInfo(User friendshipRequestSender, User friendshipRequestReceiver) {
+    this.friendshipRequestSender = friendshipRequestSender;
+    this.friendshipRequestReceiver = friendshipRequestReceiver;
+    friendshipRequestSender.getSentFriendshipRequests().add(this);
+    friendshipRequestReceiver.getReceivedFriendshipRequests().add(this);
+  }
+
+  public void setFriendshipRequestStatus(FriendshipRequestStatus friendshipRequestStatus) {
+    this.friendshipRequestStatus = friendshipRequestStatus;
+  }
+
+  @Override
+  public String toString(){
+    return "FriendshipRequest [friendshipRequestId=" + friendshipRequestId
+        + ", friendshipRequestSender=" + friendshipRequestSender.getUserIdentifier()
+        + ", friendshipRequestReceiver=" + friendshipRequestReceiver.getUserIdentifier()
+        + ", friendshipRequestStatus=" + friendshipRequestStatus + "]";
+  }
 }
