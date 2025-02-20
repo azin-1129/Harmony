@@ -2,7 +2,7 @@ package com.harmony.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.harmony.dto.request.CreateToFriendshipRequestDto;
+import com.harmony.dto.request.CreateFriendshipRequestDto;
 import com.harmony.dto.response.ReceivedFriendshipRequestResponseDto;
 import com.harmony.dto.response.SentFriendshipRequestResponseDto;
 import com.harmony.entity.FriendshipRequest;
@@ -94,8 +94,8 @@ class FriendshipRequestServiceTest {
     String toUserIdentifier="cheese";
 
     // 양쪽 request list에 저장될 dto
-    CreateToFriendshipRequestDto createToFriendshipRequestDto=CreateToFriendshipRequestDto.builder()
-        .toUserIdentifier(toUserIdentifier)
+    CreateFriendshipRequestDto createToFriendshipRequestDto= CreateFriendshipRequestDto.builder()
+        .receiverIdentifier(toUserIdentifier)
         .build();
 
     // when request는 a to b, b to a로 저장 되어야 역요청이 성립하지 않음
@@ -128,8 +128,8 @@ class FriendshipRequestServiceTest {
     String toUserIdentifier="choco";
     String fromUserIdentifier="cheese";
 
-    CreateToFriendshipRequestDto createToFriendshipRequestDto=CreateToFriendshipRequestDto.builder()
-        .toUserIdentifier(toUserIdentifier)
+    CreateFriendshipRequestDto createToFriendshipRequestDto= CreateFriendshipRequestDto.builder()
+        .receiverIdentifier(toUserIdentifier)
         .build();
 
     friendshipRequestService.createFriendshipRequest(fromUserId, createToFriendshipRequestDto);
@@ -169,8 +169,8 @@ class FriendshipRequestServiceTest {
     String toUserIdentifier="choco";
     String fromUserIdentifier="cheese";
 
-    CreateToFriendshipRequestDto createToFriendshipRequestDto=CreateToFriendshipRequestDto.builder()
-        .toUserIdentifier(toUserIdentifier)
+    CreateFriendshipRequestDto createToFriendshipRequestDto= CreateFriendshipRequestDto.builder()
+        .receiverIdentifier(toUserIdentifier)
         .build();
 
     friendshipRequestService.createFriendshipRequest(fromUserId, createToFriendshipRequestDto);
@@ -208,8 +208,8 @@ class FriendshipRequestServiceTest {
     String toUserIdentifier="choco";
     String fromUserIdentifier="cheese";
 
-    CreateToFriendshipRequestDto createToFriendshipRequestDto=CreateToFriendshipRequestDto.builder()
-        .toUserIdentifier(toUserIdentifier)
+    CreateFriendshipRequestDto createToFriendshipRequestDto= CreateFriendshipRequestDto.builder()
+        .receiverIdentifier(toUserIdentifier)
         .build();
 
     friendshipRequestService.createFriendshipRequest(fromUserId, createToFriendshipRequestDto);
@@ -247,8 +247,8 @@ class FriendshipRequestServiceTest {
     String toUserIdentifier="choco";
     String fromUserIdentifier="cheese";
 
-    CreateToFriendshipRequestDto createToFriendshipRequestDto=CreateToFriendshipRequestDto.builder()
-        .toUserIdentifier(toUserIdentifier)
+    CreateFriendshipRequestDto createToFriendshipRequestDto= CreateFriendshipRequestDto.builder()
+        .receiverIdentifier(toUserIdentifier)
         .build();
 
     friendshipRequestService.createFriendshipRequest(fromUserId, createToFriendshipRequestDto);
@@ -281,18 +281,18 @@ class FriendshipRequestServiceTest {
   // 예외
 
   // 친구 추가 요청을 수락하려니 상대방이 이미 취소했다면?
-  @DisplayName("이미 취소된 친구 요청(A-B)")
+  @DisplayName("수락 시, 이미 취소된 친구 요청(A-B)")
   @Order(6)
   @Test
-  public void AlreadyCanceledFriendshipRequest(){
+  public void AlreadyCanceledFriendshipRequestWhenAccept(){
     // given
     Long toUserId=1L;
     Long fromUserId=2L;
     String toUserIdentifier="choco";
     String fromUserIdentifier="cheese";
 
-    CreateToFriendshipRequestDto createToFriendshipRequestDto=CreateToFriendshipRequestDto.builder()
-        .toUserIdentifier(toUserIdentifier)
+    CreateFriendshipRequestDto createToFriendshipRequestDto= CreateFriendshipRequestDto.builder()
+        .receiverIdentifier(toUserIdentifier)
         .build();
 
     friendshipRequestService.createFriendshipRequest(fromUserId, createToFriendshipRequestDto);
@@ -307,6 +307,36 @@ class FriendshipRequestServiceTest {
     // then
     assertThrows(AlreadyCanceledFriendshipRequestException.class, ()
     -> friendshipRequestService.acceptFriendshipRequest(toUserId, fromUserIdentifier));
+
+  }
+
+  // 친구 추가 요청을 거절하려니 상대방이 이미 취소했다면?
+  @DisplayName("거절 시, 이미 취소된 친구 요청(A-B)")
+  @Order(6)
+  @Test
+  public void AlreadyCanceledFriendshipRequestWhenReject(){
+    // given
+    Long toUserId=1L;
+    Long fromUserId=2L;
+    String toUserIdentifier="choco";
+    String fromUserIdentifier="cheese";
+
+    CreateFriendshipRequestDto createToFriendshipRequestDto= CreateFriendshipRequestDto.builder()
+        .receiverIdentifier(toUserIdentifier)
+        .build();
+
+    friendshipRequestService.createFriendshipRequest(fromUserId, createToFriendshipRequestDto);
+
+    FriendshipRequest friendshipRequest=(FriendshipRequest) userRepository.findById(fromUserId).get().getSentFriendshipRequests().toArray()[0];
+    log.info("요청 되긴 했나요?:"+friendshipRequest.toString());
+
+    friendshipRequestService.cancelFriendshipRequest(toUserId, fromUserIdentifier);
+
+    // when
+
+    // then
+    assertThrows(AlreadyCanceledFriendshipRequestException.class, ()
+        -> friendshipRequestService.rejectFriendshipRequest(toUserId, fromUserIdentifier));
 
   }
 
