@@ -34,7 +34,10 @@ public enum ErrorCode implements ResponseCode {
   CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 채팅방입니다."),
 
   // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡParticipantㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-  PARTICIPANT_ALREADY_LEFT(HttpStatus.BAD_REQUEST, "이미 퇴장한 참가자입니다.");
+  PARTICIPANT_ALREADY_LEFT(HttpStatus.BAD_REQUEST, "이미 퇴장한 참가자입니다."),
+
+  // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡFriendshipRequestㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+  FRIENDSHIP_REQUEST_ALREADY_CANCELED(HttpStatus.BAD_REQUEST, "이미 취소된 친구 요청입니다.");
 
   private final HttpStatus httpStatus;
 
