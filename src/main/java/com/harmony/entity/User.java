@@ -1,10 +1,12 @@
 package com.harmony.entity;
 
 import com.harmony.global.BaseTime;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -54,13 +56,13 @@ public class User extends BaseTime {
   @Column(name="role", nullable = false)
   private Role role;
 
-  @OneToMany(mappedBy = "user")
+  @OneToMany(fetch=FetchType.LAZY, mappedBy = "user",  cascade= CascadeType.ALL, orphanRemoval = true)
   private Set<Friendship> friendships = new HashSet<>();
 
-  @OneToMany(mappedBy = "friendshipRequestSender")
+  @OneToMany(fetch=FetchType.LAZY, mappedBy = "friendshipRequestSender", cascade= CascadeType.ALL, orphanRemoval = true)
   private Set<FriendshipRequest> sentFriendshipRequests = new HashSet<>();
 
-  @OneToMany(mappedBy = "friendshipRequestReceiver")
+  @OneToMany(fetch=FetchType.LAZY, mappedBy = "friendshipRequestReceiver", cascade= CascadeType.ALL, orphanRemoval = true)
   private Set<FriendshipRequest> receivedFriendshipRequests = new HashSet<>();
 
   // update
