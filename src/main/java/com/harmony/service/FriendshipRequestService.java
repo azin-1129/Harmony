@@ -9,7 +9,6 @@ import com.harmony.entity.FriendshipRequest;
 import com.harmony.entity.FriendshipRequestStatus;
 import com.harmony.entity.User;
 import com.harmony.exception.AlreadyCanceledFriendshipRequestException;
-import com.harmony.exception.DuplicatedUserNicknameException;
 import com.harmony.global.response.code.ErrorCode;
 import com.harmony.repository.FriendshipRepository;
 import com.harmony.repository.FriendshipRequestRepository;
