@@ -17,7 +17,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@ToString
 @Getter
 @Builder
 @Entity
@@ -41,4 +40,18 @@ public class Friendship {
   @Enumerated(EnumType.STRING)
   @Column(name="friend_type", nullable = false)
   FriendType friendType;
+
+  public void setUsers(User user, User friend) {
+    this.user = user;
+    this.friend = friend;
+    user.getFriendships().add(this);
+  }
+
+  @Override
+  public String toString(){
+    return "Friendship [friendshipId=" + friendshipId
+        + ", friend=" + friend.getUserIdentifier()
+        + ", user=" + user.getUserIdentifier()
+        + ", friendType=" + friendType + "]";
+  }
 }
