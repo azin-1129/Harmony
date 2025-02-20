@@ -1,5 +1,6 @@
 package com.harmony.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +13,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UpdateFriendshipRequestStatusRequestDto {
-  private String senderIdentifier;
+public class CreateFriendshipRequestDto {
+  @Schema(description = "친구 추가 요청 수신자 Identifier", defaultValue="cheese")
+  private String receiverIdentifier;
 }
