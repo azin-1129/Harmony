@@ -44,9 +44,24 @@ public enum SuccessCode implements ResponseCode {
 
   // DELETE
   LEAVE_CHATROOM_SUCCESS(HttpStatus.OK, "채팅방 퇴장에 성공했습니다."),
-  LEAVE_CHATROOM_FORCE_SUCCESS(HttpStatus.OK, "채팅방 참가자를 강퇴했습니다.");
+  LEAVE_CHATROOM_FORCE_SUCCESS(HttpStatus.OK, "채팅방 참가자를 강퇴했습니다."),
 
   // UPDATE
+
+  // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡFriendshipRequestㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+  // CREATE
+  FRIENDSHIP_REQUEST_CREATE_SUCCESS(HttpStatus.CREATED, "친구 추가 요청에 성공했습니다."),
+
+  // READ
+  SENT_FRIENDSHIP_REQUESTS_READ_SUCCESS(HttpStatus.OK, "보낸 친구 요청 목록 조회에 성공했습니다."),
+  RECEIVED_FRIENDSHIP_REQUESTS_READ_SUCCESS(HttpStatus.OK, "받은 친구 요청 목록 조회에 성공했습니다."),
+
+  // UPDATE
+  FRIENDSHIP_REQUEST_ACCEPT_SUCCESS(HttpStatus.OK, "친구 요청을 수락했습니다."),
+  FRIENDSHIP_REQUEST_REJECT_SUCCESS(HttpStatus.OK, "친구 요청을 거절했습니다."),
+  FRIENDSHIP_REQUEST_CANCEL_SUCCESS(HttpStatus.OK, "친구 요청을 취소했습니다.");
+
+  // DELETE
 
   private final HttpStatus httpStatus;
 
