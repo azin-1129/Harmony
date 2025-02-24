@@ -10,12 +10,15 @@ import com.harmony.entity.FriendshipRequestStatus;
 import com.harmony.entity.Role;
 import com.harmony.entity.User;
 import com.harmony.exception.AlreadyCanceledFriendshipRequestException;
+import com.harmony.global.response.exception.EntityNotFoundException;
 import com.harmony.repository.FriendshipRequestRepository;
 import com.harmony.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -32,7 +35,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class FriendshipRequestServiceTest {
   @Autowired
+  private EntityManager em;
+
+  @Autowired
   private FriendshipRequestService friendshipRequestService;
+
+  @Autowired
+  private UserService userService;
 
   @Autowired
   private FriendshipRequestRepository friendshipRequestRepository;
@@ -41,7 +50,7 @@ class FriendshipRequestServiceTest {
   private UserRepository userRepository;
 
   // 3명 회원가입
-  User choco, cheese, oreo;
+  User choco, cheese, oreo, pikmin;
   @BeforeAll
   void setUp(){
     choco= User.builder()
@@ -80,6 +89,18 @@ class FriendshipRequestServiceTest {
         .build();
 
     userRepository.save(oreo);
+
+    pikmin= User.builder()
+        .email("azin@bloom.com")
+        .userIdentifier("pikmin")
+        .password("azin1129!")
+        .profileImageName("mushroom.png")
+        .nickname("보라뚱돼지")
+        .withdraw(false)
+        .role(Role.MEMBER)
+        .build();
+
+    userRepository.save(pikmin);
   }
 
   // 친구 추가 요청
@@ -312,7 +333,7 @@ class FriendshipRequestServiceTest {
 
   // 친구 추가 요청을 거절하려니 상대방이 이미 취소했다면?
   @DisplayName("거절 시, 이미 취소된 친구 요청(A-B)")
-  @Order(6)
+  @Order(7)
   @Test
   public void AlreadyCanceledFriendshipRequestWhenReject(){
     // given
@@ -340,4 +361,125 @@ class FriendshipRequestServiceTest {
 
   }
 
+  // 친구 추가 요청을 수락하려니 상대방이 이미 탈퇴했다면?
+  @DisplayName("수락 시, 이미 탈퇴한 상대(A-B):withdraw=true")
+  @Order(8)
+  @Test
+  public void AlreadyWithdrawFriendshipRequestSenderWhenAccept(){
+    // given
+    Long toUserId=1L;
+    Long fromUserId=2L;
+    String toUserIdentifier="choco";
+    String fromUserIdentifier="cheese";
+
+    CreateFriendshipRequestDto createToFriendshipRequestDto= CreateFriendshipRequestDto.builder()
+        .receiverIdentifier(toUserIdentifier)
+        .build();
+
+    friendshipRequestService.createFriendshipRequest(fromUserId, createToFriendshipRequestDto);
+
+    User sender=userRepository.findById(fromUserId).get();
+    sender.updateWithDraw(true);
+    // when
+    FriendshipRequest sentFriendshipRequest=(FriendshipRequest) userRepository.findById(fromUserId).get().getSentFriendshipRequests().toArray()[0];
+    FriendshipRequest receivedFriendshipRequest=(FriendshipRequest) userRepository.findById(toUserId).get().getReceivedFriendshipRequests().toArray()[0];
+    // then
+    assertThrows(EntityNotFoundException.class, ()
+        -> friendshipRequestService.acceptFriendshipRequest(toUserId, fromUserIdentifier));
+    assertEquals(FriendshipRequestStatus.CANCELED, sentFriendshipRequest.getFriendshipRequestStatus());
+    assertEquals(FriendshipRequestStatus.CANCELED, receivedFriendshipRequest.getFriendshipRequestStatus());
+  }
+
+  // 친구 추가 요청을 수락하려니 상대방이 이미 탈퇴했다면?
+//  @DisplayName("수락 시, 이미 탈퇴한 상대(A-B):null")
+//  @Order(9)
+//  @Test
+//  public void AlreadyDeletedFriendshipRequestSenderWhenAccept(){
+//    // given
+//    Long toUserId=1L;
+//    Long fromUserId=4L;
+//    String toUserIdentifier="choco";
+//    String fromUserIdentifier="pikmin";
+//
+//    CreateFriendshipRequestDto createToFriendshipRequestDto= CreateFriendshipRequestDto.builder()
+//        .receiverIdentifier(toUserIdentifier)
+//        .build();
+//
+//    friendshipRequestService.createFriendshipRequest(fromUserId, createToFriendshipRequestDto);
+//
+//    userRepository.deleteById(fromUserId);
+//
+//    log.info("user 정보가 소실되었습니다!");
+//
+//    // 연쇄되어 request의 정보가 지워지므로, 상관 없을 듯.
+//    // when
+//    List<ReceivedFriendshipRequestResponseDto> receivedFriendshipRequests=friendshipRequestService.receivedFriendshipRequest(toUserId);
+//    System.out.println(receivedFriendshipRequests);
+//    // then
+//    assertThrows(EntityNotFoundException.class, ()
+//        -> friendshipRequestService.acceptFriendshipRequest(toUserId, fromUserIdentifier));
+//    assertEquals(0, receivedFriendshipRequests.size());
+//  }
+
+  // 거절하려니 탈퇴 1
+  @DisplayName("거절 시, 이미 탈퇴한 상대(A-B):withdraw=true")
+  @Order(10)
+  @Test
+  public void AlreadyWithdrawFriendshipRequestSenderWhenReject(){
+    // given
+    Long toUserId=1L;
+    Long fromUserId=2L;
+    String toUserIdentifier="choco";
+    String fromUserIdentifier="cheese";
+
+    CreateFriendshipRequestDto createToFriendshipRequestDto= CreateFriendshipRequestDto.builder()
+        .receiverIdentifier(toUserIdentifier)
+        .build();
+
+    friendshipRequestService.createFriendshipRequest(fromUserId, createToFriendshipRequestDto);
+
+    User sender=userRepository.findById(fromUserId).get();
+    sender.updateWithDraw(true);
+    // when
+    FriendshipRequest sentFriendshipRequest=(FriendshipRequest) userRepository.findById(fromUserId).get().getSentFriendshipRequests().toArray()[0];
+    FriendshipRequest receivedFriendshipRequest=(FriendshipRequest) userRepository.findById(toUserId).get().getReceivedFriendshipRequests().toArray()[0];
+    // then
+    assertThrows(EntityNotFoundException.class, ()
+        -> friendshipRequestService.rejectFriendshipRequest(toUserId, fromUserIdentifier));
+    assertEquals(FriendshipRequestStatus.CANCELED, sentFriendshipRequest.getFriendshipRequestStatus());
+    assertEquals(FriendshipRequestStatus.CANCELED, receivedFriendshipRequest.getFriendshipRequestStatus());
+  }
+
+  // 거절하려니 탈퇴 2
+
+  // 취소하려니 탈퇴 1
+  @DisplayName("취소 시, 이미 탈퇴한 상대(A-B):withdraw=true")
+  @Order(12)
+  @Test
+  public void AlreadyWithdrawFriendshipRequestSenderWhenCancel(){
+    // given
+    Long toUserId=1L;
+    Long fromUserId=2L;
+    String toUserIdentifier="choco";
+    String fromUserIdentifier="cheese";
+
+    CreateFriendshipRequestDto createToFriendshipRequestDto= CreateFriendshipRequestDto.builder()
+        .receiverIdentifier(toUserIdentifier)
+        .build();
+
+    friendshipRequestService.createFriendshipRequest(fromUserId, createToFriendshipRequestDto);
+
+    User sender=userRepository.findById(fromUserId).get();
+    sender.updateWithDraw(true);
+    // when
+    FriendshipRequest sentFriendshipRequest=(FriendshipRequest) userRepository.findById(fromUserId).get().getSentFriendshipRequests().toArray()[0];
+    FriendshipRequest receivedFriendshipRequest=(FriendshipRequest) userRepository.findById(toUserId).get().getReceivedFriendshipRequests().toArray()[0];
+    // then
+    assertThrows(EntityNotFoundException.class, ()
+        -> friendshipRequestService.cancelFriendshipRequest(toUserId, fromUserIdentifier));
+    assertEquals(FriendshipRequestStatus.CANCELED, sentFriendshipRequest.getFriendshipRequestStatus());
+    assertEquals(FriendshipRequestStatus.CANCELED, receivedFriendshipRequest.getFriendshipRequestStatus());
+  }
+
+  // 최소하려니 탈퇴 2
 }
