@@ -45,8 +45,8 @@ public class FriendshipRequest {
   public void setFriendshipRequestInfo(User friendshipRequestSender, User friendshipRequestReceiver) {
     this.friendshipRequestSender = friendshipRequestSender;
     this.friendshipRequestReceiver = friendshipRequestReceiver;
-    friendshipRequestSender.getSentFriendshipRequests().add(this);
-    friendshipRequestReceiver.getReceivedFriendshipRequests().add(this);
+    this.friendshipRequestSender.getSentFriendshipRequests().add(this);
+    this.friendshipRequestReceiver.getReceivedFriendshipRequests().add(this);
   }
 
   public void setFriendshipRequestStatus(FriendshipRequestStatus friendshipRequestStatus) {
