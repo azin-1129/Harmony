@@ -65,7 +65,12 @@ public class UserService {
   }
 
   public User getUserByUserIdentifier(String userIdentifier) {
-    return userRepository.findByUserIdentifier(userIdentifier).get();
+
+    return userRepository.findByUserIdentifier(userIdentifier).orElseThrow(
+        ()        -> new EntityNotFoundException(
+            ErrorCode.USER_NOT_FOUND
+        )
+    );
   }
   // 비번 업뎃
   public void updateUserPassword(Long userId, String newPassword) {
@@ -111,5 +116,10 @@ public class UserService {
     }
 
     userToWithDraw.get().updateWithDraw(true);
+  }
+
+  // 테스트용 삭제 메서드
+  public void deleteUserForce(Long userId){
+    userRepository.deleteById(userId);
   }
 }
