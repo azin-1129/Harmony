@@ -109,30 +109,4 @@ class ChatRoomControllerTest {
 
   // 예외테스트
 
-  // TODO: Validation을 Participant Controller로 옮겨야함
-  // 단체 채팅방 생성 양식 기재 오류
-//  @DisplayName("단체 채팅방 생성 실패-기재 오류 테스트")
-//  @Test
-//  void createGroupChatRoomFailedByInvalidArgument() throws Exception {
-//    // given
-//    GroupChatRoomCreateRequestDto groupChatRoomCreateRequestDto=GroupChatRoomCreateRequestDto.builder()
-//        .chatRoomName("빅보!") // 오류사항
-//        .chatRoomCountMax(1) // 오류사항
-//        .build();
-//
-//    // stub
-//    doNothing().when(chatRoomService).createGroupChatRoom(any(GroupChatRoomCreateRequestDto.class));
-//
-//    // when
-//    ResultActions resultActions=
-//        mockMvc.perform(MockMvcRequestBuilders
-//            .post("/chatroom/create/group")
-//            .contentType(MediaType.APPLICATION_JSON)
-//            .content(objectMapper.writeValueAsString(groupChatRoomCreateRequestDto)));
-//
-//    // then
-//    resultActions
-//        .andExpect(status().isBadRequest())
-//        .andDo(print());
-//  }
 }
