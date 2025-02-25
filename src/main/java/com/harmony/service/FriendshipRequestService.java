@@ -9,13 +9,14 @@ import com.harmony.entity.FriendshipRequest;
 import com.harmony.entity.FriendshipRequestStatus;
 import com.harmony.entity.User;
 import com.harmony.exception.AlreadyCanceledFriendshipRequestException;
-import com.harmony.global.response.code.ErrorCode;
+import com.harmony.global.response.code.ErrorCode;import com.harmony.global.response.exception.EntityNotFoundException;
 import com.harmony.repository.FriendshipRepository;
 import com.harmony.repository.FriendshipRequestRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ public class FriendshipRequestService {
 
     User sender =userService.getUserById(fromUserId);
     User receiver =userService.getUserByUserIdentifier(receiverIdentifier);
+
     System.out.println("유저 정보를 불러 왔습니다.");
 
     // 양쪽 요청 저장하기
@@ -116,24 +118,30 @@ public class FriendshipRequestService {
   }
 
   public void acceptFriendshipRequest(Long receiverId, String senderIdentifier){
-    User sender =userService.getUserByUserIdentifier(senderIdentifier);
     User receiver =userService.getUserById(receiverId); // 요청을 받은 유저
+    User sender =userService.getUserByUserIdentifier(senderIdentifier);
 
     System.out.println("유저 정보를 불러왔습니다.");
 
-    System.out.println("기존 요청:"+ receiver.getReceivedFriendshipRequests());
-    System.out.println("기존 요청:"+ sender.getSentFriendshipRequests());
-
-    // 진행중인 요청의 상태를 ACCEPTED로 변경
     FriendshipRequest toFriendshipRequest=friendshipRequestRepository.findFriendshipRequest(
         receiverId, sender.getUserId(), FriendshipRequestStatus.PENDING);
     FriendshipRequest fromFriendshipRequest=friendshipRequestRepository.findFriendshipRequest(
         sender.getUserId(), receiverId, FriendshipRequestStatus.PENDING);
 
-    System.out.println("요청 정보를 불러 왔습니다.");
+    // 유효한 요청이 없다면
     if(toFriendshipRequest==null){
       throw new AlreadyCanceledFriendshipRequestException(
           ErrorCode.FRIENDSHIP_REQUEST_ALREADY_CANCELED
+      );
+    }
+
+    // 상대방이 탈퇴 처리 진행중이라면
+    if(sender.getWithdraw()){
+      toFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.CANCELED);
+      fromFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.CANCELED);
+
+      throw new EntityNotFoundException(
+          ErrorCode.USER_ALREADY_WITHDRAW
       );
     }
 
@@ -191,6 +199,16 @@ public class FriendshipRequestService {
       );
     }
 
+    // 상대방이 탈퇴 처리 진행중이라면
+    if(sender.getWithdraw()){
+      toFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.CANCELED);
+      fromFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.CANCELED);
+
+      throw new EntityNotFoundException(
+          ErrorCode.USER_ALREADY_WITHDRAW
+      );
+    }
+
     toFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.REJECTED);
     fromFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.REJECTED);
 
@@ -210,6 +228,16 @@ public class FriendshipRequestService {
     FriendshipRequest fromFriendshipRequest=friendshipRequestRepository.findFriendshipRequest(
         sender.getUserId(),
         receiverId, FriendshipRequestStatus.PENDING);
+
+    // 상대방이 탈퇴 처리 진행중이라면
+    if(sender.getWithdraw()){
+      toFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.CANCELED);
+      fromFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.CANCELED);
+
+      throw new EntityNotFoundException(
+          ErrorCode.USER_ALREADY_WITHDRAW
+      );
+    }
 
     toFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.CANCELED);
     fromFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.CANCELED);
