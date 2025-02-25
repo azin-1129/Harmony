@@ -59,10 +59,18 @@ public enum SuccessCode implements ResponseCode {
   // UPDATE
   FRIENDSHIP_REQUEST_ACCEPT_SUCCESS(HttpStatus.OK, "친구 요청을 수락했습니다."),
   FRIENDSHIP_REQUEST_REJECT_SUCCESS(HttpStatus.OK, "친구 요청을 거절했습니다."),
-  FRIENDSHIP_REQUEST_CANCEL_SUCCESS(HttpStatus.OK, "친구 요청을 취소했습니다.");
+  FRIENDSHIP_REQUEST_CANCEL_SUCCESS(HttpStatus.OK, "친구 요청을 취소했습니다."),
 
   // DELETE
 
+  // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡFriendshipㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+  // CREATE
+
+  // READ
+  FRIENDSHIP_READ_SUCCESS(HttpStatus.OK, "추가된 친구 목록 조회에 성공했습니다.");
+  // UPDATE
+
+  // DELETE
   private final HttpStatus httpStatus;
 
   private final String message;
