@@ -17,6 +17,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -50,7 +51,7 @@ class FriendshipRequestServiceTest {
   private UserRepository userRepository;
 
   // 3명 회원가입
-  User choco, cheese, oreo, pikmin;
+  User choco, cheese, oreo, pikmin, cookie, cola;
   @BeforeAll
   void setUp(){
     choco= User.builder()
@@ -90,17 +91,46 @@ class FriendshipRequestServiceTest {
 
     userRepository.save(oreo);
 
-    pikmin= User.builder()
-        .email("azin@bloom.com")
+    pikmin=User.builder()
+        .email("azin1129@google.com")
         .userIdentifier("pikmin")
         .password("azin1129!")
-        .profileImageName("mushroom.png")
+        .profileImageName("피크민.png")
         .nickname("보라뚱돼지")
         .withdraw(false)
         .role(Role.MEMBER)
         .build();
 
     userRepository.save(pikmin);
+
+    cookie=User.builder()
+        .email("azin1129@goo.com")
+        .userIdentifier("ohyes")
+        .password("azin1129!")
+        .profileImageName("choco_chunk.png")
+        .nickname("크루키는맛있")
+        .withdraw(false)
+        .role(Role.MEMBER)
+        .build();
+
+    userRepository.save(cookie);
+
+    cola=User.builder()
+        .email("azin1129@gle.com")
+        .userIdentifier("pepsi")
+        .password("azin1129!")
+        .profileImageName("jar.png")
+        .nickname("북극곰")
+        .withdraw(false)
+        .role(Role.MEMBER)
+        .build();
+
+    userRepository.save(cola);
+  }
+
+  @AfterAll
+  void cleanUp(){
+    userRepository.deleteAll();
   }
 
   // 친구 추가 요청
@@ -391,35 +421,49 @@ class FriendshipRequestServiceTest {
   }
 
   // 친구 추가 요청을 수락하려니 상대방이 이미 탈퇴했다면?
-//  @DisplayName("수락 시, 이미 탈퇴한 상대(A-B):null")
-//  @Order(9)
-//  @Test
-//  public void AlreadyDeletedFriendshipRequestSenderWhenAccept(){
-//    // given
-//    Long toUserId=1L;
-//    Long fromUserId=4L;
-//    String toUserIdentifier="choco";
-//    String fromUserIdentifier="pikmin";
-//
-//    CreateFriendshipRequestDto createToFriendshipRequestDto= CreateFriendshipRequestDto.builder()
-//        .receiverIdentifier(toUserIdentifier)
-//        .build();
-//
-//    friendshipRequestService.createFriendshipRequest(fromUserId, createToFriendshipRequestDto);
-//
+  @DisplayName("수락 시, 이미 탈퇴한 상대(A-D):null")
+  @Order(9)
+  @Test
+  public void AlreadyDeletedFriendshipRequestSenderWhenAccept(){
+    // given
+
+    Long toUserId=1L;
+    Long fromUserId=4L;
+    String toUserIdentifier="choco";
+    String fromUserIdentifier="pikmin";
+
+    CreateFriendshipRequestDto createToFriendshipRequestDto= CreateFriendshipRequestDto.builder()
+        .receiverIdentifier(toUserIdentifier)
+        .build();
+
+    friendshipRequestService.createFriendshipRequest(fromUserId, createToFriendshipRequestDto);
+
 //    userRepository.deleteById(fromUserId);
-//
-//    log.info("user 정보가 소실되었습니다!");
-//
-//    // 연쇄되어 request의 정보가 지워지므로, 상관 없을 듯.
-//    // when
-//    List<ReceivedFriendshipRequestResponseDto> receivedFriendshipRequests=friendshipRequestService.receivedFriendshipRequest(toUserId);
-//    System.out.println(receivedFriendshipRequests);
-//    // then
-//    assertThrows(EntityNotFoundException.class, ()
-//        -> friendshipRequestService.acceptFriendshipRequest(toUserId, fromUserIdentifier));
-//    assertEquals(0, receivedFriendshipRequests.size());
-//  }
+
+    // setUp 이후 detach된(준영속) entity들을 영속 상태로 변경
+    em.merge(choco); // pikmin이 당장 delete되지 않아 연관 entity에서 참조하기 때문에 영속화해야 하는 듯
+    em.merge(pikmin);
+
+    // 양방향 컬럼 초기화(Lazy)
+    User sender=userRepository.findById(fromUserId).get();
+    User receiver=userRepository.findById(toUserId).get();
+
+    System.out.println(sender.getReceivedFriendshipRequests());
+    System.out.println(receiver.getReceivedFriendshipRequests());
+
+    // 트랜잭션 종료 시 flush
+    userRepository.delete(sender);
+
+    log.info("user 정보가 소실되었습니다!");
+
+    // when
+    List<ReceivedFriendshipRequestResponseDto> receivedFriendshipRequests=friendshipRequestService.receivedFriendshipRequest(toUserId);
+    System.out.println(receivedFriendshipRequests);
+    // then
+    assertThrows(EntityNotFoundException.class, ()
+        -> friendshipRequestService.acceptFriendshipRequest(toUserId, fromUserIdentifier));
+    assertEquals(0, receivedFriendshipRequests.size());
+  }
 
   // 거절하려니 탈퇴 1
   @DisplayName("거절 시, 이미 탈퇴한 상대(A-B):withdraw=true")
@@ -451,6 +495,49 @@ class FriendshipRequestServiceTest {
   }
 
   // 거절하려니 탈퇴 2
+  @DisplayName("거절 시, 이미 탈퇴한 상대(A-E):null")
+  @Order(11)
+  @Test
+  public void AlreadyDeletedFriendshipRequestSenderWhenReject(){
+    // given
+
+    Long toUserId=1L;
+    Long fromUserId=5L;
+    String toUserIdentifier="choco";
+    String fromUserIdentifier="cookie";
+
+    CreateFriendshipRequestDto createToFriendshipRequestDto= CreateFriendshipRequestDto.builder()
+        .receiverIdentifier(toUserIdentifier)
+        .build();
+
+    friendshipRequestService.createFriendshipRequest(fromUserId, createToFriendshipRequestDto);
+
+//    userRepository.deleteById(fromUserId);
+
+    // setUp 이후 detach된(준영속) entity들을 영속 상태로 변경
+    em.merge(choco); // pikmin이 당장 delete되지 않아 연관 entity에서 참조하기 때문에 영속화해야 하는 듯
+    em.merge(cookie);
+
+    // 양방향 컬럼 초기화(Lazy)
+    User sender=userRepository.findById(fromUserId).get();
+    User receiver=userRepository.findById(toUserId).get();
+
+    System.out.println(sender.getReceivedFriendshipRequests());
+    System.out.println(receiver.getReceivedFriendshipRequests());
+
+    // 트랜잭션 종료 시 flush
+    userRepository.delete(sender);
+
+    log.info("user 정보가 소실되었습니다!");
+
+    // when
+    List<ReceivedFriendshipRequestResponseDto> receivedFriendshipRequests=friendshipRequestService.receivedFriendshipRequest(toUserId);
+    System.out.println(receivedFriendshipRequests);
+    // then
+    assertThrows(EntityNotFoundException.class, ()
+        -> friendshipRequestService.rejectFriendshipRequest(toUserId, fromUserIdentifier));
+    assertEquals(0, receivedFriendshipRequests.size());
+  }
 
   // 취소하려니 탈퇴 1
   @DisplayName("취소 시, 이미 탈퇴한 상대(A-B):withdraw=true")
@@ -481,5 +568,48 @@ class FriendshipRequestServiceTest {
     assertEquals(FriendshipRequestStatus.CANCELED, receivedFriendshipRequest.getFriendshipRequestStatus());
   }
 
-  // 최소하려니 탈퇴 2
+  // 취소하려니 탈퇴 2
+  @DisplayName("취소 시, 이미 탈퇴한 상대(A-F):null")
+  @Order(13)
+  @Test
+  public void AlreadyDeletedFriendshipRequestSenderWhenCancel(){
+    // given
+
+    Long toUserId=1L;
+    Long fromUserId=6L;
+    String toUserIdentifier="choco";
+    String fromUserIdentifier="cola";
+
+    CreateFriendshipRequestDto createToFriendshipRequestDto= CreateFriendshipRequestDto.builder()
+        .receiverIdentifier(toUserIdentifier)
+        .build();
+
+    friendshipRequestService.createFriendshipRequest(fromUserId, createToFriendshipRequestDto);
+
+//    userRepository.deleteById(fromUserId);
+
+    // setUp 이후 detach된(준영속) entity들을 영속 상태로 변경
+    em.merge(choco); // pikmin이 당장 delete되지 않아 연관 entity에서 참조하기 때문에 영속화해야 하는 듯
+    em.merge(cola);
+
+    // 양방향 컬럼 초기화(Lazy)
+    User sender=userRepository.findById(fromUserId).get();
+    User receiver=userRepository.findById(toUserId).get();
+
+    System.out.println(sender.getReceivedFriendshipRequests());
+    System.out.println(receiver.getReceivedFriendshipRequests());
+
+    // 트랜잭션 종료 시 flush
+    userRepository.delete(sender);
+
+    log.info("user 정보가 소실되었습니다!");
+
+    // when
+    List<ReceivedFriendshipRequestResponseDto> receivedFriendshipRequests=friendshipRequestService.receivedFriendshipRequest(toUserId);
+    System.out.println(receivedFriendshipRequests);
+    // then
+    assertThrows(EntityNotFoundException.class, ()
+        -> friendshipRequestService.cancelFriendshipRequest(toUserId, fromUserIdentifier));
+    assertEquals(0, receivedFriendshipRequests.size());
+  }
 }
