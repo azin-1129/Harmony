@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.GetMapping;import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +36,22 @@ public class FriendshipRequestController {
   public ResponseEntity<Object> createFriendshipRequest(
       @RequestBody CreateFriendshipRequestDto createToFriendshipRequestDto){
     friendshipRequestService.createFriendshipRequest(givenUserId, createToFriendshipRequestDto);
+
+    return SuccessResponse.createSuccess(
+        SuccessCode.FRIENDSHIP_REQUEST_CREATE_SUCCESS
+    );
+  }
+
+  // 친구 추가 요청
+  @PostMapping("/send/{senderId}")
+  @Operation(summary="테스트용 친구 추가 요청 생성", description="친구 추가 요청을 생성합니다.")
+  @ApiResponses(value={
+      @ApiResponse(responseCode="201", description="친구 추가 요청에 성공했습니다.")
+  })
+  public ResponseEntity<Object> createFriendshipRequest(
+      @PathVariable Long senderId,
+      @RequestBody CreateFriendshipRequestDto createToFriendshipRequestDto){
+    friendshipRequestService.createFriendshipRequest(senderId, createToFriendshipRequestDto);
 
     return SuccessResponse.createSuccess(
         SuccessCode.FRIENDSHIP_REQUEST_CREATE_SUCCESS
