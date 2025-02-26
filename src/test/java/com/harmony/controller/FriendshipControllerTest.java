@@ -27,10 +27,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-@WebMvcTest(controllers = FriendController.class)
+@WebMvcTest(controllers = FriendshipController.class)
 @ExtendWith(MockitoExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class FriendControllerTest {
+class FriendshipControllerTest {
   @Autowired
   private MockMvc mockMvc;
 
@@ -49,8 +49,8 @@ class FriendControllerTest {
 
   // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡREADㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
-  // 친구 검색
-  @DisplayName("친구 검색 테스트")
+  // 친구 목록 조회
+  @DisplayName("친구 목록 조회 테스트")
   @Test
   void readFriendships() throws Exception{
     // given
