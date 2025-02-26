@@ -46,7 +46,8 @@ public class FriendshipRequestController {
   @PostMapping("/send/{senderId}")
   @Operation(summary="테스트용 친구 추가 요청 생성", description="친구 추가 요청을 생성합니다.")
   @ApiResponses(value={
-      @ApiResponse(responseCode="201", description="친구 추가 요청에 성공했습니다.")
+      @ApiResponse(responseCode="201", description="친구 추가 요청에 성공했습니다."),
+      @ApiResponse(responseCode="400", description="이미 진행중인 친구 요청입니다.")
   })
   public ResponseEntity<Object> createFriendshipRequest(
       @PathVariable Long senderId,

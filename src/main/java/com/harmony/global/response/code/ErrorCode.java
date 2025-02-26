@@ -37,7 +37,14 @@ public enum ErrorCode implements ResponseCode {
   PARTICIPANT_ALREADY_LEFT(HttpStatus.BAD_REQUEST, "이미 퇴장한 참가자입니다."),
 
   // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡFriendshipRequestㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-  FRIENDSHIP_REQUEST_ALREADY_CANCELED(HttpStatus.BAD_REQUEST, "이미 취소된 친구 요청입니다.");
+  // CREATE
+  FRIENDSHIP_REQUEST_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 진행중인 친구 요청입니다."),
+  // READ
+
+  // UPDATE
+  INVALID_FRIENDSHIP_REQUEST(HttpStatus.BAD_REQUEST, "유효하지 않은 친구 요청입니다.");
+
+  // DELETE
 
   private final HttpStatus httpStatus;
 
