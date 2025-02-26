@@ -10,6 +10,7 @@ import com.harmony.entity.FriendshipRequestStatus;
 import com.harmony.entity.Role;
 import com.harmony.entity.User;
 import com.harmony.exception.AlreadyCanceledFriendshipRequestException;
+import com.harmony.global.response.exception.EntityAlreadyExistException;
 import com.harmony.global.response.exception.EntityNotFoundException;
 import com.harmony.repository.FriendshipRequestRepository;
 import com.harmony.repository.UserRepository;
@@ -165,7 +166,7 @@ class FriendshipRequestServiceTest {
     assertNotNull(friendshipRequest);
     assertEquals(fromUserId2, friendshipRequest.getFriendshipRequestSender().getUserId());
     assertEquals(toUserId2, friendshipRequest.getFriendshipRequestReceiver().getUserId());
-    assertEquals(FriendshipRequestStatus.PENDING, friendshipRequest.getFriendshipRequestStatus());
+    assertEquals(FriendshipRequestStatus.SENT, friendshipRequest.getFriendshipRequestStatus());
   }
 
   // 친구 수락
@@ -331,9 +332,34 @@ class FriendshipRequestServiceTest {
 
   // 예외
 
+  // 친구 추가 요청할 때, 상대방이 이미 보낸 상태라면?
+  @DisplayName("요청 시, 이미 요청된 친구 요청(A-B)")
+  @Order(6)
+  @Test
+  public void AlreadyPendingFriendshipRequest(){
+    // given
+    Long fromUserId=1L;
+    Long toUserId=2L;
+    String fromUserIdentifier="choco";
+    String toUserIdentifier="cheese";
+
+    // 양쪽 request list에 저장될 dto
+    CreateFriendshipRequestDto createToFriendshipRequestDto= CreateFriendshipRequestDto.builder()
+        .receiverIdentifier(toUserIdentifier)
+        .build();
+
+    // when request는 a to b, b to a로 저장 되어야 역요청이 성립하지 않음
+    friendshipRequestService.createFriendshipRequest(fromUserId, createToFriendshipRequestDto);
+
+    // then
+
+    assertThrows(EntityAlreadyExistException.class, ()
+        -> friendshipRequestService.createFriendshipRequest(fromUserId, createToFriendshipRequestDto));
+  }
+
   // 친구 추가 요청을 수락하려니 상대방이 이미 취소했다면?
   @DisplayName("수락 시, 이미 취소된 친구 요청(A-B)")
-  @Order(6)
+  @Order(7)
   @Test
   public void AlreadyCanceledFriendshipRequestWhenAccept(){
     // given
@@ -363,7 +389,7 @@ class FriendshipRequestServiceTest {
 
   // 친구 추가 요청을 거절하려니 상대방이 이미 취소했다면?
   @DisplayName("거절 시, 이미 취소된 친구 요청(A-B)")
-  @Order(7)
+  @Order(8)
   @Test
   public void AlreadyCanceledFriendshipRequestWhenReject(){
     // given
@@ -393,7 +419,7 @@ class FriendshipRequestServiceTest {
 
   // 친구 추가 요청을 수락하려니 상대방이 이미 탈퇴했다면?
   @DisplayName("수락 시, 이미 탈퇴한 상대(A-B):withdraw=true")
-  @Order(8)
+  @Order(9)
   @Test
   public void AlreadyWithdrawFriendshipRequestSenderWhenAccept(){
     // given
@@ -422,7 +448,7 @@ class FriendshipRequestServiceTest {
 
   // 친구 추가 요청을 수락하려니 상대방이 이미 탈퇴했다면?
   @DisplayName("수락 시, 이미 탈퇴한 상대(A-D):null")
-  @Order(9)
+  @Order(10)
   @Test
   public void AlreadyDeletedFriendshipRequestSenderWhenAccept(){
     // given
@@ -467,7 +493,7 @@ class FriendshipRequestServiceTest {
 
   // 거절하려니 탈퇴 1
   @DisplayName("거절 시, 이미 탈퇴한 상대(A-B):withdraw=true")
-  @Order(10)
+  @Order(11)
   @Test
   public void AlreadyWithdrawFriendshipRequestSenderWhenReject(){
     // given
@@ -496,7 +522,7 @@ class FriendshipRequestServiceTest {
 
   // 거절하려니 탈퇴 2
   @DisplayName("거절 시, 이미 탈퇴한 상대(A-E):null")
-  @Order(11)
+  @Order(12)
   @Test
   public void AlreadyDeletedFriendshipRequestSenderWhenReject(){
     // given
@@ -541,7 +567,7 @@ class FriendshipRequestServiceTest {
 
   // 취소하려니 탈퇴 1
   @DisplayName("취소 시, 이미 탈퇴한 상대(A-B):withdraw=true")
-  @Order(12)
+  @Order(13)
   @Test
   public void AlreadyWithdrawFriendshipRequestSenderWhenCancel(){
     // given
@@ -570,7 +596,7 @@ class FriendshipRequestServiceTest {
 
   // 취소하려니 탈퇴 2
   @DisplayName("취소 시, 이미 탈퇴한 상대(A-F):null")
-  @Order(13)
+  @Order(14)
   @Test
   public void AlreadyDeletedFriendshipRequestSenderWhenCancel(){
     // given
