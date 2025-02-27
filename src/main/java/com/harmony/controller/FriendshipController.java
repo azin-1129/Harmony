@@ -31,7 +31,7 @@ public class FriendshipController {
       @ApiResponse(responseCode = "200", description = "추가된 친구 목록 조회에 성공했습니다.")
   })
   public ResponseEntity<Object> selectFriendships(){
-    List<FriendshipResponseDto> friendshipResponseDtos=friendshipService.readFriendships(givenUserId);
+    List<FriendshipResponseDto> friendshipResponseDtos=friendshipService.selectFriendships(givenUserId);
 
     return SuccessResponse.createSuccess(
         SuccessCode.FRIENDSHIP_READ_SUCCESS,

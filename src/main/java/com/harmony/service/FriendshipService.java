@@ -22,7 +22,8 @@ public class FriendshipService {
   private final FriendshipRepository friendshipRepository;
   private final UserService userService;
 
-  public List<FriendshipResponseDto> readFriendships(Long userId){
+  // TODO: 페이징 처리, 프론트에서 친구 검색
+  public List<FriendshipResponseDto> selectFriendships(Long userId){
     List<Friendship> friendships=friendshipRepository.findByUserId(userId);
 
     List<FriendshipResponseDto> friendshipResponseDtos=new ArrayList<>();

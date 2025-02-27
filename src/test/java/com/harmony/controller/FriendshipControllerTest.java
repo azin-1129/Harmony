@@ -64,7 +64,7 @@ class FriendshipControllerTest {
     friendshipResponseDtos.add(friendshipResponseDto);
 
     // stub
-    when(friendshipService.readFriendships(any(Long.class)))
+    when(friendshipService.selectFriendships(any(Long.class)))
         .thenReturn(friendshipResponseDtos);
 
     // when
@@ -80,7 +80,7 @@ class FriendshipControllerTest {
             .andExpect(jsonPath("$..data[0].profileImageName").value("보뚱이.jpg"))
             .andExpect(jsonPath("$..data[0].friendType").value("FRIEND"));
 
-    verify(friendshipService, times(1)).readFriendships(any(Long.class));
+    verify(friendshipService, times(1)).selectFriendships(any(Long.class));
 
   }
   // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡUPDATEㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
