@@ -15,13 +15,13 @@ public interface FriendshipRequestRepository extends JpaRepository<FriendshipReq
       "WHERE f.friendshipRequestSender.userId = :fromUserId " +
       "AND f.friendshipRequestReceiver.userId = :toUserId "+
   "AND f.friendshipRequestStatus = :status")
-  Optional<FriendshipRequest> findByToUserIdAndFromUserIdAndFriendshipRequestStatus(@Param("fromUserId") Long fromUserId,
+  Optional<FriendshipRequest> findByFromUserIdAndToUserIdAndFriendshipRequestStatus(@Param("fromUserId") Long fromUserId,
       @Param("toUserId") Long toUserId, @Param("status") FriendshipRequestStatus status);
 
   @Query("SELECT f FROM FriendshipRequest f " +
       "WHERE f.friendshipRequestSender.userId = :fromUserId " +
       "AND f.friendshipRequestStatus = :status")
-  List<FriendshipRequest> findByFromUserIdAndFriendshipReqStatus(Long fromUserId, FriendshipRequestStatus status);
+  List<FriendshipRequest> findByFromUserIdAndFriendshipRequestStatus(Long fromUserId, FriendshipRequestStatus status);
 
 
 }
