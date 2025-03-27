@@ -29,13 +29,14 @@ import org.springframework.stereotype.Service;
 public class FriendshipRequestService {
   private final UserService userService;
   private final FriendshipRequestRepository friendshipRequestRepository;
+  // TODO: 아래 레포지토리를 꼭 의존해야 하는가..?
   private final FriendshipRepository friendshipRepository;
 
   public void createFriendshipRequest(Long fromUserId, CreateFriendshipRequestDto createToFriendshipRequestDto){
     String receiverIdentifier=createToFriendshipRequestDto.getReceiverIdentifier();
 
     User receiver =userService.getUserByUserIdentifier(receiverIdentifier);
-    Optional<FriendshipRequest> friendshipRequest=friendshipRequestRepository.findByToUserIdAndFromUserIdAndFriendshipRequestStatus(
+    Optional<FriendshipRequest> friendshipRequest=friendshipRequestRepository.findByFromUserIdAndToUserIdAndFriendshipRequestStatus(
         fromUserId, receiver.getUserId(), FriendshipRequestStatus.SENT);
 
     if(friendshipRequest.isPresent()){
@@ -74,7 +75,7 @@ public class FriendshipRequestService {
 
   // 내가 보낸 요청
   public List<SentFriendshipRequestResponseDto> sentFriendshipRequest(Long userId){
-    List<FriendshipRequest> sentFriendshipRequests=friendshipRequestRepository.findByFromUserIdAndFriendshipReqStatus(userId, FriendshipRequestStatus.SENT);
+    List<FriendshipRequest> sentFriendshipRequests=friendshipRequestRepository.findByFromUserIdAndFriendshipRequestStatus(userId, FriendshipRequestStatus.SENT);
 
     List<SentFriendshipRequestResponseDto> sentFriendshipRequestResponseDtos=new ArrayList<SentFriendshipRequestResponseDto>();
     for(FriendshipRequest sentFriendshipRequest:sentFriendshipRequests){
@@ -90,7 +91,7 @@ public class FriendshipRequestService {
 
   // 내가 받은 요청
   public List<ReceivedFriendshipRequestResponseDto> receivedFriendshipRequest(Long userId){
-    List<FriendshipRequest> receivedFriendshipRequests=friendshipRequestRepository.findByFromUserIdAndFriendshipReqStatus(userId, FriendshipRequestStatus.RECEIVED);
+    List<FriendshipRequest> receivedFriendshipRequests=friendshipRequestRepository.findByFromUserIdAndFriendshipRequestStatus(userId, FriendshipRequestStatus.RECEIVED);
 
     List<ReceivedFriendshipRequestResponseDto> receivedFriendshipRequestResponseDtos=new ArrayList<ReceivedFriendshipRequestResponseDto>();
     for(FriendshipRequest receivedFriendshipRequest:receivedFriendshipRequests){
@@ -110,14 +111,14 @@ public class FriendshipRequestService {
 
     System.out.println("유저 정보를 불러왔습니다.");
 
-    FriendshipRequest graphFriendshipRequest =friendshipRequestRepository.findByToUserIdAndFromUserIdAndFriendshipRequestStatus(
+    FriendshipRequest graphFriendshipRequest =friendshipRequestRepository.findByFromUserIdAndToUserIdAndFriendshipRequestStatus(
         receiverId, sender.getUserId(), FriendshipRequestStatus.RECEIVED).orElseThrow(
         () -> new AlreadyCanceledFriendshipRequestException(
             ErrorCode.INVALID_FRIENDSHIP_REQUEST
         )
     );
 
-    FriendshipRequest receivedFriendshipRequest =friendshipRequestRepository.findByToUserIdAndFromUserIdAndFriendshipRequestStatus(
+    FriendshipRequest receivedFriendshipRequest =friendshipRequestRepository.findByFromUserIdAndToUserIdAndFriendshipRequestStatus(
         sender.getUserId(), receiverId, FriendshipRequestStatus.SENT).orElseThrow(
         () -> new AlreadyCanceledFriendshipRequestException(
             ErrorCode.INVALID_FRIENDSHIP_REQUEST
@@ -176,13 +177,13 @@ public class FriendshipRequestService {
     System.out.println("기존 요청:"+ sender.getSentFriendshipRequests());
 
     // 진행중인 요청의 상태를 REJECTED로 변경
-    FriendshipRequest receivedFriendshipRequest =friendshipRequestRepository.findByToUserIdAndFromUserIdAndFriendshipRequestStatus(
+    FriendshipRequest receivedFriendshipRequest =friendshipRequestRepository.findByFromUserIdAndToUserIdAndFriendshipRequestStatus(
         receiverId, sender.getUserId(), FriendshipRequestStatus.RECEIVED).orElseThrow(
         () -> new AlreadyCanceledFriendshipRequestException(
             ErrorCode.INVALID_FRIENDSHIP_REQUEST
         )
     );
-    FriendshipRequest sentFriendshipRequest =friendshipRequestRepository.findByToUserIdAndFromUserIdAndFriendshipRequestStatus(
+    FriendshipRequest sentFriendshipRequest =friendshipRequestRepository.findByFromUserIdAndToUserIdAndFriendshipRequestStatus(
         sender.getUserId(),
         receiverId, FriendshipRequestStatus.SENT).orElseThrow(
         () -> new AlreadyCanceledFriendshipRequestException(
@@ -206,19 +207,18 @@ public class FriendshipRequestService {
     System.out.println("친구 요청을 거절했습니다.");
   }
 
-  public void cancelFriendshipRequest(Long receiverId, String senderIdentifier){
-    User sender =userService.getUserByUserIdentifier(senderIdentifier);
-    User receiver =userService.getUserById(receiverId); // 요청을 받은 유저
+  public void cancelFriendshipRequest(Long senderId, String receiverIdentifier){
+    User sender =userService.getUserById(senderId);
+    User receiver =userService.getUserByUserIdentifier(receiverIdentifier);
 
     System.out.println("기존 요청:"+ receiver.getReceivedFriendshipRequests());
     System.out.println("기존 요청:"+ sender.getSentFriendshipRequests());
 
     // 진행중인 요청의 상태를 CANCELED로 변경
-    FriendshipRequest receivedFriendshipRequest =friendshipRequestRepository.findByToUserIdAndFromUserIdAndFriendshipRequestStatus(
-        receiverId, sender.getUserId(), FriendshipRequestStatus.RECEIVED).get();
-    FriendshipRequest sentFriendshipRequest =friendshipRequestRepository.findByToUserIdAndFromUserIdAndFriendshipRequestStatus(
-        sender.getUserId(),
-        receiverId, FriendshipRequestStatus.SENT).get();
+    FriendshipRequest receivedFriendshipRequest =friendshipRequestRepository.findByFromUserIdAndToUserIdAndFriendshipRequestStatus(
+        receiver.getUserId(), senderId, FriendshipRequestStatus.RECEIVED).get();
+    FriendshipRequest sentFriendshipRequest =friendshipRequestRepository.findByFromUserIdAndToUserIdAndFriendshipRequestStatus(
+        senderId, receiver.getUserId(), FriendshipRequestStatus.SENT).get();
 
     // 상대방이 탈퇴 처리 진행중이라면
     if(sender.getWithdraw()){
