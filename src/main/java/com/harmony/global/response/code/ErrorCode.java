@@ -36,15 +36,35 @@ public enum ErrorCode implements ResponseCode {
   // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡParticipantㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
   PARTICIPANT_ALREADY_LEFT(HttpStatus.BAD_REQUEST, "이미 퇴장한 참가자입니다."),
 
+  // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡFriendshipㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+  // CREATE
+
+  // READ
+
+  // UPDATE
+
+  // DELETE
+  FRIENDSHIP_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 친구입니다."),
+
   // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡFriendshipRequestㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
   // CREATE
   FRIENDSHIP_REQUEST_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "이미 진행중인 친구 요청입니다."),
   // READ
 
   // UPDATE
-  INVALID_FRIENDSHIP_REQUEST(HttpStatus.BAD_REQUEST, "유효하지 않은 친구 요청입니다.");
+  INVALID_FRIENDSHIP_REQUEST(HttpStatus.BAD_REQUEST, "유효하지 않은 친구 요청입니다."),
 
   // DELETE
+
+  // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡBlockㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+  // CREATE
+
+  // READ
+
+  // UPDATE
+
+  // DELETE
+  BLOCK_NOT_FOUND(HttpStatus.BAD_REQUEST, "존재하지 않는 차단 이력입니다.");
 
   private final HttpStatus httpStatus;
 

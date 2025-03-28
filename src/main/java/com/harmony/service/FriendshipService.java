@@ -9,7 +9,6 @@ import com.harmony.repository.FriendshipRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,18 +43,22 @@ public class FriendshipService {
     User user=userService.getUserById(userId);
     User friend=userService.getUserByUserIdentifier(friendIdentifier);
 
-    Optional<Friendship> friendship=friendshipRepository.findByUserIdAndFriendId(userId, friend.getUserId());
-    if(friendship.isPresent()){
-      user.getFriendships().remove(friendship.get());
+    Friendship friendship=friendshipRepository.findByUserIdAndFriendId(userId, friend.getUserId())
+        .orElseThrow(
+            () -> new EntityNotFoundException(
+                ErrorCode.FRIENDSHIP_NOT_FOUND
+            )
+        );
 
-      Optional<Friendship> reversedFriendship=friendshipRepository.findByUserIdAndFriendId(friend.getUserId(), userId);
-      friend.getFriendships().remove(reversedFriendship.get());
+    Friendship reversedFriendship=friendshipRepository.findByUserIdAndFriendId(friend.getUserId(), userId)        .orElseThrow(
+        () -> new EntityNotFoundException(
+            ErrorCode.FRIENDSHIP_NOT_FOUND
+        )
+    );
 
-      System.out.println("친구를 삭제했습니다.");
-    }else{
-      throw new EntityNotFoundException(
-          ErrorCode.USER_NOT_FOUND
-      );
-    }
+    user.getFriendships().remove(friendship);
+    friend.getFriendships().remove(reversedFriendship);
+
+    System.out.println("친구를 삭제했습니다.");
   }
 }
