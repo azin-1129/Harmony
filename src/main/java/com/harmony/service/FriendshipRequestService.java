@@ -49,15 +49,12 @@ public class FriendshipRequestService {
     System.out.println("유저 정보를 불러 왔습니다.");
 
     // 양쪽 요청 저장하기
+    // TODO: 여기다 컬럼 추가하는 거랑 밑에 set으로 지정하는 거랑 무슨 차이지?
     FriendshipRequest sendingfriendshipRequest = FriendshipRequest.builder()
-        .friendshipRequestSender(sender)
-        .friendshipRequestReceiver(receiver)
         .friendshipRequestStatus(FriendshipRequestStatus.SENT)
         .build();
 
     FriendshipRequest willReceiveFriendshipRequest = FriendshipRequest.builder()
-        .friendshipRequestSender(receiver)
-        .friendshipRequestReceiver(sender)
         .friendshipRequestStatus(FriendshipRequestStatus.RECEIVED)
         .build();
 
@@ -142,14 +139,10 @@ public class FriendshipRequestService {
 
     // friend에 Insert
     Friendship friendshipTo=Friendship.builder()
-        .user(receiver)
-        .friend(sender)
         .friendType(FriendType.FRIEND)
         .build();
 
     Friendship friendshipFrom=Friendship.builder()
-        .user(sender)
-        .friend(receiver)
         .friendType(FriendType.FRIEND)
         .build();
 
@@ -216,19 +209,18 @@ public class FriendshipRequestService {
 
     // 진행중인 요청의 상태를 CANCELED로 변경
     FriendshipRequest receivedFriendshipRequest =friendshipRequestRepository.findByFromUserIdAndToUserIdAndFriendshipRequestStatus(
-        receiver.getUserId(), senderId, FriendshipRequestStatus.RECEIVED).get();
+        receiver.getUserId(), senderId, FriendshipRequestStatus.RECEIVED).orElseThrow(
+        () -> new EntityNotFoundException(
+            ErrorCode.INVALID_FRIENDSHIP_REQUEST
+        )
+    );
+
     FriendshipRequest sentFriendshipRequest =friendshipRequestRepository.findByFromUserIdAndToUserIdAndFriendshipRequestStatus(
-        senderId, receiver.getUserId(), FriendshipRequestStatus.SENT).get();
-
-    // 상대방이 탈퇴 처리 진행중이라면
-    if(sender.getWithdraw()){
-      receivedFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.CANCELED);
-      sentFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.CANCELED);
-
-      throw new EntityNotFoundException(
-          ErrorCode.USER_ALREADY_WITHDRAW
-      );
-    }
+        senderId, receiver.getUserId(), FriendshipRequestStatus.SENT).orElseThrow(
+        () -> new EntityNotFoundException(
+            ErrorCode.INVALID_FRIENDSHIP_REQUEST
+        )
+    );
 
     receivedFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.CANCELED);
     sentFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.CANCELED);
