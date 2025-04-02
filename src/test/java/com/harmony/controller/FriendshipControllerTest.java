@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.harmony.dto.response.FriendshipResponseDto;
+import com.harmony.dto.response.SelectFriendshipResponseDto;
 import com.harmony.entity.FriendType;
 import com.harmony.service.FriendshipService;
 import java.util.ArrayList;
@@ -54,8 +54,8 @@ class FriendshipControllerTest {
   @Test
   void readFriendships() throws Exception{
     // given
-    List<FriendshipResponseDto> friendshipResponseDtos =new ArrayList<>();
-    FriendshipResponseDto friendshipResponseDto= FriendshipResponseDto.builder()
+    List<SelectFriendshipResponseDto> friendshipResponseDtos =new ArrayList<>();
+    SelectFriendshipResponseDto friendshipResponseDto= SelectFriendshipResponseDto.builder()
         .friendIdentifier("pikmin")
         .nickname("보라뚱돼지")
         .profileImageName("보뚱이.jpg")

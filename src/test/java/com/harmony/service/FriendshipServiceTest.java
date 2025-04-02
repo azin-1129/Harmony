@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.harmony.dto.request.CreateFriendshipRequestDto;
-import com.harmony.dto.response.FriendshipResponseDto;
+import com.harmony.dto.response.SelectFriendshipResponseDto;
 import com.harmony.entity.Role;
 import com.harmony.entity.User;
 import com.harmony.global.response.exception.EntityNotFoundException;
@@ -95,7 +95,7 @@ class FriendshipServiceTest {
     friendshipRequestService.acceptFriendshipRequest(receiverId, fromUserIdentifier);
 
     // when
-    List<FriendshipResponseDto> friendships=friendshipService.selectFriendships(receiverId);
+    List<SelectFriendshipResponseDto> friendships=friendshipService.selectFriendships(receiverId);
 
     System.out.println("친구 목록:"+friendships);
     // then
@@ -127,7 +127,7 @@ class FriendshipServiceTest {
 
     em.flush();
     System.out.println("친삭 후:"+receiver.getFriendships());
-    List<FriendshipResponseDto> friendships=friendshipService.selectFriendships(receiverId);
+    List<SelectFriendshipResponseDto> friendships=friendshipService.selectFriendships(receiverId);
 
     // then
     assertEquals(0, friendships.size());

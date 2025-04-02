@@ -1,6 +1,6 @@
 package com.harmony.service;
 
-import com.harmony.dto.response.FriendshipResponseDto;
+import com.harmony.dto.response.SelectFriendshipResponseDto;
 import com.harmony.entity.Friendship;
 import com.harmony.entity.User;
 import com.harmony.global.response.code.ErrorCode;
@@ -22,12 +22,12 @@ public class FriendshipService {
   private final UserService userService;
 
   // TODO: 페이징 처리, 프론트에서 친구 검색
-  public List<FriendshipResponseDto> selectFriendships(Long userId){
+  public List<SelectFriendshipResponseDto> selectFriendships(Long userId){
     List<Friendship> friendships=friendshipRepository.findByUserId(userId);
 
-    List<FriendshipResponseDto> friendshipResponseDtos=new ArrayList<>();
+    List<SelectFriendshipResponseDto> friendshipResponseDtos=new ArrayList<>();
     for(Friendship friendship:friendships){
-      FriendshipResponseDto friendshipResponseDto= FriendshipResponseDto.builder()
+      SelectFriendshipResponseDto friendshipResponseDto= SelectFriendshipResponseDto.builder()
           .friendIdentifier(friendship.getFriend().getUserIdentifier())
           .nickname(friendship.getFriend().getNickname())
           .profileImageName(friendship.getFriend().getProfileImageName())
@@ -37,6 +37,16 @@ public class FriendshipService {
     }
 
     return friendshipResponseDtos;
+  }
+
+  // 테스트
+  public boolean existsFriendDSL(Long userId, Long friendId){
+    return friendshipRepository.existsFriendship(userId, friendId);
+  }
+
+  // 테스트
+  public boolean existsFriend(Long userId, Long friendId){
+    return friendshipRepository.existsByUserIdAndFriendId(userId, friendId);
   }
 
   public void deleteFriendship(Long userId, String friendIdentifier){
