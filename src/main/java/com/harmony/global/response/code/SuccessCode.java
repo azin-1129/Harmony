@@ -72,7 +72,20 @@ public enum SuccessCode implements ResponseCode {
   // UPDATE
 
   // DELETE
-  FRIENDSHIP_DELETE_SUCCESS(HttpStatus.OK, "친구를 삭제했습니다.");
+  FRIENDSHIP_DELETE_SUCCESS(HttpStatus.OK, "친구를 삭제했습니다."),
+
+  // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡBlockㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+  // CREATE
+  BLOCK_SUCCESS(HttpStatus.OK, "해당 유저를 차단했습니다."),
+
+  // READ
+  BLOCK_READ_SUCCESS(HttpStatus.OK, "차단한 상대 목록 조회에 성공했습니다."),
+
+  // UPDATE
+
+  // DELETE
+  UN_BLOCK_SUCCESS(HttpStatus.OK, "해당 유저 차단을 해제했습니다.");
+
 
   private final HttpStatus httpStatus;
 
