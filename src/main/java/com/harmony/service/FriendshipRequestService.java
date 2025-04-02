@@ -110,14 +110,14 @@ public class FriendshipRequestService {
 
     FriendshipRequest graphFriendshipRequest =friendshipRequestRepository.findByFromUserIdAndToUserIdAndFriendshipRequestStatus(
         receiverId, sender.getUserId(), FriendshipRequestStatus.RECEIVED).orElseThrow(
-        () -> new AlreadyCanceledFriendshipRequestException(
+        () -> new EntityNotFoundException(
             ErrorCode.INVALID_FRIENDSHIP_REQUEST
         )
     );
 
     FriendshipRequest receivedFriendshipRequest =friendshipRequestRepository.findByFromUserIdAndToUserIdAndFriendshipRequestStatus(
         sender.getUserId(), receiverId, FriendshipRequestStatus.SENT).orElseThrow(
-        () -> new AlreadyCanceledFriendshipRequestException(
+        () -> new EntityNotFoundException(
             ErrorCode.INVALID_FRIENDSHIP_REQUEST
         )
     );
@@ -226,5 +226,9 @@ public class FriendshipRequestService {
     sentFriendshipRequest.setFriendshipRequestStatus(FriendshipRequestStatus.CANCELED);
 
     System.out.println("친구 요청을 취소했습니다.");
+  }
+
+  public boolean existsFriendshipRequestDSL(Long fromUserId, Long toUserId, FriendshipRequestStatus friendshipRequestStatus){
+    return friendshipRequestRepository.existsFriendshipRequest(fromUserId, toUserId, friendshipRequestStatus);
   }
 }
