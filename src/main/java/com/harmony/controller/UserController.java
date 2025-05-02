@@ -18,9 +18,11 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -73,6 +75,14 @@ public class UserController {
     );
   }
 
+  @GetMapping("/info")
+  @PreAuthorize("hasAnyRole('ROLE_MEMBER', 'ROLE_ADMIN')")
+  public ResponseEntity<Object> selectUserInfo(){
+    return SuccessResponse.createSuccess(
+        SuccessCode.USER_INFO_READ_SUCCESS,
+        userService.findUserInfo()
+    );
+  }
   // 비번 업뎃
   @PostMapping("update/password")
   @Operation(summary="비밀번호 변경", description="비밀번호 변경 API")

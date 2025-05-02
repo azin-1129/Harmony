@@ -1,6 +1,7 @@
 package com.harmony.service;
 
 import com.harmony.dto.request.RegisterRequestDto;
+import com.harmony.dto.response.SelectUserInfoResponseDto;
 import com.harmony.entity.User;
 import com.harmony.exception.DuplicatedUserNicknameException;
 import com.harmony.exception.DuplicatedUserPasswordException;
@@ -9,11 +10,13 @@ import com.harmony.global.response.code.ErrorCode;
 import com.harmony.global.response.exception.EntityNotFoundException;
 import com.harmony.global.response.exception.InvalidArgumentException;
 import com.harmony.repository.UserRepository;
+import com.harmony.security.utils.SecurityUtil;
 import jakarta.transaction.Transactional;
 import java.util.HashMap;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
   private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
   // TODO: 이메일, 식별자, 닉네임 중복 처리 이렇게 해도 되나?
   public void registerUser(RegisterRequestDto registerRequestDto) {
@@ -44,8 +48,8 @@ public class UserService {
       User user = User.builder()
           .email(registerRequestDto.getEmail())
           .userIdentifier(registerRequestDto.getUserIdentifier())
-          .password(registerRequestDto.getPassword())
-          .profileImageName("")
+          .password(passwordEncoder.encode(registerRequestDto.getPassword()))
+          .profileImageName("") // TODO: 기본 프사 넣어줘야 할 듯?
           .nickname(registerRequestDto.getNickname())
           .withdraw(false)
           .role(registerRequestDto.getRole())
@@ -58,6 +62,27 @@ public class UserService {
           validateResult
       );
     }
+  }
+
+  public SelectUserInfoResponseDto findUserInfo(){
+    String email= SecurityUtil.getCurrentEmail().orElseThrow(()->
+        new RuntimeException("Security Context에 인증 정보가 없습니다."));
+
+    User user=userRepository.findByEmail(email).orElseThrow(
+        ()->new EntityNotFoundException(
+            ErrorCode.USER_NOT_FOUND
+        )
+    );
+
+    SelectUserInfoResponseDto selectUserInfoResponseDto=
+        SelectUserInfoResponseDto.builder()
+            .email(email)
+            .userIdentifier(user.getUserIdentifier())
+            .profileImageName(user.getProfileImageName())
+            .nickname(user.getNickname())
+            .build();
+
+    return selectUserInfoResponseDto;
   }
 
   public User getUserById(Long userId){
