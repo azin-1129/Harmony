@@ -12,6 +12,7 @@ public enum SuccessCode implements ResponseCode {
   USER_REGISTER_SUCCESS(HttpStatus.CREATED, "회원가입에 성공했습니다."),
 
   // READ
+  USER_INFO_READ_SUCCESS(HttpStatus.OK, "내 정보 조회에 성공했습니다."),
 
   // UPDATE
   USER_UPDATE_PASSWORD_SUCCESS(HttpStatus.OK, "비밀번호를 변경했습니다."),
@@ -84,7 +85,19 @@ public enum SuccessCode implements ResponseCode {
   // UPDATE
 
   // DELETE
-  UN_BLOCK_SUCCESS(HttpStatus.OK, "해당 유저 차단을 해제했습니다.");
+  UN_BLOCK_SUCCESS(HttpStatus.OK, "해당 유저 차단을 해제했습니다."),
+
+  // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡAuthㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+  // AUTH
+  AUTH_LOGIN_SUCCESS(HttpStatus.OK, "로그인에 성공했습니다."),
+  AUTH_REISSUE_SUCCESS(HttpStatus.OK, "토큰 재발급에 성공했습니다.");
+  // CREATE
+
+  // READ
+
+  // UPDATE
+
+  // DELETE
 
 
   private final HttpStatus httpStatus;
