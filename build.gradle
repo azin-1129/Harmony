@@ -27,6 +27,15 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
+	// Spring Security
+	implementation "org.springframework.boot:spring-boot-starter-security:3.3.4"
+	implementation "org.springframework.boot:spring-boot-starter-web:3.3.4"
+
+	// JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
 	// STOMP
 	implementation 'org.springframework:spring-messaging:6.2.1'
 	implementation 'org.springframework:spring-websocket:6.1.13'
@@ -51,6 +60,7 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
 	// lombok
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
