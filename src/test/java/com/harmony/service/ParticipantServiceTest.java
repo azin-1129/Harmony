@@ -72,7 +72,7 @@ class ParticipantServiceTest {
         .profileImageName("orange_orange_cat.png")
         .nickname("초코고양이")
         .withdraw(false)
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     userRepository.save(choco);
@@ -84,7 +84,7 @@ class ParticipantServiceTest {
         .profileImageName("cheese_cat.png")
         .nickname("치즈고양이")
         .withdraw(false)
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     userRepository.save(cheese);
@@ -96,7 +96,7 @@ class ParticipantServiceTest {
         .profileImageName("oreo_cat.png")
         .nickname("오레오 고양이")
         .withdraw(false)
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     userRepository.save(oreo);
@@ -108,7 +108,7 @@ class ParticipantServiceTest {
         .profileImageName("chaos_gatto.png")
         .nickname("알록달록 고양이")
         .withdraw(false)
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     userRepository.save(chaos);

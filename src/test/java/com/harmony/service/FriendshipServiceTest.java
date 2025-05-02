@@ -53,7 +53,7 @@ class FriendshipServiceTest {
         .profileImageName("orange_orange_cat.png")
         .nickname("초코고양이")
         .withdraw(false)
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     userRepository.save(choco);
@@ -65,7 +65,7 @@ class FriendshipServiceTest {
         .profileImageName("cheese_cat.png")
         .nickname("치즈고양이")
         .withdraw(false)
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     userRepository.save(cheese);

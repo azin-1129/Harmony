@@ -50,7 +50,7 @@ class UserServiceTest {
         .profileImageName("orange_orange_cat.png")
         .nickname("초코고양이")
         .withdraw(false)
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     userRepository.save(user);
@@ -69,7 +69,7 @@ class UserServiceTest {
             .nickname("키티지니")
             .password("azin1129!")
             .passwordConfirm("azin1129!")
-            .role(Role.MEMBER)
+            .role(Role.ROLE_MEMBER)
             .build();
 
     // when
@@ -160,7 +160,7 @@ class UserServiceTest {
         .nickname("초코고양이") // 오류사항
         .password("azin1129!")
         .passwordConfirm("azin1129!")
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     // when
@@ -181,7 +181,7 @@ class UserServiceTest {
         .nickname("치즈고양이")
         .password("azin1129!")
         .passwordConfirm("azin1129!")
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     // when
@@ -202,7 +202,7 @@ class UserServiceTest {
         .nickname("치즈고양이")
         .password("azin1129!")
         .passwordConfirm("azin1129!")
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     // when

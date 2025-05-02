@@ -20,7 +20,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -62,7 +61,7 @@ class FriendshipRequestServiceTest {
         .profileImageName("orange_orange_cat.png")
         .nickname("초코고양이")
         .withdraw(false)
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     userRepository.save(choco);
@@ -75,7 +74,7 @@ class FriendshipRequestServiceTest {
         .profileImageName("cheese_cat.png")
         .nickname("치즈고양이")
         .withdraw(false)
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     userRepository.save(cheese);
@@ -87,7 +86,7 @@ class FriendshipRequestServiceTest {
         .profileImageName("oreo_cat.png")
         .nickname("오레오 고양이")
         .withdraw(false)
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     userRepository.save(oreo);
@@ -99,7 +98,7 @@ class FriendshipRequestServiceTest {
         .profileImageName("피크민.png")
         .nickname("보라뚱돼지")
         .withdraw(false)
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     userRepository.save(pikmin);
@@ -111,7 +110,7 @@ class FriendshipRequestServiceTest {
         .profileImageName("choco_chunk.png")
         .nickname("크루키는맛있")
         .withdraw(false)
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     userRepository.save(cookie);
@@ -123,7 +122,7 @@ class FriendshipRequestServiceTest {
         .profileImageName("jar.png")
         .nickname("북극곰")
         .withdraw(false)
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     userRepository.save(cola);

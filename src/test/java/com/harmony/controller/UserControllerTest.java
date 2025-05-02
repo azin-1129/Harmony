@@ -1,6 +1,5 @@
 package com.harmony.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -59,7 +58,7 @@ class UserControllerTest {
         .nickname("초코고양이")
         .password("azin1129!")
         .passwordConfirm("azin1129!")
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     // stub
@@ -227,7 +226,7 @@ class UserControllerTest {
         .userIdentifier("choco")
         .nickname("초코고양이")
         .password("1129") // 오류사항
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     // when
@@ -253,7 +252,7 @@ class UserControllerTest {
         .nickname("초코고양이")
         .password("azin1129!")
         .passwordConfirm("azin112!") // 오류사항
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     // when
@@ -279,7 +278,7 @@ class UserControllerTest {
         .nickname("초코고양이")
         .password("azin1129!")
         .passwordConfirm("") // 오류사항
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     // when
@@ -305,7 +304,7 @@ class UserControllerTest {
         .nickname("초코고양이")
         .password("azin1129!")
         .passwordConfirm("azin1129!")
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     // when
@@ -331,7 +330,7 @@ class UserControllerTest {
         .nickname("초") // 오류사항
         .password("azin1129!")
         .passwordConfirm("azin1129!")
-        .role(Role.MEMBER)
+        .role(Role.ROLE_MEMBER)
         .build();
 
     // when
