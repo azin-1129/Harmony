@@ -44,6 +44,6 @@ public class RegisterRequestDto {
   @Schema(description = "비밀번호 확인", defaultValue = "azin1129!")
   private String passwordConfirm;
 
-  @Schema(description = "권한", defaultValue = "MEMBER", allowableValues = {"MEMBER", "ADMIN"})
+  @Schema(description = "권한", defaultValue = "ROLE_MEMBER", allowableValues = {"ROLE_MEMBER", "ROLE_ADMIN"})
   private Role role;
 }
