@@ -1,6 +1,7 @@
 package com.harmony.env;
 
 import com.harmony.security.filter.AuthenticationFilter;
+import com.harmony.security.filter.CustomExceptionFilter;
 import com.harmony.security.handler.JwtAccessDeniedHandler;
 import com.harmony.security.handler.JwtAuthenticationEntryPoint;
 import java.util.List;
@@ -26,7 +27,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
   private final String[] allowedUrls=
-      {"/v3/api-docs/**", "/swagger/**", "/swagger-ui/**", "/swagger-resources/**", "/user/register", "/auth/login", "/auth/reissue"};
+      {"/v3/api-docs/**", "/swagger/**", "/swagger-ui/**", "/swagger-resources/**", "/user/register", "/auth/login", "/auth/reissue", "/error"};
+  private final CustomExceptionFilter customExceptionFilter;
   private final AuthenticationFilter authenticationFilter;
   private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
   private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
@@ -47,6 +49,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()) // 지정된 url 외 인증 없이 접근 불가능
         // UsernamePasswordAthenticationFilter 이전에 JwtAuthorizationFilter가 수행된다. UsernamePasswordAuthenticationFilter를 거치기 전에 이미 인증이 완료된다.
         .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 인증 추가(커스텀)
+        .addFilterBefore(customExceptionFilter, AuthenticationFilter.class)
         .exceptionHandling(exceptionConfig->
             exceptionConfig.accessDeniedHandler(jwtAccessDeniedHandler)
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint))

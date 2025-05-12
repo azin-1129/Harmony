@@ -1,5 +1,6 @@
 package com.harmony.security.utils;
 
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.security.core.userdetails.User;
 import com.harmony.exception.ExpiredTokenException;
 import com.harmony.exception.InvalidTokenException;
@@ -99,8 +100,8 @@ public class TokenProvider {
   }
 
   // AuthenticationFilter에서 활용
-  public Authentication getAuthentication(String accessToken){
-    Claims claims=parseClaims(accessToken);
+  public Authentication getAuthentication(String token){
+    Claims claims=parseClaims(token);
 
     if(claims.get(AUTHORITIES_KEY)==null){
       throw new InvalidTokenException(
@@ -144,12 +145,14 @@ public class TokenProvider {
     try{
       Jwts.parser().setSigningKey(key).build().parseClaimsJws(token);
       return true;
-    } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
-      log.info("토큰이 유효하지 않습니다.");
-      return false;
+    } catch (SignatureException | SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+      throw new InvalidTokenException(
+          ErrorCode.AUTH_INVALID_TOKEN
+      );
     } catch (ExpiredJwtException e) {
-      log.info("토큰이 만료되었습니다.");
-      return false;
+      throw new ExpiredTokenException(
+          ErrorCode.AUTH_EXPIRED_TOKEN
+      );
     }
   }
 
