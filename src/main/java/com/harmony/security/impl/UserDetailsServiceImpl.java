@@ -1,10 +1,8 @@
 package com.harmony.security.impl;
 
 import com.harmony.entity.User;
-import com.harmony.exception.AuthFailedException;
+import com.harmony.exception.LoginFailedException;
 import com.harmony.global.response.code.ErrorCode;
-import com.harmony.global.response.exception.EntityNotFoundException;
-import com.harmony.global.response.exception.InvalidArgumentException;
 import com.harmony.repository.UserRepository;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +11,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -30,7 +27,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     return userRepository.findByEmail(userEmail)
         .map(user->createUserDetails(user))
-        .orElseThrow(()->new AuthFailedException(ErrorCode.AUTH_FAILED));
+        .orElseThrow(()->new LoginFailedException(ErrorCode.AUTH_LOGIN_FAILED));
   }
 
   private UserDetails createUserDetails(User user){
