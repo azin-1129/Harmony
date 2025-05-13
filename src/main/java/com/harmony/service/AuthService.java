@@ -1,8 +1,10 @@
 package com.harmony.service;
 
 import com.harmony.dto.request.LoginDto;
+import com.harmony.dto.response.ReissueResponseDto;
 import com.harmony.entity.RefreshToken;
 import com.harmony.exception.AuthFailedException;
+import com.harmony.exception.LoginFailedException;
 import com.harmony.global.response.code.ErrorCode;
 import com.harmony.repository.RefreshTokenRepository;
 import com.harmony.security.ReissueDto;
@@ -52,47 +54,40 @@ public class AuthService {
 
       return tokenDto;
     }catch(BadCredentialsException e){ // PW 불일치 캐치
-      throw new AuthFailedException(
-          ErrorCode.AUTH_FAILED
+      throw new LoginFailedException(
+          ErrorCode.AUTH_LOGIN_FAILED
       );
     }
   }
 
-  // TODO: Refresh Token을 Redis에서 관리, Custom Exception은 일단 보류
-  public TokenDto reissue(ReissueDto reissueDto){
+  // TODO: Refresh Token을 Redis에서 관리
+  public ReissueResponseDto reissue(ReissueDto reissueDto){
     // Refresh Token 검증
-    if(!tokenProvider.isValidToken(reissueDto.getRefreshToken())){
-      throw new RuntimeException("토큰이 유효하지 않음");
+    if(!tokenProvider.isValidToken(reissueDto.getRefreshToken())){ // Refresh Token이 유효하지 않을 시, 재 로그인 필요
+      throw new AuthFailedException(
+          ErrorCode.AUTH_INVALID_TOKEN
+      );
     }
 
-    // Access Token에서 ID 가져오기
-    // TODO: 아니면 token 안에 user email을 넣어야 하는가?
-    Authentication authentication=tokenProvider.getAuthentication(reissueDto.getAccessToken());
+    // Refresh Token에서 ID 가져오기
+    Authentication authentication=tokenProvider.getAuthentication(reissueDto.getRefreshToken());
 
     // ID를 기반으로 Server의 Refresh Token 값 가져오기
+    // TODO: 로그아웃 처리
     RefreshToken refreshToken=refreshTokenRepository.findByUserEmail(authentication.getName())
-        .orElseThrow(()->new RuntimeException("로그아웃된 사용자입니다."));
+        .orElseThrow(()->new AuthFailedException(
+            ErrorCode.AUTH_INVALID_TOKEN
+        ));
 
     // Refresh Token 값이 Server와 일치하는지 검사
     if(!refreshToken.getRefreshToken().equals(reissueDto.getRefreshToken())){
-      throw new RuntimeException("Refresh Token 정보가 일치하지 않음");
+      throw new AuthFailedException(
+          ErrorCode.AUTH_INVALID_TOKEN
+      );
     }
 
-    TokenDto tokenDto=null;
-    // TODO: 재발급 시점은 언제?
-    if(tokenProvider.refreshTokenPeriodCheck(refreshToken.getRefreshToken())){
-      // Refresh Token 유효 기간이 3일 미만일 경우 Access, Refresh 모두 재발급
-      tokenDto=tokenProvider.generateTokenDto(authentication);
-
-      RefreshToken newRefreshToken=refreshToken.updateRefreshToken(tokenDto.getRefreshToken());
-      refreshTokenRepository.save(newRefreshToken);
-    }else{
-      // Refresh Token 유효 기간이 3일 이상일 경우 Access만 재발급
-      tokenDto=TokenDto.builder()
-          .accessToken(tokenProvider.generateAccessTokenOnly(authentication))
-          .build();
-    }
-
-    return tokenDto;
+    return ReissueResponseDto.builder()
+        .accessToken(tokenProvider.generateAccessTokenOnly(authentication))
+        .build();
   }
 }
