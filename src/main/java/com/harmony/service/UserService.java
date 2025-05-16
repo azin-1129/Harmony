@@ -5,6 +5,7 @@ import com.harmony.dto.response.SelectUserInfoResponseDto;
 import com.harmony.entity.User;
 import com.harmony.exception.DuplicatedUserNicknameException;
 import com.harmony.exception.DuplicatedUserPasswordException;
+import com.harmony.exception.SecurityContextNotFoundException;
 import com.harmony.exception.UserAlreadyWithdrawException;
 import com.harmony.global.response.code.ErrorCode;
 import com.harmony.global.response.exception.EntityNotFoundException;
@@ -66,7 +67,10 @@ public class UserService {
 
   public SelectUserInfoResponseDto findUserInfo(){
     String email= SecurityUtil.getCurrentEmail().orElseThrow(()->
-        new RuntimeException("Security Context에 인증 정보가 없습니다."));
+        new SecurityContextNotFoundException(
+            ErrorCode.AUTH_CONTEXT_NOT_FOUND
+        )
+    );
 
     User user=userRepository.findByEmail(email).orElseThrow(
         ()->new EntityNotFoundException(
