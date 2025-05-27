@@ -27,7 +27,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
   private final String[] allowedUrls=
-      {"/v3/api-docs/**", "/swagger/**", "/swagger-ui/**", "/swagger-resources/**", "/user/register", "/auth/login", "/auth/reissue", "/error"};
+      {"/ws/**", "/v3/api-docs/**", "/swagger/**", "/swagger-ui/**", "/swagger-resources/**", "/user/register", "/auth/login", "/auth/reissue", "/error"};
   private final CustomExceptionFilter customExceptionFilter;
   private final AuthenticationFilter authenticationFilter;
   private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -61,7 +61,7 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource(){
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(List.of("*"));
+    configuration.setAllowedOriginPatterns(List.of("*"));
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(List.of("*"));
     configuration.setAllowCredentials(true);
