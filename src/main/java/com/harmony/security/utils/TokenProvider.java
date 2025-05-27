@@ -1,7 +1,8 @@
 package com.harmony.security.utils;
 
+import com.harmony.security.impl.UserDetailsImpl;
+import com.harmony.security.impl.UserDetailsServiceImpl;
 import io.jsonwebtoken.security.SignatureException;
-import org.springframework.security.core.userdetails.User;
 import com.harmony.exception.ExpiredTokenException;
 import com.harmony.exception.InvalidTokenException;
 import com.harmony.global.response.code.ErrorCode;
@@ -27,7 +28,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -43,12 +43,17 @@ public class TokenProvider {
   // 60000 * 30 = 1800000 180만 초가 30분?
   // 1.8만초=3초
   // 원래 30분 : 1000*60*30
-  private static final long ACCESS_TOKEN_EXPIRE_TIME=18000; // 30분
+  private static final long ACCESS_TOKEN_EXPIRE_TIME=1000*60*5; // 30분
   private static final long REFRESH_TOKEN_EXPIRE_TIME=1000*60*60*24*7; // 7일
   private static final long THREE_DAYS=1000*60*60*24*3;
-  private final Key key;
 
-  public TokenProvider(@Value("${jwt.secret}") String jwtSecretKey){
+  private final Key key;
+  // TODO: 여기다가 UserDetailsServiceImpl 끼워도 되나..? 아님 JwtFilter가 필요한가?
+  private final UserDetailsServiceImpl userDetailsServiceImpl;
+
+  public TokenProvider(@Value("${jwt.secret}") String jwtSecretKey,
+      UserDetailsServiceImpl userDetailsServiceImpl){
+    this.userDetailsServiceImpl = userDetailsServiceImpl;
     byte[] keyBytes= Decoders.BASE64.decode(jwtSecretKey);
     this.key=Keys.hmacShaKeyFor(keyBytes);
   }
@@ -101,9 +106,12 @@ public class TokenProvider {
 
   // AuthenticationFilter에서 활용
   public Authentication getAuthentication(String token){
+    log.info("get Authentication에 진입합니다.");
     Claims claims=parseClaims(token);
+    log.info("parse를 완료했습니다.");
 
     if(claims.get(AUTHORITIES_KEY)==null){
+      log.error("claim 내 auth key가 null 입니다.");
       throw new InvalidTokenException(
           ErrorCode.AUTH_INVALID_TOKEN
       );
@@ -115,7 +123,9 @@ public class TokenProvider {
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toList());
 
-    UserDetails principal=new User(claims.getSubject(), "", authorities);
+    // TODO: 메시지에 프사 링크같은 건 어떻게 해야하지?
+    UserDetailsImpl principal=userDetailsServiceImpl.loadUserByUsername(claims.getSubject());
+
     return new UsernamePasswordAuthenticationToken(principal, "", authorities);
   }
   // Refresh Token 유효기간 지정
@@ -159,8 +169,10 @@ public class TokenProvider {
   // JWT 내에서 Claims 정보 반환
   private Claims parseClaims(String accessToken) {
     try {
+      log.info("parse 작업을 시작합니다.");
       return Jwts.parser().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
     } catch (ExpiredJwtException e) {
+      log.error("만료된 토큰입니다.");
       throw new ExpiredTokenException(
           ErrorCode.AUTH_EXPIRED_TOKEN
       );

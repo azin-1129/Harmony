@@ -21,13 +21,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
   // 사용자 Email로 해당 사용자의 인증 정보 load
   @Override
-  public UserDetails loadUserByUsername(String userEmail){
+  public UserDetailsImpl loadUserByUsername(String userEmail){
     log.info("userDetails service 진입");
     log.info("userEmail: {}", userEmail);
 
     return userRepository.findByEmail(userEmail)
-        .map(user->createUserDetails(user))
+        .map(user->new UserDetailsImpl(user))
         .orElseThrow(()->new LoginFailedException(ErrorCode.AUTH_LOGIN_FAILED));
+//    return userRepository.findByEmail(userEmail)
+//        .map(user->createUserDetails(user))
+//        .orElseThrow(()->new LoginFailedException(ErrorCode.AUTH_LOGIN_FAILED));
   }
 
   private UserDetails createUserDetails(User user){
