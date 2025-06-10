@@ -1,5 +1,6 @@
 package com.harmony.entity;
 
+import com.harmony.dto.form.ArticleForm;
 import com.harmony.global.BaseTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,7 +36,7 @@ public class Article extends BaseTime {
   @JoinColumn(name="user_id")
   private User author;
 
-  @Column(name="article_media_url", nullable=true, length=255)
+  @Column(name="article_media_url", nullable=false, length=255)
   private String articleMediaUrl;
 
   @Enumerated(EnumType.STRING)
@@ -48,7 +49,7 @@ public class Article extends BaseTime {
   @Column(name="article_comment_count", nullable=false, columnDefinition="smallint")
   private Integer articleCommentCount;
 
-  @Column(name="is_comment_enabled", nullable=false)
+  @Column(name="is_comment_disabled", nullable=false)
   private Boolean isCommentDisabled;
 
   @Column(name="article_like_count", nullable=false, columnDefinition="smallint")
@@ -56,4 +57,10 @@ public class Article extends BaseTime {
 
   @Column(name="article_thumbnail_url", nullable=true, length=255)
   private String articleThumbnailUrl;
+
+  // update
+  public void updateContents(ArticleForm articleForm){
+    this.articleMediaUrl = articleForm.getArticleMediaUrl();
+    this.articleText = articleForm.getArticleText();
+  }
 }
