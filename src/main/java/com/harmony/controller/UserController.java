@@ -84,7 +84,7 @@ public class UserController {
     );
   }
   // 비번 업뎃
-  @PostMapping("update/password")
+  @PostMapping("/update/password")
   @Operation(summary="비밀번호 변경", description="비밀번호 변경 API")
   @ApiResponses(value={
       @ApiResponse(responseCode="200", description="비밀번호 변경 성공"),
@@ -121,7 +121,7 @@ public class UserController {
   }
 
   // 닉넴 업뎃
-  @PostMapping("update/nickname")
+  @PostMapping("/update/nickname")
   @Operation(summary="닉네임 변경", description="닉네임 변경 API")
   @ApiResponses(value={
       @ApiResponse(responseCode="200", description="닉네임 변경 성공"),
@@ -153,7 +153,7 @@ public class UserController {
   // 프사 업뎃
   // TODO: 지원하지 않는 이미지 형식?
   // TODO: 이미지 @Valid도 있나..? Dto에는 없음
-  @PostMapping("update/profile-image")
+  @PostMapping("/update/profile-image")
   @Operation(summary="프로필 사진 변경", description="프로필 사진 변경 API")
   @ApiResponses(value={
       @ApiResponse(responseCode="200", description="프로필 사진 변경 성공"),
