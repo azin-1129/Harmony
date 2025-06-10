@@ -90,7 +90,7 @@ public enum SuccessCode implements ResponseCode {
   // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡAuthㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
   // AUTH
   AUTH_LOGIN_SUCCESS(HttpStatus.OK, "로그인에 성공했습니다."),
-  AUTH_REISSUE_SUCCESS(HttpStatus.OK, "토큰 재발급에 성공했습니다.");
+  AUTH_REISSUE_SUCCESS(HttpStatus.OK, "토큰 재발급에 성공했습니다."),
   // CREATE
 
   // READ
@@ -98,6 +98,20 @@ public enum SuccessCode implements ResponseCode {
   // UPDATE
 
   // DELETE
+
+  // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡArticleㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+  // CREATE
+  WRITE_ARTICLE_SUCCESS(HttpStatus.CREATED, "게시물 작성에 성공했습니다."),
+
+  // READ
+  FOLLOWING_USER_ARTICLES_READ_SUCCESS(HttpStatus.OK, "팔로잉 피드 최신순 정렬에 성공했습니다."),
+  USER_ARTICLES_READ_SUCCESS(HttpStatus.OK, "특정 유저의 피드 최신순 정렬에 성공했습니다."),
+
+  // UPDATE
+  ARTICLE_UPDATE_SUCCESS(HttpStatus.OK, "게시물 수정에 성공했습니다."),
+
+  // DELETE
+  ARTICLE_DELETE_SUCCESS(HttpStatus.OK, "게시물 삭제에 성공했습니다.");
 
 
   private final HttpStatus httpStatus;

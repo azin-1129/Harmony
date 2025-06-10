@@ -71,7 +71,7 @@ public enum ErrorCode implements ResponseCode {
   AUTH_EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
   AUTH_LOGIN_FAILED(HttpStatus.BAD_REQUEST, "ID나 PW가 올바르지 않습니다."),
   AUTH_FAILED(HttpStatus.UNAUTHORIZED, "인증 정보가 올바르지 않습니다."),
-  AUTH_CONTEXT_NOT_FOUND(HttpStatus.UNAUTHORIZED, "인증 정보가 유효하지 않습니다.");
+  AUTH_CONTEXT_NOT_FOUND(HttpStatus.UNAUTHORIZED, "인증 정보가 유효하지 않습니다."),
 
   // CREATE
 
@@ -80,6 +80,7 @@ public enum ErrorCode implements ResponseCode {
   // UPDATE
 
   // DELETE
+  ARTICLE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시물입니다.");
 
   private final HttpStatus httpStatus;
 
