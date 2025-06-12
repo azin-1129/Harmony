@@ -90,7 +90,11 @@ public class UserService {
   }
 
   public User getUserById(Long userId){
-    return userRepository.findById(userId).get();
+    return userRepository.findById(userId).orElseThrow(
+        () -> new EntityNotFoundException(
+            ErrorCode.USER_NOT_FOUND
+        )
+    );
   }
 
   public User getUserByUserIdentifier(String userIdentifier) {
@@ -147,8 +151,20 @@ public class UserService {
     userToWithDraw.get().updateWithDraw(true);
   }
 
-  // 테스트용 삭제 메서드
+  // 테스트용 삭제 메서드(로그인하지 않은 상태에서 실행)
   public void deleteUserForce(Long userId){
-    userRepository.deleteById(userId);
+    User userToWithdraw=userRepository.findById(userId).orElseThrow(
+        () -> new EntityNotFoundException(
+            ErrorCode.USER_NOT_FOUND
+        )
+    );
+
+    if(userToWithdraw.getWithdraw()){
+      throw new UserAlreadyWithdrawException(
+          ErrorCode.USER_ALREADY_WITHDRAW
+      );
+    }
+
+    userToWithdraw.updateWithDraw(true);
   }
 }
