@@ -12,6 +12,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.AccessLevel;
@@ -65,6 +67,9 @@ public class User extends BaseTime {
   @OneToMany(fetch=FetchType.LAZY, mappedBy = "friendshipRequestReceiver", cascade= CascadeType.ALL, orphanRemoval = true)
   private Set<FriendshipRequest> receivedFriendshipRequests = new HashSet<>();
 
+  @Column(name = "withdrawn_at",columnDefinition = "TIMESTAMP")
+  private LocalDateTime withdrawnAt;
+
   // update
   public void updatePassword(String newPassword) {
     this.password = newPassword;
@@ -80,5 +85,6 @@ public class User extends BaseTime {
 
   public void updateWithDraw(boolean newWithdraw) {
     this.withdraw = newWithdraw;
+    this.withdrawnAt=LocalDateTime.now();
   }
 }
