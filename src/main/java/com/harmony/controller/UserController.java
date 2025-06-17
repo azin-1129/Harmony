@@ -168,6 +168,14 @@ public class UserController {
     );
   }
 
+  // 탈퇴 취소
+//  public ResponseEntity<Object> activateUser(){
+//    // withdraw=false, withdrawn_at=null
+//
+//    return SuccessResponse.createSuccess(
+//            SuccessCode.USER_ACTIVATE_SUCCESS
+//    );
+//  }
   // 탈퇴
   @DeleteMapping
   @Operation(summary="회원탈퇴", description="회원탈퇴 API")

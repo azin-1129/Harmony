@@ -36,10 +36,10 @@ public class User extends BaseTime {
   @Column(name = "user_id", nullable = false)
   private Long userId;
 
-  @Column(name = "user_email", nullable = false, length=255)
+  @Column(name = "user_email", nullable = true, length=255)
   private String email;
 
-  @Column(name="user_identifier", nullable=false, length=20)
+  @Column(name="user_identifier", nullable=true, length=20)
   private String userIdentifier;
 
   @Column(name = "password", nullable = false, length=255)
@@ -48,7 +48,7 @@ public class User extends BaseTime {
   @Column(name = "profile_image_name", nullable = false, length=255)
   private String profileImageName;
 
-  @Column(name = "nickname", nullable = false, length=10)
+  @Column(name = "nickname", nullable = true, length=10)
   private String nickname;
 
   @Column(name = "withdraw", nullable = false)

@@ -129,6 +129,7 @@ public class ParticipantController {
   @ApiResponses(value={
       @ApiResponse(responseCode = "200", description = "채팅방 참가자 조회에 성공했습니다.")
   })
+  // TODO: 탈퇴한 user는 제외
   public ResponseEntity<Object> selectChatRoomParticipants(@RequestBody
   SelectChatRoomParticipantsRequestDto selectChatRoomParticipantsRequestDto) {
     List<SelectChatRoomParticipantsResponseDto> filteredParticipants=participantService.selectChatRoomParticipants(selectChatRoomParticipantsRequestDto);
