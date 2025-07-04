@@ -5,9 +5,11 @@ import com.harmony.entity.ChatRoomType;
 import com.harmony.entity.Participant;
 import com.harmony.entity.ParticipantId;
 import com.harmony.entity.User;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -31,6 +33,14 @@ public interface ParticipantRepository extends JpaRepository<Participant, Partic
   @Query("SELECT c FROM ChatRoom c WHERE c.chatRoomId IN (" +
       "SELECT p.participantId.chatroomId FROM Participant p WHERE p.participantId.userId = :userId)")
   List<ChatRoom> findChatRoomsByUserId(@Param("userId") Long userId);
+
+  @Query("SELECT p FROM Participant p WHERE p.participantId.userId IN :userIds AND p.participantId.chatroomId IN :chatRoomIds")
+  List<Participant> findSoftDeletedParticipants(@Param("userIds") List<Long> userIds, @Param("chatRoomIds") List<Long> chatRoomIds);
+
+  @Transactional
+  @Modifying(clearAutomatically=true)
+  @Query("DELETE FROM Participant p WHERE p.participantId in :ids")
+  void deleteSoftDeletedParticipantsBulk(@Param("ids") List<ParticipantId> ids);
 }
 /**
  * 나, 상대 id 기반으로 참여한 id 중 일치하는 값이 있으며, 그 값이 개인 채팅방인지 조회해야 함

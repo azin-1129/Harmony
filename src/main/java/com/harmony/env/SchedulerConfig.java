@@ -26,8 +26,8 @@ public class SchedulerConfig {
     private final BlockRepository blockRepository;
 
     // 하루마다 새벽에.
-    @Scheduled(cron="00 25 17 * * *")
-    public void run(){
+    @Scheduled(cron="00 29 16 * * *")
+    public void softDeleteWithdrawnUsersData(){
         // withdrawn_at이 30일 지난 user들을 찾는다.
 //        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(31);
         LocalDateTime cutoffDate = LocalDateTime.now().minusDays(0);
@@ -103,6 +103,38 @@ public class SchedulerConfig {
         }
     }
 
-    // 한 달마다 새벽에
+    // 한 달마다 새벽 3시에. cron=0 0 3 1 * ?
     // 채팅방 참여자 0인 데이터 정리
+    @Scheduled(cron="00 30 16 * * *")
+    public void deleteZeroCountChatRoomsInfo(){
+        // 참여자 수가 0인 채팅방들
+        List<ChatRoom> chatRooms=chatRoomRepository.findAllZeroCountChatRooms();
+        List<Long> chatRoomIds=new ArrayList<>();
+        for(ChatRoom chatRoom: chatRooms){
+            chatRoomIds.add(chatRoom.getChatRoomId());
+        }
+
+        // 탈퇴자들 정보
+        List<User> withdrawnUsers=userRepository.findByWithdraw(true);
+        List<Long> withdrawnUserIds=new ArrayList<>();
+        for(User user: withdrawnUsers){
+            withdrawnUserIds.add(user.getUserId());
+        }
+
+        // 탈퇴자들의 id가 포함되고+참여자 수가 0인 채팅방들의 id가 포함되는 참여자 정보 조회
+        List<Participant> softDeletedParticipants=participantRepository.findSoftDeletedParticipants(withdrawnUserIds, chatRoomIds);
+        log.info("soft delete된 participant read 완료");
+        List<ParticipantId> softDeletedParticipantIds=new ArrayList<>();
+        for(Participant participant: softDeletedParticipants){
+            softDeletedParticipantIds.add(participant.getParticipantId());
+            log.info("participants id 정보 추가중 ...");
+        }
+
+        // 참여자 정보 먼저 delete
+        participantRepository.deleteSoftDeletedParticipantsBulk(softDeletedParticipantIds);
+        log.info("soft delete된 participant 정보를 제거했습니다.");
+
+        chatRoomRepository.deleteChatRoomsBulk(chatRoomIds);
+        log.info("참가자 수가 0인 채팅방 데이터를 제거했습니다.");
+    }
 }

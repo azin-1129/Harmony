@@ -16,4 +16,12 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     @Modifying(clearAutomatically=true)
     @Query("update ChatRoom c set c.chatRoomCount=c.chatRoomCount-1 where c.chatRoomId in :chatRoomIds")
     void minusChatRoomCountBulk(@Param("chatRoomIds") List<Long> chatRoomIds);
+
+    @Query("SELECT c FROM ChatRoom c WHERE c.chatRoomCount=0")
+    List<ChatRoom> findAllZeroCountChatRooms();
+
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("DELETE FROM ChatRoom c WHERE c.chatRoomId in :ids")
+    void deleteChatRoomsBulk(@Param("ids") List<Long> ids);
 }
