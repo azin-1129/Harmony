@@ -24,9 +24,10 @@ public class SchedulerConfig {
     private final FriendshipRequestRepository friendshipRequestRepository;
     private final ArticleRepository articleRepository;
     private final BlockRepository blockRepository;
+    private final CommentRepository commentRepository;
 
     // 하루마다 새벽에.
-    @Scheduled(cron="00 29 16 * * *")
+    @Scheduled(cron="00 05 14 * * *")
     public void softDeleteWithdrawnUsersData(){
         // withdrawn_at이 30일 지난 user들을 찾는다.
 //        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(31);
@@ -77,12 +78,12 @@ public class SchedulerConfig {
             log.info("해당 유저와 관련된 차단 이력을 모두 삭제했습니다.");
 
             // comments
-//            List<Comment> comments=commentRepository.findCommentsByUserId(userId);
-//            List<Long> commentIds=new ArrayList<>();
-//            for(Comment comment: comments){
-//                commentIds.add(comment.getCommentId());
-//            }
-//            commentRepository.deleteCommentBulk(commentIds);
+            List<Comment> comments=commentRepository.findCommentsByUserId(userId);
+            List<Long> commentIds=new ArrayList<>();
+            for(Comment comment: comments){
+                commentIds.add(comment.getCommentId());
+            }
+            commentRepository.deleteCommentsBulk(commentIds);
 
             // articles
             List<Article> articles=articleRepository.findArticlesByAuthorId(userId);
