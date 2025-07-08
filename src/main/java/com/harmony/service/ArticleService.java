@@ -63,6 +63,7 @@ public class ArticleService {
           .articleCommentCount(article.getArticleCommentCount())
           .articleLikeCount(article.getArticleLikeCount())
           .articleThumbnailUrl(article.getArticleThumbnailUrl())
+          .createdAt(article.getCreatedAt())
           .build();
 
       selectFollowingUserArticlesResponseDtos.add(selectFollowingUserArticlesResponseDto);

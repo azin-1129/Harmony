@@ -1,5 +1,6 @@
 package com.harmony.dto.response;
 
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,4 +21,5 @@ public class SelectFollowingUserArticlesResponseDto {
   private Integer articleCommentCount;
   private Integer articleLikeCount;
   private String articleThumbnailUrl;
+  private LocalDateTime createdAt;
 }
