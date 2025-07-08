@@ -101,7 +101,7 @@ public enum SuccessCode implements ResponseCode {
 
   // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡArticleㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
   // CREATE
-  WRITE_ARTICLE_SUCCESS(HttpStatus.CREATED, "게시물 작성에 성공했습니다."),
+  ARTICLE_CREATE_SUCCESS(HttpStatus.CREATED, "게시물 작성에 성공했습니다."),
 
   // READ
   FOLLOWING_USER_ARTICLES_READ_SUCCESS(HttpStatus.OK, "팔로잉 피드 최신순 정렬에 성공했습니다."),
@@ -111,7 +111,19 @@ public enum SuccessCode implements ResponseCode {
   ARTICLE_UPDATE_SUCCESS(HttpStatus.OK, "게시물 수정에 성공했습니다."),
 
   // DELETE
-  ARTICLE_DELETE_SUCCESS(HttpStatus.OK, "게시물 삭제에 성공했습니다.");
+  ARTICLE_DELETE_SUCCESS(HttpStatus.OK, "게시물 삭제에 성공했습니다."),
+
+  // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡCommentㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+  // CREATE
+  COMMENT_CREATE_SUCCESS(HttpStatus.CREATED, "댓글 작성에 성공했습니다."),
+
+  // READ
+  COMMENT_READ_SUCCESS(HttpStatus.OK, "댓글 목록 조회에 성공했습니다."),
+
+  // UPDATE
+
+  // DELETE
+  COMMENT_DELETE_SUCCESS(HttpStatus.OK, "댓글 삭제에 성공했습니다.");
 
 
   private final HttpStatus httpStatus;

@@ -73,6 +73,7 @@ public enum ErrorCode implements ResponseCode {
   AUTH_FAILED(HttpStatus.UNAUTHORIZED, "인증 정보가 올바르지 않습니다."),
   AUTH_CONTEXT_NOT_FOUND(HttpStatus.UNAUTHORIZED, "인증 정보가 유효하지 않습니다."),
 
+  // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡArticleㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
   // CREATE
 
   // READ
@@ -80,7 +81,17 @@ public enum ErrorCode implements ResponseCode {
   // UPDATE
 
   // DELETE
-  ARTICLE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시물입니다.");
+  ARTICLE_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 게시물입니다."),
+
+  // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡCommentㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+  // CREATE
+
+  // READ
+
+  // UPDATE
+
+  // DELETE
+  COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 댓글입니다.");
 
   private final HttpStatus httpStatus;
 
