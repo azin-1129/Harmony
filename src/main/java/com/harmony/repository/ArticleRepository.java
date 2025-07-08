@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ArticleRepository extends JpaRepository<Article, Long> {
   @Query("SELECT a FROM Article a WHERE a.author.userId IN (" +
-      "SELECT f.friend.userId FROM Friendship f WHERE f.user.userId = :userId)"
+      "SELECT f.friend.userId FROM Friendship f WHERE f.user.userId = :userId AND f.friend.withdraw=false)"
       + "ORDER BY a.createdAt DESC")
   List<Article> findArticlesByFriendsOfUserOrderByCreatedAtDesc(@Param("userId") Long userId);
 
