@@ -35,7 +35,7 @@ public class ArticleController {
   })
   public ResponseEntity<Object> writeArticle(@RequestBody WriteArticleRequestDto writeArticleRequestDto){
     return SuccessResponse.createSuccess(
-        SuccessCode.WRITE_ARTICLE_SUCCESS,
+        SuccessCode.ARTICLE_CREATE_SUCCESS,
         articleService.writeArticle(givenUserId, writeArticleRequestDto)
     );
   }
@@ -43,7 +43,7 @@ public class ArticleController {
   // TODO: 게시물 작성(비디오)
 
   // 게시물 조회
-
+  // TODO: 날짜 필드 추가
   // 조회 1. 팔로잉 피드 최신순 정렬
   @GetMapping("/following")
   @Operation(summary="팔로잉 피드 최신순 정렬", description = "팔로잉 피드 최신순 정렬 API")
