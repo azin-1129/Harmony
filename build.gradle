@@ -27,6 +27,15 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
+	// Tika
+	implementation group: 'org.apache.tika', name: 'tika-core', version: '2.3.0'
+
+	// FilenameUtils
+	implementation 'commons-io:commons-io:2.6'
+
+	// S3
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
 	// Spring Security
 	implementation "org.springframework.boot:spring-boot-starter-security:3.3.4"
 	implementation "org.springframework.boot:spring-boot-starter-web:3.3.4"
