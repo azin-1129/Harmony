@@ -17,6 +17,8 @@ public class UserDetailsImpl implements UserDetails {
   private Long userId;
   private String email;
   private String userIdentifier;
+  @Getter
+  private String profileImageName;
   private String password;
   private String nickname;
   private boolean withdraw;
@@ -27,6 +29,7 @@ public class UserDetailsImpl implements UserDetails {
     this.userId = user.getUserId();
     this.email = user.getEmail();
     this.userIdentifier = user.getUserIdentifier();
+    this.profileImageName = user.getProfileImageName();
     this.password = user.getPassword();
     this.nickname = user.getNickname();
     this.withdraw = user.getWithdraw();
@@ -80,6 +83,6 @@ public class UserDetailsImpl implements UserDetails {
   }
 
   public String toString(){
-    return this.userId+"번 사용자,"+this.nickname+", "+this.userIdentifier;
+    return this.userId+"번 사용자, "+this.nickname+", "+this.userIdentifier+", pfp:"+this.profileImageName;
   }
 }
