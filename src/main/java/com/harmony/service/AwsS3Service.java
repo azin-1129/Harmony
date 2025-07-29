@@ -37,7 +37,11 @@ public class AwsS3Service {
   private final Tika tika=new Tika();
   private final List<String> validImageTypes= Arrays.asList("image/png", "image/jpeg");
 
-  // TODO: 업로드 시 리사이징, 업데이트
+  public String getProfileImageUrl(UserDetailsImpl userDetailsImpl){
+    return amazonS3.getUrl(bucket, userDetailsImpl.getProfileImageName()).toString();
+  }
+
+  // TODO: 업로드 시 리사이징
   public String uploadProfileImage(UserDetailsImpl userDetailsImpl, MultipartFile multipartFile){
     String originalProfileImageName=userDetailsImpl.getProfileImageName();
     // TODO: User profileImageName 초기값은 null로 바꿔야함

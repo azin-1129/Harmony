@@ -130,6 +130,7 @@ public enum SuccessCode implements ResponseCode {
   PROFILE_IMAGE_UPLOAD_SUCCESS(HttpStatus.OK, "프로필 이미지 업로드에 성공했습니다."),
 
   // READ
+  PROFILE_IMAGE_READ_SUCCESS(HttpStatus.OK, "프로필 이미지 조회에 성공했습니다."),
 
   // UPDATE
 

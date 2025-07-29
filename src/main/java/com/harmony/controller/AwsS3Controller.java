@@ -8,9 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +20,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class AwsS3Controller {
   private final AwsS3Service awsS3Service;
 
+  @GetMapping
+  public ResponseEntity<Object> getProfileImageUrl(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl){
+    return SuccessResponse.createSuccess(
+        SuccessCode.PROFILE_IMAGE_READ_SUCCESS,
+        awsS3Service.getProfileImageUrl(userDetailsImpl)
+    );
+  }
   @PostMapping
   public ResponseEntity<Object> uploadProfileImage(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, MultipartFile multipartFile){
     System.out.println("현재 로그인한 유저 정보입니당.");
