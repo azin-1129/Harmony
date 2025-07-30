@@ -70,6 +70,9 @@ public class User extends BaseTime {
   @Column(name = "withdrawn_at",columnDefinition = "TIMESTAMP")
   private LocalDateTime withdrawnAt;
 
+  @OneToMany(fetch=FetchType.LAZY, mappedBy="user", cascade=CascadeType.ALL, orphanRemoval = true)
+  private Set<Heart> hearts=new HashSet<>();
+
   // update
   public void updatePassword(String newPassword) {
     this.password = newPassword;
