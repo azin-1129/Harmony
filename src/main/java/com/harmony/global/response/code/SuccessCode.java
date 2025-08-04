@@ -135,7 +135,20 @@ public enum SuccessCode implements ResponseCode {
   // UPDATE
 
   // DELETE
-  PROFILE_IMAGE_DELETE_SUCCESS(HttpStatus.OK, "프로필 이미지 삭제에 성공했습니다.");
+  PROFILE_IMAGE_DELETE_SUCCESS(HttpStatus.OK, "프로필 이미지 삭제에 성공했습니다."),
+
+  // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡHeartㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+  // CREATE
+
+
+  // READ
+  MY_ARTICLE_HEART_READ_SUCCESS(HttpStatus.OK, "내 게시물 좋아요 목록 조회에 성공했습니다."),
+
+
+  // UPDATE
+  ARTICLE_HEART_SUCCESS(HttpStatus.OK, "게시물 좋아요에 성공했습니다.");
+
+  // DELETE
 
 
   private final HttpStatus httpStatus;

@@ -70,4 +70,12 @@ public class Article extends BaseTime {
     this.articleMediaUrl = articleForm.getArticleMediaUrl();
     this.articleText = articleForm.getArticleText();
   }
+
+  public void updateArticleLikeCount(boolean heartStatus){
+    if(heartStatus){
+      this.articleLikeCount++;
+    }else{
+      this.articleLikeCount--;
+    }
+  }
 }
