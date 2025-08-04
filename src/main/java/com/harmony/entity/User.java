@@ -14,7 +14,9 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -71,7 +73,7 @@ public class User extends BaseTime {
   private LocalDateTime withdrawnAt;
 
   @OneToMany(fetch=FetchType.LAZY, mappedBy="user", cascade=CascadeType.ALL, orphanRemoval = true)
-  private Set<Heart> hearts=new HashSet<>();
+  private List<Heart> hearts=new ArrayList<>();
 
   // update
   public void updatePassword(String newPassword) {
