@@ -35,4 +35,13 @@ public class Heart {
   @ManyToOne
   @JoinColumn(name="article_id")
   private Article article;
+
+  @Column(name="heart_status", nullable=false)
+  private Boolean heartStatus;
+
+  // update
+  public boolean updateHeartStatus(){
+    this.heartStatus = !this.heartStatus;
+    return this.heartStatus;
+  }
 }
