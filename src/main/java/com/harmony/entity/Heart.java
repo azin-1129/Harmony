@@ -36,12 +36,11 @@ public class Heart {
   @JoinColumn(name="article_id")
   private Article article;
 
-  @Column(name="heart_status", nullable=false)
-  private Boolean heartStatus;
+  public void setHeartInfo(){
+    this.user.getHearts().add(this);
+  }
 
-  // update
-  public boolean updateHeartStatus(){
-    this.heartStatus = !this.heartStatus;
-    return this.heartStatus;
+  public void removeHeartInfo(){
+      this.user.getHearts().remove(this);
   }
 }
