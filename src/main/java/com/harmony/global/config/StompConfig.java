@@ -1,5 +1,6 @@
 package com.harmony.global.config;
 
+import com.harmony.global.response.handler.StompExceptionHandler;
 import com.harmony.interceptor.ChannelInboundInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +14,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
 public class StompConfig implements WebSocketMessageBrokerConfigurer {
-
+  private final StompExceptionHandler stompExceptionHandler;
   private final ChannelInboundInterceptor channelInboundInterceptor;
 
   @Override
@@ -29,6 +30,7 @@ public class StompConfig implements WebSocketMessageBrokerConfigurer {
         .withSockJS();
     registry.addEndpoint("/ws")
         .setAllowedOriginPatterns("*");
+    registry.setErrorHandler(stompExceptionHandler);
   }
 
   @Override
