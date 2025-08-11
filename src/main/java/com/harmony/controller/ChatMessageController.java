@@ -6,17 +6,23 @@ import com.harmony.entity.ChatMessage;
 import com.harmony.entity.Participant;
 import com.harmony.entity.ParticipantId;
 import com.harmony.global.response.code.ErrorCode;
+import com.harmony.global.response.code.SuccessCode;
 import com.harmony.global.response.exception.EntityNotFoundException;
+import com.harmony.global.response.structure.SuccessResponse;
 import com.harmony.repository.ChatMessageRepository;
 import com.harmony.repository.ChatRoomRepository;
 import com.harmony.repository.UserRepository;
 import com.harmony.security.impl.UserDetailsImpl;
+import com.harmony.service.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/chat")
 public class ChatMessageController {
   private final SimpMessageSendingOperations template;
+  private final ChatMessageService chatMessageService;
   private final ChatRoomRepository chatRoomRepository;
   private final ChatMessageRepository chatMessageRepository;
   private final UserRepository userRepository;
@@ -74,5 +81,15 @@ public class ChatMessageController {
             .build();
 
     chatMessageRepository.save(chatMessage);
+  }
+
+  // TODO: 성능 측정, 페이지네이션
+  // 특정 채팅방의 메시지 조회
+  @GetMapping("/{chatRoomId}")
+  public ResponseEntity<Object> selectChatRoomMessages(@PathVariable Long chatRoomId){
+    return SuccessResponse.createSuccess(
+        SuccessCode.CHAT_MESSAGE_READ_SUCCESS,
+        chatMessageService.selectChatRoomMessages(chatRoomId)
+    );
   }
 }
