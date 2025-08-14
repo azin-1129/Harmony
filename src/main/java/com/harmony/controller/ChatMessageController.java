@@ -16,6 +16,9 @@ import com.harmony.security.impl.UserDetailsImpl;
 import com.harmony.service.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -86,10 +89,11 @@ public class ChatMessageController {
   // TODO: 성능 측정, 페이지네이션
   // 특정 채팅방의 메시지 조회
   @GetMapping("/{chatRoomId}")
-  public ResponseEntity<Object> selectChatRoomMessages(@PathVariable Long chatRoomId){
+  public ResponseEntity<Object> selectChatRoomMessages(@PathVariable Long chatRoomId,
+                                                       @SortDefault(sort="createdAt", direction= Sort.Direction.DESC) Pageable pageable){
     return SuccessResponse.createSuccess(
         SuccessCode.CHAT_MESSAGE_READ_SUCCESS,
-        chatMessageService.selectChatRoomMessages(chatRoomId)
+        chatMessageService.selectChatRoomMessages(chatRoomId, pageable)
     );
   }
 }
