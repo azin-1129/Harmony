@@ -36,8 +36,8 @@ public class ChatMessage extends BaseTime {
 
   @ManyToOne
   @JoinColumns({
-      @JoinColumn(name="user_id"),
-      @JoinColumn(name="chatroom_id"),
+      @JoinColumn(name="user_id", referencedColumnName="user_id"),
+      @JoinColumn(name="chatroom_id", referencedColumnName="chatroom_id"),
   })
   private Participant participant;
 
