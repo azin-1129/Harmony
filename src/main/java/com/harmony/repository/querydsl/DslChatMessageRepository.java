@@ -5,5 +5,5 @@ import com.harmony.dto.response.SlicedResponseDto;
 import org.springframework.data.domain.Pageable;
 
 public interface DslChatMessageRepository {
-  SlicedResponseDto<SelectChatRoomMessagesResponseDto> selectChatMessageSliceOrderByCreatedAtDesc(Long chatRoomId, Pageable pageable);
+  SlicedResponseDto<SelectChatRoomMessagesResponseDto> selectChatMessageSliceOrderByIdDesc(Long chatRoomId, Long chatMessageId, Pageable pageable);
 }
