@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -86,14 +87,14 @@ public class ChatMessageController {
     chatMessageRepository.save(chatMessage);
   }
 
-  // TODO: 성능 측정, 페이지네이션
   // 특정 채팅방의 메시지 조회
   @GetMapping("/{chatRoomId}")
   public ResponseEntity<Object> selectChatRoomMessages(@PathVariable Long chatRoomId,
+                                                       @RequestParam(required = false) Long chatMessageId,
                                                        @SortDefault(sort="createdAt", direction= Sort.Direction.DESC) Pageable pageable){
     return SuccessResponse.createSuccess(
         SuccessCode.CHAT_MESSAGE_READ_SUCCESS,
-        chatMessageService.selectChatRoomMessages(chatRoomId, pageable)
+        chatMessageService.selectChatRoomMessages(chatRoomId, chatMessageId, pageable)
     );
   }
 }

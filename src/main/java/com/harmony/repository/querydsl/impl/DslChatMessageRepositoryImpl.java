@@ -2,11 +2,14 @@ package com.harmony.repository.querydsl.impl;
 
 import static com.harmony.entity.QChatMessage.chatMessage1;
 import static com.harmony.entity.QChatRoom.chatRoom;
+import static com.harmony.entity.QParticipant.participant;
+import static com.harmony.entity.QUser.user;
 
 import com.harmony.dto.response.SelectChatRoomMessagesResponseDto;
 import com.harmony.dto.response.SlicedResponseDto;
 import com.harmony.entity.ChatMessage;
 import com.harmony.repository.querydsl.DslChatMessageRepository;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,26 +20,20 @@ import org.springframework.data.domain.Pageable;
 public class DslChatMessageRepositoryImpl implements DslChatMessageRepository {
   private final JPAQueryFactory qf;
 
-
-  // TODO: 쿼리 한 번 더 나가는 것 수정
   @Override
-  public SlicedResponseDto<SelectChatRoomMessagesResponseDto> selectChatMessageSliceOrderByCreatedAtDesc(Long chatRoomId, Pageable pageable) {
-    // Join 해야함
+  public SlicedResponseDto<SelectChatRoomMessagesResponseDto> selectChatMessageSliceOrderByIdDesc(Long chatRoomId, Long chatMessageId, Pageable pageable) {
     // 해당 채팅방 ID의 메시지 불러오기
     List<ChatMessage> chatMessages=qf
-        .select(chatMessage1)
-        .from(chatRoom)
-        .join(chatMessage1)
-        .on(chatRoom.chatRoomId.eq(chatMessage1.participant.chatRoom.chatRoomId))
-        .where(chatRoom.chatRoomId.eq(chatRoomId))
+        .selectDistinct(chatMessage1)
+        .from(chatMessage1)
+        .where(chatMessage1.participant.chatRoom.chatRoomId.eq(chatRoomId), messageIdLt(chatMessageId))
+        .join(chatMessage1.participant, participant).fetchJoin()
+        .join(participant.chatRoom, chatRoom).fetchJoin()
+        .join(participant.user, user).fetchJoin()
         .orderBy(chatMessage1.chatMessageId.desc())
         .limit(pageable.getPageSize()+1)
         .fetch();
 
-//        .where(chatMessage1.chatMessageId.eq(chatMessageId))
-//        .orderBy(chatMessage1.chatMessageId.desc())
-//        .limit(pageable.getPageSize()+1)
-//        .fetch();
     // cursor 역할을 하는 chat message ID로부터 limit n개 가져오기
     // ID 기반 DESC 정렬
     List<SelectChatRoomMessagesResponseDto> selectChatRoomMessagesResponseDtos=new ArrayList<>();
@@ -62,5 +59,8 @@ public class DslChatMessageRepositoryImpl implements DslChatMessageRepository {
     }
 
     return new SlicedResponseDto<SelectChatRoomMessagesResponseDto>(lastChatMessageId, selectChatRoomMessagesResponseDtos, hasNext);
+  }
+  private BooleanExpression messageIdLt(Long chatMessageId) {
+    return chatMessageId!=null ? chatMessage1.chatMessageId.lt(chatMessageId) : null;
   }
 }

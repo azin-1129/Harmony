@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 public class ChatMessageService {
   private final ChatMessageRepository chatMessageRepository;
 
-  public SlicedResponseDto<SelectChatRoomMessagesResponseDto> selectChatRoomMessages(Long chatRoomId, Pageable pageable){
+  public SlicedResponseDto<SelectChatRoomMessagesResponseDto> selectChatRoomMessages(Long chatRoomId, Long chatMessageId, Pageable pageable){
     // TODO: 채팅방이 있는지부터 판단좀
-    return chatMessageRepository.selectChatMessageSliceOrderByCreatedAtDesc(chatRoomId, pageable);
+    return chatMessageRepository.selectChatMessageSliceOrderByIdDesc(chatRoomId, chatMessageId, pageable);
   }
 }
