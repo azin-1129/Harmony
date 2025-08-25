@@ -1,4 +1,9 @@
 spring:
+  data:
+    redis:
+      host: ${redis.host}
+      port: ${redis.port}
+      password: ${redis.password}
   servlet:
     multipart:
       max-file-size: 10MB # 업로드 가능한 개별 파일의 최대 크기. default: 1MB
@@ -10,7 +15,7 @@ spring:
     password: ${mysql.password}
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true

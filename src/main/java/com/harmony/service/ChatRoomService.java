@@ -31,8 +31,10 @@ public class ChatRoomService {
         .chatRoomType(ChatRoomType.PERSONAL_CHATROOM)
         .build();
 
+    // TODO: Redis에 ChatRoom 넘겨주기
     chatRoomRepository.save(chatRoom);
 
+    // 이미 있는 방이라면 그대로 return
     return chatRoom;
   }
 
@@ -47,6 +49,7 @@ public class ChatRoomService {
         .chatRoomType(ChatRoomType.GROUP_CHATROOM)
         .build();
 
+    // TODO: Redis에 ChatRoom 넘겨주기
     chatRoomRepository.save(chatRoom);
 
     return chatRoom;

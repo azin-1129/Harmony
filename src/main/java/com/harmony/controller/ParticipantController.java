@@ -13,6 +13,7 @@ import com.harmony.global.response.code.SuccessCode;
 import com.harmony.global.response.structure.ErrorResponse;
 import com.harmony.global.response.structure.SuccessResponse;
 import com.harmony.service.ParticipantService;
+import com.harmony.service.RedisChatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,6 +28,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +40,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ParticipantController {
   private final ParticipantService participantService;
+  private final RedisChatService redisChatService;
+
   private final Long givenUserId=1L; // 임시 userId
+  // 개인 채팅방 참가(Redis)
+  @GetMapping("/{chatRoomId}")
+  public ResponseEntity<Object> participateChatRoom(@PathVariable String chatRoomId){
+    redisChatService.enterChatRoom(chatRoomId);
+    return SuccessResponse.createSuccess(
+        SuccessCode.PARTICIPATE_CHATROOM_SUCCESS
+    );
+  }
+
   // CREATE
   // 개인 채팅방 참가+생성(방 제목 어쩌지.. null 처리?)
   @PostMapping("/init/personal")
@@ -107,7 +120,7 @@ public class ParticipantController {
   }
 
   // READ
-
+  // TODO: 페이지네이션
   // 내가 참여한 채팅방 목록 조회
   @GetMapping("/participated")
   @Operation(summary="참여한 채팅방 목록 조회", description="내가 참여한 채팅방 목록 조회 API")

@@ -12,7 +12,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.util.Date;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,7 +28,9 @@ import lombok.ToString;
 @Table(name = "chatmessages")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatMessage extends BaseTime {
+public class ChatMessage extends BaseTime implements Serializable {
+  @Serial
+  private static final long serialVersionUID = -7452725699480792148L;
 
   @Id
   @GeneratedValue(strategy= GenerationType.IDENTITY)

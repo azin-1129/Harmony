@@ -1,11 +1,13 @@
 package com.harmony.controller;
 
 import com.harmony.dto.form.ChatRoomNameForm;
+import com.harmony.entity.ChatRoom;
 import com.harmony.global.response.code.ErrorCode;
 import com.harmony.global.response.code.SuccessCode;
 import com.harmony.global.response.structure.ErrorResponse;
 import com.harmony.global.response.structure.SuccessResponse;
 import com.harmony.service.ChatRoomService;
+import com.harmony.service.RedisChatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -30,6 +32,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ChatRoomController {
   private final ChatRoomService chatRoomService;
+//  private final RedisChatService redisChatService;
+
+  // 개인 채팅방 생성(Redis)
+  @PostMapping("/personal")
+  public ResponseEntity<Object> createPersonalChatRoom(){
+    // TODO: 채팅방 생성 분기
+    // redis hashMap에 넣는 작업임.
+    // 이미 DB에 채팅방이 존재하면 DB에 생성하지 않는다.
+    // 이미 Redis HashMap에 채팅방 데이터가 존재하면 Redis HashMap에 생성하지 않는다.
+    ChatRoom personalChatRoom = chatRoomService.createPersonalChatRoom();
+//    redisChatService.createChatRoom(personalChatRoom);
+
+    return SuccessResponse.createSuccess(
+        SuccessCode.PERSONAL_CHATROOM_CREATE_SUCCESS,
+        personalChatRoom
+    );
+  }
+
+  // 단체 채팅방 생성
+//  @PostMapping("/group")
 
   // TODO: bindingResult 메소드 추가?
 

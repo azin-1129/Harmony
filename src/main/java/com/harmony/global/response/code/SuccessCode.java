@@ -47,6 +47,7 @@ public enum SuccessCode implements ResponseCode {
 
   // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡParticipateㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
   // CREATE
+  PARTICIPATE_CHATROOM_SUCCESS(HttpStatus.OK, "채팅방 참가에 성공했습니다."),
   PARTICIPATE_GROUP_CHATROOM_SUCCESS(HttpStatus.OK, "단체 채팅방 참가에 성공했습니다."),
 
   // READ

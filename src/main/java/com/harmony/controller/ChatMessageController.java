@@ -14,6 +14,7 @@ import com.harmony.repository.ChatRoomRepository;
 import com.harmony.repository.UserRepository;
 import com.harmony.security.impl.UserDetailsImpl;
 import com.harmony.service.ChatMessageService;
+import com.harmony.service.RedisChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -36,16 +37,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/chat")
 public class ChatMessageController {
+//  private final RedisChatService redisChatMessageService;
   private final SimpMessageSendingOperations template;
   private final ChatMessageService chatMessageService;
   private final ChatRoomRepository chatRoomRepository;
   private final ChatMessageRepository chatMessageRepository;
   private final UserRepository userRepository;
 
-  // @DestinationVariable, @PathVariable 차이?
   @MessageMapping("/{chatRoomId}")
   public void sendMessage(@RequestBody ChatMessageRequestDto chatMessageRequestDto, @DestinationVariable Long chatRoomId, Authentication authentication) {
-    // TODO: CustomUserDetails 적용
     UserDetailsImpl sender=((UserDetailsImpl)authentication.getPrincipal());
     log.info("전송중인 사용자의 정보:"+sender);
     // TODO: 입장 메세지는?
@@ -69,7 +69,7 @@ public class ChatMessageController {
     // TODO: 채팅방 부재 시 예외
     Participant participantUser=Participant.builder()
         .participantId(participantSenderId)
-        .user(userRepository.findByEmail(sender.getUsername()).orElseThrow(
+        .user(userRepository.findById(sender.getUserId()).orElseThrow(
             ()->new EntityNotFoundException(
                 ErrorCode.USER_NOT_FOUND
             )
@@ -84,6 +84,7 @@ public class ChatMessageController {
             .isRead(false)
             .build();
 
+//    redisChatMessageService.send(chatMessageResponseDto, chatRoomId.toString(), chatMessage);
     chatMessageRepository.save(chatMessage);
   }
 

@@ -9,6 +9,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +25,9 @@ import lombok.ToString;
 @Table(name = "chatrooms")
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatRoom extends BaseTime {
+public class ChatRoom extends BaseTime implements Serializable {
+  @Serial
+  private static final long serialVersionUID = -6068167034840208477L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
