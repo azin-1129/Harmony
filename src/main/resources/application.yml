@@ -10,7 +10,7 @@ spring:
     password: ${mysql.password}
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
@@ -32,6 +32,8 @@ logging:
 
 jwt:
   secret: ${jwt.secret_key}
+  access-token-expiration: ${jwt.access_token_expiration}
+  refresh-token-expiration: ${jwt.refresh_token_expiration}
 
 # AWS S3
 cloud:

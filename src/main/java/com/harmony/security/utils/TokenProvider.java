@@ -37,31 +37,29 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 public class TokenProvider {
   // 환경변수
   private static final String AUTHORITIES_KEY="auth";
-  private static SecretKey JWT_SECRET_KEY;
   private static final String BEARER_TYPE="Bearer";
-  // TODO: 아래 시간 정보 yml에 숨겨 @Value로 받아오기
-  // 60000 * 30 = 1800000 180만 초가 30분?
-  // 1.8만초=3초
-  // 원래 30분 : 1000*60*30
-  private static final long ACCESS_TOKEN_EXPIRE_TIME=1000*60*5; // 30분
-  private static final long REFRESH_TOKEN_EXPIRE_TIME=1000*60*60*24*7; // 7일
+  private final long ACCESS_TOKEN_EXPIRE_TIME;
+  private final long REFRESH_TOKEN_EXPIRE_TIME;
   private static final long THREE_DAYS=1000*60*60*24*3;
 
-  private final Key key;
-  // TODO: 여기다가 UserDetailsServiceImpl 끼워도 되나..? 아님 JwtFilter가 필요한가?
+  private SecretKey key; // JWT Secret key
   private final UserDetailsServiceImpl userDetailsServiceImpl;
 
   public TokenProvider(@Value("${jwt.secret}") String jwtSecretKey,
-      UserDetailsServiceImpl userDetailsServiceImpl){
+      UserDetailsServiceImpl userDetailsServiceImpl,
+      @Value("${jwt.access-token-expiration}") long accessTokenExpiration,
+      @Value("${jwt.refresh-token-expiration}") long refreshTokenExpiration){
     this.userDetailsServiceImpl = userDetailsServiceImpl;
     byte[] keyBytes= Decoders.BASE64.decode(jwtSecretKey);
     this.key=Keys.hmacShaKeyFor(keyBytes);
+    this.ACCESS_TOKEN_EXPIRE_TIME=accessTokenExpiration;
+    this.REFRESH_TOKEN_EXPIRE_TIME=refreshTokenExpiration;
   }
 
   // TODO: Subject가 필요한가? 그것보다 JWT를 어떻게 구성할 것인가?
   // 사용자 정보를 기반으로 Token을 생성하여 반환
   public TokenDto generateTokenDto(Authentication authentication){
-    log.debug("생성된 JWT Secret Key: "+JWT_SECRET_KEY);
+    log.debug("생성된 JWT Secret Key: "+key);
     String authorities=authentication.getAuthorities().stream()
         .map(GrantedAuthority::getAuthority)
         .collect(Collectors.joining(","));
@@ -84,22 +82,23 @@ public class TokenProvider {
     return generateAccessToken(authentication.getName(), authorities);
   }
 
-  public String generateAccessToken(String email, String authorities){
+  private String generateAccessToken(String email, String authorities){
     return Jwts.builder()
-        .setSubject(email)
+        .subject(email)
+        .issuedAt(new Date())
         .claims(createClaims(authorities))
-        .signWith(key, SignatureAlgorithm.HS256)
+        .signWith(key)
         .expiration(createAccessTokenExpiredDate())
         .compact();
   }
-  public String generateRefreshToken(String email, String authorities){
-    log.debug("JWT Secret Key: "+JWT_SECRET_KEY);
+  private String generateRefreshToken(String email, String authorities){
+    log.debug("JWT Secret Key: "+key);
 
     return Jwts.builder()
-        .setSubject(email)
+        .subject(email)
         .claims(createClaims(authorities))
 //        .claim("isRefreshToken", true)
-        .signWith(key, SignatureAlgorithm.HS256)
+        .signWith(key)
         .expiration(createRefreshTokenExpiredDate())
         .compact();
   }
@@ -123,19 +122,18 @@ public class TokenProvider {
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toList());
 
-    // TODO: 메시지에 프사 링크같은 건 어떻게 해야하지?
     UserDetailsImpl principal=userDetailsServiceImpl.loadUserByUsername(claims.getSubject());
 
     return new UsernamePasswordAuthenticationToken(principal, "", authorities);
   }
   // Refresh Token 유효기간 지정
-  private static Date createRefreshTokenExpiredDate(){
+  private Date createRefreshTokenExpiredDate(){
     long now=(new Date()).getTime();
     return new Date(now+REFRESH_TOKEN_EXPIRE_TIME);
   }
 
   // 토큰 만료기간 지정
-  private static Date createAccessTokenExpiredDate(){
+  private Date createAccessTokenExpiredDate(){
     long now=(new Date()).getTime();
     return new Date(now+ACCESS_TOKEN_EXPIRE_TIME);
   }
@@ -153,7 +151,7 @@ public class TokenProvider {
   // Token을 기반으로 유효 토큰 여부 반환. AuthenticationFilter에서 활용
   public boolean isValidToken(String token){
     try{
-      Jwts.parser().setSigningKey(key).build().parseClaimsJws(token);
+      Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
       return true;
     } catch (SignatureException | SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
       throw new InvalidTokenException(
@@ -170,8 +168,12 @@ public class TokenProvider {
   private Claims parseClaims(String accessToken) {
     try {
       log.info("parse 작업을 시작합니다.");
-      return Jwts.parser().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
-    } catch (ExpiredJwtException e) {
+      return Jwts.parser().verifyWith(key).build().parseSignedClaims(accessToken).getPayload();
+    }  catch (SignatureException | SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+      throw new InvalidTokenException(
+          ErrorCode.AUTH_INVALID_TOKEN
+      );
+    }catch (ExpiredJwtException e) {
       log.error("만료된 토큰입니다.");
       throw new ExpiredTokenException(
           ErrorCode.AUTH_EXPIRED_TOKEN
