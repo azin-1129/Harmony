@@ -3,6 +3,7 @@ package com.harmony.controller;
 import com.harmony.dto.request.BlockRequestDto;
 import com.harmony.dto.request.UnBlockRequestDto;
 import com.harmony.dto.response.SelectBlockResponseDto;
+import com.harmony.global.annotation.CurrentUserId;
 import com.harmony.global.response.code.SuccessCode;
 import com.harmony.global.response.structure.SuccessResponse;
 import com.harmony.service.BlockService;
@@ -25,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class BlockController {
   private final BlockService blockService;
-  private final Long givenUserId=1L;
 
   // 차단하기
   @PostMapping("/blocking")
@@ -33,8 +33,8 @@ public class BlockController {
   @ApiResponses(value={
       @ApiResponse(responseCode="200", description="해당 유저를 차단했습니다.")
   })
-  public ResponseEntity<Object> blockUser(@RequestBody BlockRequestDto blockRequestDto){
-    blockService.blockUser(givenUserId, blockRequestDto.getBlockedUserIdentifier());
+  public ResponseEntity<Object> blockUser(@CurrentUserId Long userId, @RequestBody BlockRequestDto blockRequestDto){
+    blockService.blockUser(userId, blockRequestDto.getBlockedUserIdentifier());
     return SuccessResponse.createSuccess(
         SuccessCode.BLOCK_SUCCESS
     );
@@ -46,8 +46,8 @@ public class BlockController {
   @ApiResponses(value={
       @ApiResponse(responseCode="200", description="차단한 상대 목록 조회에 성공했습니다.")
   })
-  public ResponseEntity<Object> selectBlocks(){
-    List<SelectBlockResponseDto> blockResponseDtos=blockService.selectBlocks(givenUserId);
+  public ResponseEntity<Object> selectBlocks(@CurrentUserId Long userId){
+    List<SelectBlockResponseDto> blockResponseDtos=blockService.selectBlocks(userId);
 
     return SuccessResponse.createSuccess(
         SuccessCode.BLOCK_READ_SUCCESS,
@@ -61,10 +61,10 @@ public class BlockController {
       @ApiResponse(responseCode="200", description="해당 유저 차단을 해제했습니다."),
       @ApiResponse(responseCode="400", description="존재하지 않는 차단 이력입니다.")
   })
-  public ResponseEntity<Object> unBlockUser(@RequestBody UnBlockRequestDto unBlockRequestDto){
+  public ResponseEntity<Object> unBlockUser(@CurrentUserId Long userId, @RequestBody UnBlockRequestDto unBlockRequestDto){
     return SuccessResponse.createSuccess(
         SuccessCode.UN_BLOCK_SUCCESS,
-        blockService.unBlockUser(givenUserId, unBlockRequestDto.getUnBlockedUserIdentifier())
+        blockService.unBlockUser(userId, unBlockRequestDto.getUnBlockedUserIdentifier())
     );
   }
 }

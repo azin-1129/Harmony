@@ -4,6 +4,7 @@ import com.harmony.dto.form.NicknameForm;
 import com.harmony.dto.form.PasswordForm;
 import com.harmony.dto.form.ProfileImageForm;
 import com.harmony.dto.request.RegisterRequestDto;
+import com.harmony.global.annotation.CurrentUserId;
 import com.harmony.global.response.code.ErrorCode;
 import com.harmony.global.response.code.SuccessCode;
 import com.harmony.global.response.structure.ErrorResponse;
@@ -36,6 +37,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
   private final UserService userService;
   private final Long givenUserId=1L; // 임시 userId
+
+  @GetMapping("/test")
+  public ResponseEntity<Object> test(@CurrentUserId Long userId) {
+    log.info("user id: {}", userId);
+    return ResponseEntity.ok(userId);
+  }
 
   // TODO: userId 처리, Password 암호화
   @PostMapping("/register")

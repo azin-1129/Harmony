@@ -2,6 +2,7 @@ package com.harmony.controller;
 
 import com.harmony.dto.form.ArticleForm;
 import com.harmony.dto.request.WriteArticleRequestDto;
+import com.harmony.global.annotation.CurrentUserId;
 import com.harmony.global.response.code.SuccessCode;
 import com.harmony.global.response.structure.SuccessResponse;
 import com.harmony.service.ArticleService;
@@ -25,18 +26,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ArticleController {
   private final ArticleService articleService;
-  private final Long givenUserId=1L;
 
+  // TODO: MultiPartFile로 이미지 교체
   // 게시물 작성(이미지+텍스트)
   @PostMapping("/write")
   @Operation(summary="이미지+텍스트 게시물 작성", description = "게시물 작성 API")
   @ApiResponses(value = {
       @ApiResponse(responseCode="201", description = "게시물 작성에 성공했습니다.")
   })
-  public ResponseEntity<Object> writeArticle(@RequestBody WriteArticleRequestDto writeArticleRequestDto){
+  public ResponseEntity<Object> writeArticle(@CurrentUserId Long userId, @RequestBody WriteArticleRequestDto writeArticleRequestDto){
     return SuccessResponse.createSuccess(
         SuccessCode.ARTICLE_CREATE_SUCCESS,
-        articleService.writeArticle(givenUserId, writeArticleRequestDto)
+        articleService.writeArticle(userId, writeArticleRequestDto)
     );
   }
 
@@ -50,10 +51,10 @@ public class ArticleController {
   @ApiResponses(value = {
       @ApiResponse(responseCode="200", description = "팔로잉 피드 최신순 정렬에 성공했습니다.")
   })
-  public ResponseEntity<Object> selectFollowingUserArticles(){
+  public ResponseEntity<Object> selectFollowingUserArticles(@CurrentUserId Long userId){
     return SuccessResponse.createSuccess(
         SuccessCode.FOLLOWING_USER_ARTICLES_READ_SUCCESS,
-        articleService.selectFollowingUserArticles(givenUserId)
+        articleService.selectFollowingUserArticles(userId)
     );
   }
 
@@ -73,6 +74,7 @@ public class ArticleController {
 
   // TODO: 게시물 조회(비디오)
 
+  // TODO: 수정 or 삭제 시, 작성자 id와 일치하지 않으면 반려
   // 게시물 수정
   @PostMapping("/update/{articleId}")
   @Operation(summary="게시물 수정", description = "게시물 수정 API")

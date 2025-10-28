@@ -70,8 +70,9 @@ public enum ErrorCode implements ResponseCode {
   AUTH_INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "잘못된 토큰입니다."),
   AUTH_EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
   AUTH_LOGIN_FAILED(HttpStatus.BAD_REQUEST, "ID나 PW가 올바르지 않습니다."),
-  AUTH_FAILED(HttpStatus.UNAUTHORIZED, "인증 정보가 올바르지 않습니다."),
+  AUTH_AUTHENTICATE_FAILED(HttpStatus.UNAUTHORIZED, "인증 정보가 올바르지 않습니다."),
   AUTH_CONTEXT_NOT_FOUND(HttpStatus.UNAUTHORIZED, "인증 정보가 유효하지 않습니다."),
+  AUTH_AUTHORIZE_FAILED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
 
   // ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡArticleㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
   // CREATE

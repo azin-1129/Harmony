@@ -33,19 +33,19 @@ public class AuthService {
     log.info("login 메소드 진입");
     UsernamePasswordAuthenticationToken authenticationToken=
         new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
-
     log.info("authenticationToken 생성");
 
-    // authenticate()에 CustomUserDetailService의 loadUserByUsername 실행
-    try{
+    // authenticate()에 CustomUserDetailService의 loadUserByUsername 실행.
+    // PW 불일치 시, AuthenticationProvider.authenticate()에서 BadCredentialsException 발생
+    try {
       Authentication authentication = authenticationManagerBuilder.getObject()
           .authenticate(authenticationToken);
       SecurityContextHolder.getContext().setAuthentication(authentication);
 
       log.info("Auth Service 작업이 끝났습니다.");
 
-      TokenDto tokenDto=tokenProvider.generateTokenDto(authentication);
-      RefreshToken refreshToken=RefreshToken.builder()
+      TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+      RefreshToken refreshToken = RefreshToken.builder()
           .userEmail(loginDto.getEmail())
           .refreshToken(tokenDto.getRefreshToken())
           .build();
@@ -73,7 +73,6 @@ public class AuthService {
     Authentication authentication=tokenProvider.getAuthentication(reissueDto.getRefreshToken());
 
     // ID를 기반으로 Server의 Refresh Token 값 가져오기
-    // TODO: 로그아웃 처리
     RefreshToken refreshToken=refreshTokenRepository.findByUserEmail(authentication.getName())
         .orElseThrow(()->new AuthFailedException(
             ErrorCode.AUTH_INVALID_TOKEN

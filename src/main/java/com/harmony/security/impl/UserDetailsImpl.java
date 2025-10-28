@@ -76,6 +76,10 @@ public class UserDetailsImpl implements UserDetails {
     return !withdraw;
   }
 
+  public long getUserId(){
+    return userId;
+  }
+
   private Collection<GrantedAuthority> createAuthorities(String role){
     GrantedAuthority grantedAuthority=new SimpleGrantedAuthority(role);
 

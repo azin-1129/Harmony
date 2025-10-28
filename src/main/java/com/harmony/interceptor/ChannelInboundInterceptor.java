@@ -34,7 +34,8 @@ public class ChannelInboundInterceptor implements ChannelInterceptor {
         // Spring STOMP Docs에 따르면, CONNECT 시 Header를 인증한다.
         log.info("해당 커맨드는 CONNECT 입니다.");
         // 사람들은 ChannelInterceptor에서 JWT 인증을 수행하고, access.user에 등록한다.
-        //
+        log.info("sessionId:"+header.getSessionId()+", destination:"+header.getDestination());
+
         String accessToken=header.getFirstNativeHeader("Authorization");
         if(accessToken.startsWith(BEARER_PREFIX) && accessToken.length()>7){
             accessToken=accessToken.substring(7);

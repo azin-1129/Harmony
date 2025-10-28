@@ -1,6 +1,7 @@
 package com.harmony.controller;
 
 import com.harmony.dto.request.WriteCommentRequestDto;
+import com.harmony.global.annotation.CurrentUserId;
 import com.harmony.global.response.code.SuccessCode;
 import com.harmony.global.response.structure.SuccessResponse;
 import com.harmony.service.CommentService;
@@ -19,14 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class CommentController {
   private final CommentService commentService;
-  private final Long givenUserId=1L;
 
   // 댓글 작성
   @PostMapping
-  public ResponseEntity<Object> writeComment(@RequestBody WriteCommentRequestDto writeCommentRequestDto){
+  public ResponseEntity<Object> writeComment(@CurrentUserId Long userId, @RequestBody WriteCommentRequestDto writeCommentRequestDto){
     return SuccessResponse.createSuccess(
         SuccessCode.COMMENT_CREATE_SUCCESS,
-        commentService.writeComment(givenUserId, writeCommentRequestDto)
+        commentService.writeComment(userId, writeCommentRequestDto)
     );
   }
 
