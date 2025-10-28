@@ -8,6 +8,7 @@ import com.harmony.dto.request.ParticipateGroupChatRoomRequestDto;
 import com.harmony.dto.request.SelectChatRoomParticipantsRequestDto;
 import com.harmony.dto.response.SelectChatRoomParticipantsResponseDto;
 import com.harmony.dto.response.SelectParticipatedChatRoomsResponseDto;
+import com.harmony.global.annotation.CurrentUserId;
 import com.harmony.global.response.code.ErrorCode;
 import com.harmony.global.response.code.SuccessCode;
 import com.harmony.global.response.structure.ErrorResponse;
@@ -38,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ParticipantController {
   private final ParticipantService participantService;
-  private final Long givenUserId=1L; // 임시 userId
+
   // CREATE
   // 개인 채팅방 참가+생성(방 제목 어쩌지.. null 처리?)
   @PostMapping("/init/personal")
@@ -47,9 +48,11 @@ public class ParticipantController {
       @ApiResponse(responseCode = "201", description = "개인 채팅방 생성에 성공했습니다."),
       @ApiResponse(responseCode="400", description="탈퇴한 사용자입니다.")
   })
-  public ResponseEntity<Object> createAndParticipatePersonalChatRoom(@RequestBody
+  public ResponseEntity<Object> createAndParticipatePersonalChatRoom(
+      @CurrentUserId Long userId,
+      @RequestBody
   CreateAndParticipatePersonalChatRoomRequestDto createAndParticipatePersonalChatRoomRequestDto) {
-    Long createdPersonalChatRoomId=participantService.createAndParticipatePersonalChatRoom(givenUserId, createAndParticipatePersonalChatRoomRequestDto);
+    Long createdPersonalChatRoomId=participantService.createAndParticipatePersonalChatRoom(userId, createAndParticipatePersonalChatRoomRequestDto);
 
     return SuccessResponse.createSuccess(
         SuccessCode.PERSONAL_CHATROOM_CREATE_SUCCESS,
@@ -64,7 +67,11 @@ public class ParticipantController {
       @ApiResponse(responseCode = "201", description = "단체 채팅방 생성에 성공했습니다."),
       @ApiResponse(responseCode="400", description="입력 양식이 잘못되었습니다.")
   })
-  public ResponseEntity<Object> createAndParticipateGroupChatRoom(@RequestBody @Valid CreateAndParticipateGroupChatRoomRequestDto createAndParticipateGroupChatRoomRequestDto, BindingResult bindingResult) {
+  public ResponseEntity<Object> createAndParticipateGroupChatRoom(
+      @CurrentUserId Long userId,
+      @RequestBody @Valid CreateAndParticipateGroupChatRoomRequestDto createAndParticipateGroupChatRoomRequestDto,
+      BindingResult bindingResult
+  ) {
     // 입력 형식이 올바르지 않다면 에러
     if(bindingResult.hasErrors()){
       Map<String, String> validatorResult=new HashMap<>();
@@ -80,7 +87,7 @@ public class ParticipantController {
       );
     }
 
-    Long createdGroupChatRoomId= participantService.createAndParticipateGroupChatRoom(givenUserId, createAndParticipateGroupChatRoomRequestDto);
+    Long createdGroupChatRoomId= participantService.createAndParticipateGroupChatRoom(userId, createAndParticipateGroupChatRoomRequestDto);
 
     return SuccessResponse.createSuccess(
         SuccessCode.GROUP_CHATROOM_CREATE_SUCCESS,
@@ -97,8 +104,11 @@ public class ParticipantController {
       @ApiResponse(responseCode="400", description="대화상대가 많아 참여할 수 없습니다.")
   })
   // 단체 채팅방 참여
-  public ResponseEntity<Object> participateGroupChatRoom(@RequestBody ParticipateGroupChatRoomRequestDto participateGroupChatRoomRequestDto) {
-    Long participatedGroupChatId= participantService.participateGroupChatRoom(givenUserId, participateGroupChatRoomRequestDto);
+  public ResponseEntity<Object> participateGroupChatRoom(
+      @CurrentUserId Long userId,
+      @RequestBody ParticipateGroupChatRoomRequestDto participateGroupChatRoomRequestDto
+  ) {
+    Long participatedGroupChatId= participantService.participateGroupChatRoom(userId, participateGroupChatRoomRequestDto);
 
     return SuccessResponse.createSuccess(
           SuccessCode.PARTICIPATE_GROUP_CHATROOM_SUCCESS,
@@ -114,8 +124,8 @@ public class ParticipantController {
   @ApiResponses(value={
       @ApiResponse(responseCode = "200", description = "참가한 채팅방 목록 조회에 성공했습니다.")
   })
-  public ResponseEntity<Object> selectParticipatedChatRooms(){
-    List<SelectParticipatedChatRoomsResponseDto> filteredChatRooms=participantService.selectParticipatedChatRooms(givenUserId);
+  public ResponseEntity<Object> selectParticipatedChatRooms(@CurrentUserId Long userId){
+    List<SelectParticipatedChatRoomsResponseDto> filteredChatRooms=participantService.selectParticipatedChatRooms(userId);
 
     return SuccessResponse.createSuccess(
         SuccessCode.PARTICIPATED_CHATROOM_READ_SUCCESS,
@@ -149,8 +159,11 @@ public class ParticipantController {
       @ApiResponse(responseCode="404", description="존재하지 않는 채팅방입니다."),
       @ApiResponse(responseCode="400", description="이미 퇴장한 참가자입니다.")
   })
-  public ResponseEntity<Object> leaveChatRoom(@RequestBody LeaveChatRoomRequestDto leaveChatRoomRequestDto){
-    participantService.leaveChatRoom(givenUserId, leaveChatRoomRequestDto);
+  public ResponseEntity<Object> leaveChatRoom(
+      @CurrentUserId Long userId,
+      @RequestBody LeaveChatRoomRequestDto leaveChatRoomRequestDto
+  ){
+    participantService.leaveChatRoom(userId, leaveChatRoomRequestDto);
 
     return SuccessResponse.createSuccess(
         SuccessCode.LEAVE_CHATROOM_SUCCESS

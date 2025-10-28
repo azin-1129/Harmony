@@ -5,6 +5,7 @@ import com.harmony.dto.request.CreateFriendshipRequestDto;
 import com.harmony.dto.request.UpdateReceivedFriendshipRequestStatusRequestDto;
 import com.harmony.dto.response.ReceivedFriendshipRequestResponseDto;
 import com.harmony.dto.response.SentFriendshipRequestResponseDto;
+import com.harmony.global.annotation.CurrentUserId;
 import com.harmony.global.response.code.SuccessCode;
 import com.harmony.global.response.structure.SuccessResponse;
 import com.harmony.service.FriendshipRequestService;
@@ -25,34 +26,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class FriendshipRequestController {
   private final FriendshipRequestService friendshipRequestService;
-  private final Long givenUserId=1L; // 임시 userId
 
   // 친구 추가 요청
   @PostMapping("/send")
   @Operation(summary="친구 추가 요청 생성", description="친구 추가 요청을 생성합니다.")
   @ApiResponses(value={
-      @ApiResponse(responseCode="201", description="친구 추가 요청에 성공했습니다.")
-  })
-  public ResponseEntity<Object> createFriendshipRequest(
-      @RequestBody CreateFriendshipRequestDto createToFriendshipRequestDto){
-    friendshipRequestService.createFriendshipRequest(givenUserId, createToFriendshipRequestDto);
-
-    return SuccessResponse.createSuccess(
-        SuccessCode.FRIENDSHIP_REQUEST_CREATE_SUCCESS
-    );
-  }
-
-  // 친구 추가 요청
-  @PostMapping("/send/{senderId}")
-  @Operation(summary="테스트용 친구 추가 요청 생성", description="친구 추가 요청을 생성합니다.")
-  @ApiResponses(value={
       @ApiResponse(responseCode="201", description="친구 추가 요청에 성공했습니다."),
       @ApiResponse(responseCode="400", description="이미 진행중인 친구 요청입니다.")
   })
   public ResponseEntity<Object> createFriendshipRequest(
-      @PathVariable Long senderId,
+      @CurrentUserId Long userId,
       @RequestBody CreateFriendshipRequestDto createToFriendshipRequestDto){
-    friendshipRequestService.createFriendshipRequest(senderId, createToFriendshipRequestDto);
+    friendshipRequestService.createFriendshipRequest(userId, createToFriendshipRequestDto);
 
     return SuccessResponse.createSuccess(
         SuccessCode.FRIENDSHIP_REQUEST_CREATE_SUCCESS
@@ -65,8 +50,8 @@ public class FriendshipRequestController {
   @ApiResponses(value={
       @ApiResponse(responseCode="200", description = "보낸 친구 요청 목록 조회에 성공했습니다.")
   })
-  public ResponseEntity<Object> sentFriendshipRequest(){
-    List<SentFriendshipRequestResponseDto> sentFriendshipRequests=friendshipRequestService.sentFriendshipRequest(givenUserId);
+  public ResponseEntity<Object> sentFriendshipRequest(@CurrentUserId Long userId){
+    List<SentFriendshipRequestResponseDto> sentFriendshipRequests=friendshipRequestService.sentFriendshipRequest(userId);
 
     return SuccessResponse.createSuccess(
         SuccessCode.SENT_FRIENDSHIP_REQUESTS_READ_SUCCESS,
@@ -80,8 +65,8 @@ public class FriendshipRequestController {
   @ApiResponses(value={
       @ApiResponse(responseCode="200", description = "받은 친구 요청 목록 조회에 성공했습니다.")
   })
-  public ResponseEntity<Object> receivedFriendshipRequest(){
-    List<ReceivedFriendshipRequestResponseDto> receivedFriendshipRequests=friendshipRequestService.receivedFriendshipRequest(givenUserId);
+  public ResponseEntity<Object> receivedFriendshipRequest(@CurrentUserId Long userId){
+    List<ReceivedFriendshipRequestResponseDto> receivedFriendshipRequests=friendshipRequestService.receivedFriendshipRequest(userId);
 
     return SuccessResponse.createSuccess(
         SuccessCode.RECEIVED_FRIENDSHIP_REQUESTS_READ_SUCCESS,
@@ -97,9 +82,10 @@ public class FriendshipRequestController {
       @ApiResponse(responseCode="400", description="이미 취소된 친구 요청입니다.")
   })
   public ResponseEntity<Object> acceptFriendshipRequest(
+      @CurrentUserId Long userId,
       @RequestBody UpdateReceivedFriendshipRequestStatusRequestDto updateFriendshipRequestStatusRequestDto
   ){
-    friendshipRequestService.acceptFriendshipRequest(givenUserId,
+    friendshipRequestService.acceptFriendshipRequest(userId,
         updateFriendshipRequestStatusRequestDto.getSenderIdentifier());
 
     return SuccessResponse.createSuccess(
@@ -115,9 +101,10 @@ public class FriendshipRequestController {
       @ApiResponse(responseCode="400", description="이미 취소된 친구 요청입니다.")
   })
   public ResponseEntity<Object> rejectFriendshipRequest(
+      @CurrentUserId Long userId,
       @RequestBody UpdateReceivedFriendshipRequestStatusRequestDto updateFriendshipRequestStatusRequestDto
   ){
-    friendshipRequestService.rejectFriendshipRequest(givenUserId,
+    friendshipRequestService.rejectFriendshipRequest(userId,
         updateFriendshipRequestStatusRequestDto.getSenderIdentifier());
 
     return SuccessResponse.createSuccess(
@@ -132,9 +119,10 @@ public class FriendshipRequestController {
       @ApiResponse(responseCode="200", description = "친구 요청을 취소했습니다.")
   })
   public ResponseEntity<Object> cancelFriendshipRequest(
+      @CurrentUserId Long userId,
       @RequestBody CancelSentFriendshipRequestRequestDto cancelSentFriendshipRequestRequestDto
   ){
-    friendshipRequestService.cancelFriendshipRequest(givenUserId,
+    friendshipRequestService.cancelFriendshipRequest(userId,
         cancelSentFriendshipRequestRequestDto.getReceiverIdentifier());
 
     return SuccessResponse.createSuccess(

@@ -2,6 +2,7 @@ package com.harmony.controller;
 
 import com.harmony.dto.request.DeleteFriendshipRequestDto;
 import com.harmony.dto.response.SelectFriendshipResponseDto;
+import com.harmony.global.annotation.CurrentUserId;
 import com.harmony.global.response.code.SuccessCode;
 import com.harmony.global.response.structure.SuccessResponse;
 import com.harmony.service.FriendshipService;
@@ -24,27 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class FriendshipController {
   private final FriendshipService friendshipService;
-  private final Long givenUserId=1L;
-
-  //  테스트
-  @GetMapping("/exist-friend-dsl")
-  public ResponseEntity<Object> existsFriendship1(){
-    long beforeTime=System.currentTimeMillis();
-    friendshipService.existsFriendDSL(givenUserId, 2L);
-    long afterTime=System.currentTimeMillis();
-    log.info("소요 시간:"+(afterTime-beforeTime));
-    return ResponseEntity.ok("테스트 API 호출");
-  }
-
-  //  테스트
-  @GetMapping("/exist-friend2")
-  public ResponseEntity<Object> existsFriendship2(){
-    long beforeTime=System.currentTimeMillis();
-    friendshipService.existsFriend(givenUserId, 2L);
-    long afterTime=System.currentTimeMillis();
-    log.info("소요 시간:"+(afterTime-beforeTime));
-    return ResponseEntity.ok("테스트 API 호출");
-  }
 
   // 친구 목록
   @GetMapping("/friendships")
@@ -52,8 +32,8 @@ public class FriendshipController {
   @ApiResponses(value={
       @ApiResponse(responseCode = "200", description = "추가된 친구 목록 조회에 성공했습니다.")
   })
-  public ResponseEntity<Object> selectFriendships(){
-    List<SelectFriendshipResponseDto> friendshipResponseDtos=friendshipService.selectFriendships(givenUserId);
+  public ResponseEntity<Object> selectFriendships(@CurrentUserId Long userId){
+    List<SelectFriendshipResponseDto> friendshipResponseDtos=friendshipService.selectFriendships(userId);
 
     return SuccessResponse.createSuccess(
         SuccessCode.FRIENDSHIP_READ_SUCCESS,
@@ -61,7 +41,7 @@ public class FriendshipController {
     );
   }
 
-  // 친구 검색
+  // TODO: 친구 검색
 
   // 친구 삭제
   @DeleteMapping
@@ -70,8 +50,8 @@ public class FriendshipController {
       @ApiResponse(responseCode="200", description="친구를 삭제했습니다."),
       @ApiResponse(responseCode="400", description="존재하지 않는 친구입니다.")
   })
-  public ResponseEntity<Object> deleteFriendship(@RequestBody DeleteFriendshipRequestDto deleteFriendshipRequestDto){
-    friendshipService.deleteFriendship(givenUserId, deleteFriendshipRequestDto.getFriendIdentifier());
+  public ResponseEntity<Object> deleteFriendship(@CurrentUserId Long userId, @RequestBody DeleteFriendshipRequestDto deleteFriendshipRequestDto){
+    friendshipService.deleteFriendship(userId, deleteFriendshipRequestDto.getFriendIdentifier());
 
     return SuccessResponse.createSuccess(
         SuccessCode.FRIENDSHIP_DELETE_SUCCESS
