@@ -28,9 +28,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     return userRepository.findByEmail(userEmail)
         .map(user->new UserDetailsImpl(user))
         .orElseThrow(()->new LoginFailedException(ErrorCode.AUTH_LOGIN_FAILED));
-//    return userRepository.findByEmail(userEmail)
-//        .map(user->createUserDetails(user))
-//        .orElseThrow(()->new LoginFailedException(ErrorCode.AUTH_LOGIN_FAILED));
   }
 
   private UserDetails createUserDetails(User user){
