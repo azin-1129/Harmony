@@ -50,8 +50,10 @@ public class ParticipantService {
       );
     }
 
+    // TODO: isPresent() 갈아 끼우기
     Optional<Long> existPersonalChatRoomId = getAlreadyCreatedPersonalChatRoomId(userId, partner.getUserId());
 
+    // TODO: 개인 채팅방이 이미 있는 경우도 예외인가?
     if (existPersonalChatRoomId.isPresent()) { // 이미 개인 채팅방이 존재
       return existPersonalChatRoomId.get();
     }
@@ -268,6 +270,7 @@ public class ParticipantService {
         .chatroomId(chatRoomId)
         .build();
 
+    // TODO: isPresent() 갈아 끼우기
     ChatRoom chatRoom=chatRoomService.getChatRoomById(chatRoomId).get();
 
     // 인원 수 감소
