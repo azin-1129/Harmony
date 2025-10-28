@@ -1,7 +1,5 @@
 package com.harmony.security.filter;
 
-import com.harmony.exception.ExpiredTokenException;
-import com.harmony.global.response.code.ErrorCode;
 import com.harmony.security.utils.TokenProvider;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
@@ -31,12 +29,17 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     // Request header에서 token 추출
     String jwt=resolveToken(request);
 
+    log.info("request URL:"+request.getRequestURL());
+    log.info("jwt token:"+jwt);
     log.info("Authentication Filter");
     if (StringUtils.isNotBlank(jwt)) {
       if (tokenUtils.isValidToken(jwt)) {
         Authentication authentication = tokenUtils.getAuthentication(jwt);
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        log.info("Security Context에 등록했습니다.");
       }
+    }else{
+      log.info("valid 과정을 진행하지 않았습니다.");
     }
 
     filterChain.doFilter(request, response);
@@ -44,6 +47,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
   private String resolveToken(HttpServletRequest request) {
     String bearerToken=request.getHeader(AUTHORIZATION_HEADER);
+    log.debug("bearer token:"+bearerToken);
     if(StringUtils.isNotBlank(bearerToken)){
       if(bearerToken.startsWith(BEARER_PREFIX) && bearerToken.length()>7){
         return bearerToken.substring(7);

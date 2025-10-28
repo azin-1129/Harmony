@@ -1,7 +1,5 @@
 package com.harmony.security.handler;
 
-import com.harmony.exception.AuthFailedException;
-import com.harmony.exception.LoginFailedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.harmony.global.response.code.ErrorCode;
 import com.harmony.global.response.structure.ErrorResponse;
