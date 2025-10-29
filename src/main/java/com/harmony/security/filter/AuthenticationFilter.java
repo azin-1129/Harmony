@@ -36,10 +36,10 @@ public class AuthenticationFilter extends OncePerRequestFilter {
       if (tokenUtils.isValidToken(jwt)) {
         Authentication authentication = tokenUtils.getAuthentication(jwt);
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        log.info("Security Context에 등록했습니다.");
+        log.info("JWT 인증을 완료하여, SecurityContext에 정보를 등록했습니다.");
       }
     }else{
-      log.info("valid 과정을 진행하지 않았습니다.");
+      log.warn("JWT 인증이 정상적으로 수행되지 않았습니다.");
     }
 
     filterChain.doFilter(request, response);
