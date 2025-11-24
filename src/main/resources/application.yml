@@ -18,6 +18,9 @@ spring:
 logging:
   level:
     org:
+      security:
+        web:
+          FilterChainProxy: debug
       hibernate:
         orm:
           jdbc:
