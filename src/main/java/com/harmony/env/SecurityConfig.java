@@ -4,6 +4,8 @@ import com.harmony.security.filter.AuthenticationFilter;
 import com.harmony.security.filter.CustomExceptionFilter;
 import com.harmony.security.handler.JwtAccessDeniedHandler;
 import com.harmony.security.handler.JwtAuthenticationEntryPoint;
+import com.harmony.security.handler.LogoutHandlerImpl;
+import com.harmony.security.handler.LogoutSuccessHandlerImpl;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,11 +29,13 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
   private final String[] allowedUrls=
-      {"/ws/**", "/v3/api-docs/**", "/swagger/**", "/swagger-ui/**", "/swagger-resources/**", "/user/register", "/auth/login", "/auth/reissue", "/error"};
+      {"/login", "/ws/**", "/v3/api-docs/**", "/swagger/**", "/swagger-ui/**", "/swagger-resources/**", "/user/register", "/auth/login", "/auth/reissue", "/error"};
   private final CustomExceptionFilter customExceptionFilter;
   private final AuthenticationFilter authenticationFilter;
   private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
   private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+  private final LogoutHandlerImpl logoutHandlerImpl;
+  private final LogoutSuccessHandlerImpl logoutSuccessHandlerImpl;
 
   @Bean
   public PasswordEncoder passwordEncoder(){
@@ -54,6 +58,9 @@ public class SecurityConfig {
             exceptionConfig.accessDeniedHandler(jwtAccessDeniedHandler)
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint))
         .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 미사용(JWT 사용)
+        .logout(logout -> logout.logoutUrl("/logout")
+          .addLogoutHandler(logoutHandlerImpl)
+          .logoutSuccessHandler(logoutSuccessHandlerImpl))
         .build();
   }
 

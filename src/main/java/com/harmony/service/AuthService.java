@@ -40,8 +40,6 @@ public class AuthService {
     try {
       Authentication authentication = authenticationManagerBuilder.getObject()
           .authenticate(authenticationToken);
-      SecurityContextHolder.getContext().setAuthentication(authentication);
-
       log.info("Auth Service 작업이 끝났습니다.");
 
       TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
