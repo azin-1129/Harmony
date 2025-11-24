@@ -190,4 +190,8 @@ public class TokenProvider {
     }
     return false;
   }
+
+  public String getUsername(String accessToken){
+    return Jwts.parser().verifyWith(key).build().parseSignedClaims(accessToken).getPayload().getSubject();
+  }
 }
