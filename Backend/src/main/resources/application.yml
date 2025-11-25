@@ -1,0 +1,52 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB # 업로드 가능한 개별 파일의 최대 크기. default: 1MB
+      max-request-size: 10MB # multipart/form-data 요청의 최대 허용 크기. default: 10MB
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${mysql.url}
+    username: ${mysql.username}
+    password: ${mysql.password}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    org:
+      security:
+        web:
+          FilterChainProxy: debug
+      hibernate:
+        orm:
+          jdbc:
+            bind: trace
+        SQL: debug
+        type: trace
+      springframework:
+        security: debug
+        web.socket: debug
+        messaging: debug
+
+
+jwt:
+  secret: ${jwt.secret_key}
+  access-token-expiration: ${jwt.access_token_expiration}
+  refresh-token-expiration: ${jwt.refresh_token_expiration}
+
+# AWS S3
+cloud:
+  aws:
+    credentials:
+      access-key: ${aws.access_key}
+      secret-key: ${aws.secret_key}
+    region:
+      static: ${aws.region}
+    s3:
+      bucket: ${aws.bucket}
+    stack:
+      auto: false
