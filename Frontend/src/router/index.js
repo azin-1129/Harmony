@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getAccessToken, getRefreshToken, setTokens, clearTokens } from '@/utils/tokenService'
+import { BACKEND_URL } from '@/utils/config'
 
 // JWT 만료 체크 (base64 decode)
 const isTokenExpired = (token) => {
@@ -17,7 +18,7 @@ const tryReissue = async () => {
   if (!refreshToken || isTokenExpired(refreshToken)) return false
 
   try {
-    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/reissue`, {
+    const res = await fetch(`${BACKEND_URL}/auth/reissue`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken })
