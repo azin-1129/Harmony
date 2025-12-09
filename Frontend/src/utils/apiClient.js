@@ -1,8 +1,6 @@
 // src/utils/apiClient.js
 import { getAccessToken, getRefreshToken, setTokens, clearTokens } from './tokenService'
-
-// 서버 URL
-const SERVER_URL = import.meta.env.VITE_BACKEND_URL
+import { BACKEND_URL } from './config'
 
 // JWT 만료 체크 (base64 decode)
 const isTokenExpired = (token) => {
@@ -21,7 +19,7 @@ const tryReissue = async () => {
   if (!refreshToken || isTokenExpired(refreshToken)) return false
 
   try {
-    const res = await fetch(`${SERVER_URL}/auth/reissue`, {
+    const res = await fetch(`${BACKEND_URL}/auth/reissue`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken })
@@ -59,7 +57,7 @@ export const apiFetch = async (url, options = {}, retry = true) => {
   const headers = { ...(options.headers || {}) }
   if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`
 
-  const response = await fetch(`${SERVER_URL}${url}`, { ...options, headers })
+  const response = await fetch(`${BACKEND_URL}${url}`, { ...options, headers })
 
   // 401 발생 시 재발급
   if (response.status === 401 && retry) {
