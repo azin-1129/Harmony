@@ -16,16 +16,30 @@
 
 <script setup>
 import { useRouter, useRoute } from 'vue-router'
-import { clearTokens } from '@/utils/tokenService'
+import { clearTokens, getAccessToken } from '@/utils/tokenService'
+import { apiUrl } from '@/utils/config'
 
 const router = useRouter()
 const route = useRoute()
 const go = (path) => router.push(path)
 const isActive = (path) => route.path === path
 
-const logout = () => {
-  clearTokens()
-  router.push('/login')
+const logout = async () => {
+  try {
+    const token = getAccessToken()
+    if (token) {
+      await fetch(apiUrl('/logout'), {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      })
+    }
+  } catch (err) {
+    // 네트워크 오류나 서버 오류는 무시하고 토큰만 제거
+    console.error('Logout request failed', err)
+  } finally {
+    clearTokens()
+    router.push('/login')
+  }
 }
 </script>
 
