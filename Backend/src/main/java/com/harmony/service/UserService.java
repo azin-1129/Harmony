@@ -65,14 +65,8 @@ public class UserService {
     }
   }
 
-  public SelectUserInfoResponseDto findUserInfo(){
-    String email= SecurityUtil.getCurrentEmail().orElseThrow(()->
-        new SecurityContextNotFoundException(
-            ErrorCode.AUTH_CONTEXT_NOT_FOUND
-        )
-    );
-
-    User user=userRepository.findByEmail(email).orElseThrow(
+  public SelectUserInfoResponseDto findUserInfo(Long userId){
+    User user=userRepository.findByUserId(userId).orElseThrow(
         ()->new EntityNotFoundException(
             ErrorCode.USER_NOT_FOUND
         )
@@ -80,7 +74,7 @@ public class UserService {
 
     SelectUserInfoResponseDto selectUserInfoResponseDto=
         SelectUserInfoResponseDto.builder()
-            .email(email)
+            .email(user.getEmail())
             .userIdentifier(user.getUserIdentifier())
             .profileImageName(user.getProfileImageName())
             .nickname(user.getNickname())
