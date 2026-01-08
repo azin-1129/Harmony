@@ -42,6 +42,9 @@ import HomeFeed from '@/components/HomeFeed.vue'
 import Reels from '@/components/Reels.vue'
 import Chat from '@/components/Chat.vue'
 import MyPage from '@/components/MyPage.vue'
+import Search from '@/components/Search.vue'
+import CreatePost from '@/components/CreatePost.vue'
+import Settings from '@/components/Settings.vue'
 
 const routes = [
   {
@@ -57,8 +60,11 @@ const routes = [
       { path: '', redirect: '/home' },
       { path: 'home', component: HomeFeed, meta: { requiresAuth: true } },
       { path: 'reels', component: Reels, meta: { requiresAuth: true } },
+      { path: 'search', component: Search, meta: { requiresAuth: true } },
       { path: 'chat', component: Chat, meta: { requiresAuth: true } },
-      { path: 'mypage', component: MyPage, meta: { requiresAuth: true } }
+      { path: 'mypage', component: MyPage, meta: { requiresAuth: true } },
+      { path: 'create', component: CreatePost, meta: { requiresAuth: true } },
+      { path: 'settings', component: Settings, meta: { requiresAuth: true } }
     ]
   }
 ]

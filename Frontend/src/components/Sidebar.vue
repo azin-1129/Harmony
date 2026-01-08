@@ -3,14 +3,33 @@
     <div class="top">
       <h2 class="logo">Harmony</h2>
       <ul class="menu">
-        <li :class="{ active: isActive('/home') }" @click="go('/home')">홈 피드</li>
-        <li :class="{ active: isActive('/reels') }" @click="go('/reels')">릴스</li>
-        <li :class="{ active: isActive('/chat') }" @click="go('/chat')">채팅</li>
-        <li :class="{ active: isActive('/mypage') }" @click="go('/mypage')">마이페이지</li>
+        <li :class="{ active: isActive('/home') }" @click="go('/home')">
+          <span class="icon">🏠</span> 홈
+        </li>
+        <li :class="{ active: isActive('/reels') }" @click="go('/reels')">
+          <span class="icon">🎬</span> 릴스
+        </li>
+        <li :class="{ active: isActive('/search') }" @click="go('/search')">
+          <span class="icon">🔍</span> 검색
+        </li>
+        <li :class="{ active: isActive('/chat') }" @click="go('/chat')">
+          <span class="icon">💬</span> 채팅
+        </li>
+        <li :class="{ active: isActive('/mypage') }" @click="go('/mypage')">
+          <span class="icon">👤</span> 마이페이지
+        </li>
+        <li :class="{ active: isActive('/create') }" @click="go('/create')">
+          <span class="icon">✏️</span> 게시물 작성
+        </li>
       </ul>
     </div>
 
-    <button class="logout-btn" @click="logout">로그아웃</button>
+    <div class="bottom">
+      <button class="settings-btn" @click="go('/settings')">
+        <span class="icon">⚙️</span> 설정
+      </button>
+      <button class="logout-btn" @click="logout">로그아웃</button>
+    </div>
   </nav>
 </template>
 
@@ -69,11 +88,14 @@ const logout = async () => {
 }
 
 li {
+  display: flex;
+  align-items: center;
   padding: 12px 10px;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.2s;
   margin-bottom: 4px;
+  font-size: 0.95em;
 }
 
 li:hover {
@@ -85,20 +107,52 @@ li.active {
   font-weight: bold;
 }
 
-/* ✅ 하단 고정 안 하고도 항상 보이도록 자연스럽게 배치 */
+.icon {
+  margin-right: 8px;
+  font-size: 1.1em;
+}
+
+.bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-btn,
+.logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+  font-size: 0.95em;
+  flex-shrink: 0;
+}
+
+.settings-btn {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.settings-btn:hover {
+  background-color: #e8e8e8;
+}
+
 .logout-btn {
   background-color: #6b6bff;
   color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.2s, color 0.2s;
-  flex-shrink: 0; /* 👈 버튼이 잘리지 않게 함 */
 }
 
 .logout-btn:hover {
   background-color: #5555ff;
+}
+
+.settings-btn .icon,
+.logout-btn .icon {
+  margin-right: 8px;
 }
 </style>
