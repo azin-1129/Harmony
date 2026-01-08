@@ -17,6 +17,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -25,15 +26,16 @@ import org.springframework.stereotype.Service;
 public class ArticleService {
   private final ArticleRepository articleRepository;
   private final UserService userService;
+  private final AwsS3Service awsS3Service;
 
   // 게시물 작성
-  public Long writeArticle(Long givenUserId, WriteArticleRequestDto writeArticleRequestDto){
+  public Long writeArticle(Long givenUserId, MultipartFile multipartFile, WriteArticleRequestDto writeArticleRequestDto){
     User author = userService.getUserById(
         givenUserId);
-
+    String articleImageName= awsS3Service.uploadArticleImage(multipartFile);
     Article article=Article.builder()
         .author(author)
-        .articleMediaUrl(writeArticleRequestDto.getArticleMediaUrl())
+        .articleMediaUrl(articleImageName)
         .articleMediaType(ArticleMediaType.IMAGE)
         .articleText(writeArticleRequestDto.getArticleText())
         .articleCommentCount(0)
