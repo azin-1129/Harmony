@@ -15,7 +15,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SelectFollowingUserArticlesResponseDto {
   private String authorIdentifier;
-  private String authorProfileImageName;
+  private String authorProfileImageUrl;
   private String articleMediaUrl;
   private String articleText;
   private Integer articleCommentCount;
