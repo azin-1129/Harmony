@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class UserController {
   private final UserService userService;
-  private final Long givenUserId=1L; // 임시 userId
 
   @GetMapping("/test")
   public ResponseEntity<Object> test(@CurrentUserId Long userId) {
@@ -83,13 +82,13 @@ public class UserController {
   }
 
   @GetMapping("/info")
-  @PreAuthorize("hasAnyRole('ROLE_MEMBER', 'ROLE_ADMIN')")
-  public ResponseEntity<Object> selectUserInfo(){
+  public ResponseEntity<Object> selectUserInfo(@CurrentUserId Long userId){
     return SuccessResponse.createSuccess(
         SuccessCode.USER_INFO_READ_SUCCESS,
-        userService.findUserInfo()
+        userService.findUserInfo(userId)
     );
   }
+
   // 비번 업뎃
   @PostMapping("/update/password")
   @Operation(summary="비밀번호 변경", description="비밀번호 변경 API")
@@ -97,7 +96,7 @@ public class UserController {
       @ApiResponse(responseCode="200", description="비밀번호 변경 성공"),
       @ApiResponse(responseCode="400", description="입력 양식이 잘못되었습니다.")
   })
-  public ResponseEntity<Object> updateUserPassword(@RequestBody @Valid PasswordForm passwordForm, BindingResult bindingResult){
+  public ResponseEntity<Object> updateUserPassword(@CurrentUserId Long userId, @RequestBody @Valid PasswordForm passwordForm, BindingResult bindingResult){
     // 입력 형식이 올바르지 않다면 에러
     if(bindingResult.hasErrors()){
       Map<String, String> validatorResult=new HashMap<>();
@@ -120,7 +119,7 @@ public class UserController {
       );
     }
 
-    userService.updateUserPassword(givenUserId, passwordForm.getNewPassword());
+    userService.updateUserPassword(userId, passwordForm.getNewPassword());
 
     return SuccessResponse.createSuccess(
         SuccessCode.USER_UPDATE_PASSWORD_SUCCESS
@@ -134,7 +133,7 @@ public class UserController {
       @ApiResponse(responseCode="200", description="닉네임 변경 성공"),
       @ApiResponse(responseCode="400", description="입력 양식이 잘못되었습니다.")
   })
-  public ResponseEntity<Object> updateUserNickname(@RequestBody @Valid NicknameForm nicknameForm, BindingResult bindingResult){
+  public ResponseEntity<Object> updateUserNickname(@CurrentUserId Long userId, @RequestBody @Valid NicknameForm nicknameForm, BindingResult bindingResult){
     // 입력 형식이 올바르지 않다면 에러
     if(bindingResult.hasErrors()){
       Map<String, String> validatorResult=new HashMap<>();
@@ -150,7 +149,7 @@ public class UserController {
       );
     }
 
-    userService.updateUserNickname(givenUserId, nicknameForm.getNewNickname());
+    userService.updateUserNickname(userId, nicknameForm.getNewNickname());
 
     return SuccessResponse.createSuccess(
         SuccessCode.USER_UPDATE_NICKNAME_SUCCESS
@@ -166,8 +165,8 @@ public class UserController {
       @ApiResponse(responseCode="200", description="프로필 사진 변경 성공"),
       @ApiResponse(responseCode="400", description="입력 양식이 잘못되었습니다.")
   })
-  public ResponseEntity<Object> updateUserProfileImageName(@RequestBody @Valid ProfileImageForm profileImageForm){
-    userService.updateUserProfileImage(givenUserId, profileImageForm.getNewProfileImageName());
+  public ResponseEntity<Object> updateUserProfileImageName(@CurrentUserId Long userId, @RequestBody @Valid ProfileImageForm profileImageForm){
+    userService.updateUserProfileImage(userId, profileImageForm.getNewProfileImageName());
 
     // TODO: S3에 이미지 저장
     return SuccessResponse.createSuccess(
@@ -190,8 +189,8 @@ public class UserController {
       @ApiResponse(responseCode="200", description="회원탈퇴 성공"),
       @ApiResponse(responseCode="404", description="회원탈퇴 실패")
   })
-  public ResponseEntity<Object> deleteUser(){ // Security에서 빼올 예정
-    userService.deleteUser(givenUserId);
+  public ResponseEntity<Object> deleteUser(@CurrentUserId Long userId){
+    userService.deleteUser(userId);
 
     return SuccessResponse.createSuccess(
         SuccessCode.USER_WITHDRAW_SUCCESS
@@ -200,7 +199,7 @@ public class UserController {
 
   @DeleteMapping("/force/{userId}")
   @Operation(summary="테스트용 회원탈퇴", description="회원탈퇴 API")
-  public ResponseEntity<Object> deleteUserForce(@PathVariable Long userId){ // Security에서 빼올 예정
+  public ResponseEntity<Object> deleteUserForce(@PathVariable Long userId){
     userService.deleteUserForce(userId);
 
     return SuccessResponse.createSuccess(

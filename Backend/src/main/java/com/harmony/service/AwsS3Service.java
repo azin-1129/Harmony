@@ -71,6 +71,27 @@ public class AwsS3Service {
 
     return fileName;
   }
+
+  public String uploadArticleImage(MultipartFile multipartFile){
+    ObjectMetadata objectMetadata=new ObjectMetadata();
+    objectMetadata.setContentType(validImageType(multipartFile));
+    objectMetadata.setContentLength(multipartFile.getSize());
+
+    String fileName=createFileName(multipartFile.getOriginalFilename());
+    log.info("생성된 파일 이름입니다:"+fileName);
+    try(InputStream inputStream=multipartFile.getInputStream()){
+      amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
+          .withCannedAcl(CannedAccessControlList.PublicRead));
+
+    }catch(IOException e){
+      throw new UploadFailedException(
+          ErrorCode.FILE_UPLOAD_FAILED
+      );
+    }
+
+    return fileName;
+  }
+
   private String validImageType(MultipartFile multipartFile){
     try{
       InputStream inputStream=multipartFile.getInputStream();
