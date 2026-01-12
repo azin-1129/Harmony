@@ -41,6 +41,14 @@ public class AwsS3Service {
     return amazonS3.getUrl(bucket, userDetailsImpl.getProfileImageName()).toString();
   }
 
+  public String getAuthorProfileImageUrl(String authorProfileImageName){
+    return amazonS3.getUrl(bucket, authorProfileImageName).toString();
+  }
+
+  public String getArticleImageUrl(String articleImageName){
+    return amazonS3.getUrl(bucket, articleImageName).toString();
+  }
+
   // TODO: 업로드 시 리사이징
   public String uploadProfileImage(UserDetailsImpl userDetailsImpl, MultipartFile multipartFile){
     String originalProfileImageName=userDetailsImpl.getProfileImageName();
