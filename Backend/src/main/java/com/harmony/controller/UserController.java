@@ -82,13 +82,13 @@ public class UserController {
   }
 
   @GetMapping("/info")
-  @PreAuthorize("hasAnyRole('ROLE_MEMBER', 'ROLE_ADMIN')")
-  public ResponseEntity<Object> selectUserInfo(){
+  public ResponseEntity<Object> selectUserInfo(@CurrentUserId Long userId){
     return SuccessResponse.createSuccess(
         SuccessCode.USER_INFO_READ_SUCCESS,
-        userService.findUserInfo()
+        userService.findUserInfo(userId)
     );
   }
+
   // 비번 업뎃
   @PostMapping("/update/password")
   @Operation(summary="비밀번호 변경", description="비밀번호 변경 API")
