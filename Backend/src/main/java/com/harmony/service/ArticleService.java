@@ -57,14 +57,16 @@ public class ArticleService {
     List<SelectFollowingUserArticlesResponseDto> selectFollowingUserArticlesResponseDtos=new ArrayList<>();
 
     for(Article article:articles){
+      String articleImageUrl=awsS3Service.getArticleImageUrl(article.getArticleMediaUrl());
+      String authorProfileImageUrl=awsS3Service.getAuthorProfileImageUrl(article.getAuthor().getProfileImageName());
       SelectFollowingUserArticlesResponseDto selectFollowingUserArticlesResponseDto=SelectFollowingUserArticlesResponseDto.builder()
           .authorIdentifier(article.getAuthor().getUserIdentifier())
-          .authorProfileImageName(article.getAuthor().getProfileImageName())
-          .articleMediaUrl(article.getArticleMediaUrl())
+          .authorProfileImageUrl(authorProfileImageUrl)
+          .articleMediaUrl(articleImageUrl)
           .articleText(article.getArticleText())
           .articleCommentCount(article.getArticleCommentCount())
           .articleLikeCount(article.getArticleLikeCount())
-          .articleThumbnailUrl(article.getArticleThumbnailUrl())
+          .articleThumbnailUrl(articleImageUrl) // TODO: 썸네일 생성
           .createdAt(article.getCreatedAt())
           .build();
 
@@ -88,14 +90,16 @@ public class ArticleService {
     List<SelectAuthorArticlesResponseDto> selectUserArticlesResponseDtos=new ArrayList<>();
 
     for(Article article:articles){
+      String articleImageUrl=awsS3Service.getArticleImageUrl(article.getArticleMediaUrl());
+      String authorProfileImageUrl=awsS3Service.getAuthorProfileImageUrl(article.getAuthor().getProfileImageName());
       SelectAuthorArticlesResponseDto selectUserArticlesResponseDto= SelectAuthorArticlesResponseDto.builder()
           .authorIdentifier(article.getAuthor().getUserIdentifier())
-          .authorProfileImageName(article.getAuthor().getProfileImageName())
-          .articleMediaUrl(article.getArticleMediaUrl())
+          .authorProfileImageUrl(authorProfileImageUrl)
+          .articleMediaUrl(articleImageUrl)
           .articleText(article.getArticleText())
           .articleCommentCount(article.getArticleCommentCount())
           .articleLikeCount(article.getArticleLikeCount())
-          .articleThumbnailUrl(article.getArticleThumbnailUrl())
+          .articleThumbnailUrl(articleImageUrl) // TODO: 썸네일 생성
           .createdAt(article.getCreatedAt())
           .build();
 
