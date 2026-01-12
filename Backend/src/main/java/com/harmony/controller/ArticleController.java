@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +19,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RequestMapping(value="/article")
@@ -29,15 +32,19 @@ public class ArticleController {
 
   // TODO: MultiPartFile로 이미지 교체
   // 게시물 작성(이미지+텍스트)
-  @PostMapping("/write")
+  @PostMapping(value="/write", consumes={MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
   @Operation(summary="이미지+텍스트 게시물 작성", description = "게시물 작성 API")
   @ApiResponses(value = {
       @ApiResponse(responseCode="201", description = "게시물 작성에 성공했습니다.")
   })
-  public ResponseEntity<Object> writeArticle(@CurrentUserId Long userId, @RequestBody WriteArticleRequestDto writeArticleRequestDto){
+  public ResponseEntity<Object> writeArticle(
+      @CurrentUserId Long userId,
+      @RequestPart(value="multipartfile") MultipartFile multipartFile,
+      @RequestPart WriteArticleRequestDto writeArticleRequestDto
+  ){
     return SuccessResponse.createSuccess(
         SuccessCode.ARTICLE_CREATE_SUCCESS,
-        articleService.writeArticle(userId, writeArticleRequestDto)
+        articleService.writeArticle(userId, multipartFile, writeArticleRequestDto)
     );
   }
 
