@@ -2,7 +2,7 @@
   <div class="feed-item">
     <div class="feed-header">
         <div class="header-left">
-          <img :src="feed.author.profileImage" class="profile" />
+          <img :src="getProfileImageUrl(feed.author.profileImage)" class="profile" />
           <span class="username">{{ feed.author.name }}</span>
         </div>
         <button 
@@ -57,7 +57,18 @@ const props = defineProps({
 
 const emit = defineEmits(['add-friend'])
 
+// 기본 프로필 사진 - 회색 배경에 사람 아이콘
+const DEFAULT_PROFILE_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTBFMEUwIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjOTk5Ii8+CjxwYXRoIGQ9Ik0yMCA2NSBDMjAgNjAgMzAgNTAgNTAgNTAgQzcwIDUwIDgwIDYwIDgwIDY1IiBmaWxsPSIjOTk5Ii8+Cjwvc3ZnPg=='
+
 const showComments = ref(false)
+
+// 프로필 이미지 URL 정규화 - 없으면 기본 이미지 사용
+const getProfileImageUrl = (imageUrl) => {
+  if (!imageUrl || imageUrl === null || (typeof imageUrl === 'string' && !imageUrl.trim())) {
+    return DEFAULT_PROFILE_IMAGE
+  }
+  return imageUrl
+}
 const toggleComments = () => (showComments.value = !showComments.value)
 
 const updateCommentCount = (count) => {
