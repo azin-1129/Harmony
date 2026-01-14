@@ -36,10 +36,13 @@ public class FriendshipRequestService {
     String receiverIdentifier=createToFriendshipRequestDto.getReceiverIdentifier();
 
     User receiver =userService.getUserByUserIdentifier(receiverIdentifier);
-    Optional<FriendshipRequest> friendshipRequest=friendshipRequestRepository.findByFromUserIdAndToUserIdAndFriendshipRequestStatus(
+    Optional<FriendshipRequest> sentFriendshipRequest=friendshipRequestRepository.findByFromUserIdAndToUserIdAndFriendshipRequestStatus(
         fromUserId, receiver.getUserId(), FriendshipRequestStatus.SENT);
 
-    if(friendshipRequest.isPresent()){
+    Optional<FriendshipRequest> receivedFriendshipRequest=friendshipRequestRepository.findByFromUserIdAndToUserIdAndFriendshipRequestStatus(
+        fromUserId, receiver.getUserId(), FriendshipRequestStatus.RECEIVED);
+
+    if(sentFriendshipRequest.isPresent() || receivedFriendshipRequest.isPresent()){
       throw new EntityAlreadyExistException(
           ErrorCode.FRIENDSHIP_REQUEST_ALREADY_EXIST
       );
