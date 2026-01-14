@@ -23,6 +23,7 @@ public class CommentService {
   private final CommentRepository commentRepository;
   private final ArticleRepository articleRepository;
   private final UserService userService;
+  private final AwsS3Service awsS3Service;
 
   // 댓글 작성
   public WriteCommentResponseDto writeComment(Long givenUserId, WriteCommentRequestDto writeCommentRequestDto){
@@ -42,7 +43,9 @@ public class CommentService {
     commentRepository.save(comment);
 
     WriteCommentResponseDto writeCommentResponseDto=WriteCommentResponseDto.builder()
+        .commentId(comment.getCommentId())
         .commentText(writeCommentRequestDto.getCommentText())
+        .createdAt(comment.getCreatedAt())
         .build();
 
     return writeCommentResponseDto;
@@ -52,19 +55,19 @@ public class CommentService {
 
   // 댓글 불러오기
   public List<SelectCommentResponseDto> selectComments(Long articleId){
-    Article article=articleRepository.findArticleByArticleId(articleId)
-        .orElseThrow(()->new EntityNotFoundException(
-            ErrorCode.ARTICLE_NOT_FOUND
-        ));
-
-    List<Comment> comments=article.getComments();
-
+    List<Comment> comments=commentRepository.findCommentsByArticleIdOrderByCreatedAtDesc(articleId);
     List<SelectCommentResponseDto> selectCommentResponseDtos=new ArrayList<>();
     for(Comment comment:comments){
       User writer=comment.getWriter();
+      String profileImageUrl = null;
+      String profileImageName=writer.getProfileImageName();
+      if(profileImageName!=null){
+        profileImageUrl= awsS3Service.getUserProfileImageUrl(profileImageName);
+      }
       SelectCommentResponseDto selectCommentResponseDto=SelectCommentResponseDto.builder()
-          .writerId(writer.getUserId())
-          .profileImageName(writer.getProfileImageName())
+          .commentId(comment.getCommentId())
+          .writerIdentifier(writer.getUserIdentifier())
+          .writerProfileImageUrl(profileImageUrl)
           .nickname(writer.getNickname())
           .commentText(comment.getCommentText())
           .createdAt(comment.getCreatedAt())

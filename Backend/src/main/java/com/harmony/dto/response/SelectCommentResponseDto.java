@@ -14,8 +14,9 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SelectCommentResponseDto {
-  private Long writerId;
-  private String profileImageName;
+  private Long commentId;
+  private String writerIdentifier;
+  private String writerProfileImageUrl;
   private String nickname;
   private String commentText;
   private LocalDateTime createdAt;
