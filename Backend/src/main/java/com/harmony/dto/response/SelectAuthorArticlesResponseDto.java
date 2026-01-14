@@ -14,6 +14,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SelectAuthorArticlesResponseDto {
+  private Long articleId;
   private String authorIdentifier;
   private String authorProfileImageUrl;
   private String articleMediaUrl;
