@@ -37,8 +37,9 @@ public class AwsS3Service {
   private final Tika tika=new Tika();
   private final List<String> validImageTypes= Arrays.asList("image/png", "image/jpeg");
 
-  public String getProfileImageUrl(UserDetailsImpl userDetailsImpl){
-    return amazonS3.getUrl(bucket, userDetailsImpl.getProfileImageName()).toString();
+  // TODO: 리팩토링. 메소드 중복됨
+  public String getUserProfileImageUrl(String profileImageName){
+    return amazonS3.getUrl(bucket, profileImageName).toString();
   }
 
   public String getAuthorProfileImageUrl(String authorProfileImageName){
