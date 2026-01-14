@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final AwsS3Service awsS3Service;
 
   // TODO: 이메일, 식별자, 닉네임 중복 처리 이렇게 해도 되나?
   public void registerUser(RegisterRequestDto registerRequestDto) {
@@ -50,7 +51,7 @@ public class UserService {
           .email(registerRequestDto.getEmail())
           .userIdentifier(registerRequestDto.getUserIdentifier())
           .password(passwordEncoder.encode(registerRequestDto.getPassword()))
-          .profileImageName("") // TODO: 기본 프사 넣어줘야 할 듯?
+          .profileImageName(null) // TODO: 기본 프사 넣어줘야 할 듯?
           .nickname(registerRequestDto.getNickname())
           .withdraw(false)
           .role(registerRequestDto.getRole())
@@ -76,7 +77,7 @@ public class UserService {
         SelectUserInfoResponseDto.builder()
             .email(user.getEmail())
             .userIdentifier(user.getUserIdentifier())
-            .profileImageName(user.getProfileImageName())
+            .profileImageUrl(awsS3Service.getUserProfileImageUrl(user.getProfileImageName()))
             .nickname(user.getNickname())
             .build();
 

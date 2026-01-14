@@ -1,5 +1,6 @@
 package com.harmony.dto.response;
 
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,5 +14,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WriteCommentResponseDto {
+  private Long commentId;
   private String commentText;
+  private LocalDateTime createdAt;
 }

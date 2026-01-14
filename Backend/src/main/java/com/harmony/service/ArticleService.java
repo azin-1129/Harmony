@@ -60,6 +60,7 @@ public class ArticleService {
       String articleImageUrl=awsS3Service.getArticleImageUrl(article.getArticleMediaUrl());
       String authorProfileImageUrl=awsS3Service.getAuthorProfileImageUrl(article.getAuthor().getProfileImageName());
       SelectFollowingUserArticlesResponseDto selectFollowingUserArticlesResponseDto=SelectFollowingUserArticlesResponseDto.builder()
+          .articleId(article.getArticleId())
           .authorIdentifier(article.getAuthor().getUserIdentifier())
           .authorProfileImageUrl(authorProfileImageUrl)
           .articleMediaUrl(articleImageUrl)
@@ -93,6 +94,7 @@ public class ArticleService {
       String articleImageUrl=awsS3Service.getArticleImageUrl(article.getArticleMediaUrl());
       String authorProfileImageUrl=awsS3Service.getAuthorProfileImageUrl(article.getAuthor().getProfileImageName());
       SelectAuthorArticlesResponseDto selectUserArticlesResponseDto= SelectAuthorArticlesResponseDto.builder()
+          .articleId(article.getArticleId())
           .authorIdentifier(article.getAuthor().getUserIdentifier())
           .authorProfileImageUrl(authorProfileImageUrl)
           .articleMediaUrl(articleImageUrl)

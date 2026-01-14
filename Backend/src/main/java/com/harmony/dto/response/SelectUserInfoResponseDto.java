@@ -23,7 +23,7 @@ public class SelectUserInfoResponseDto {
   // 암호(?)-현재 pw, 바꿀 pw, 바꿀 pw 컨펌
 
   // 프사
-  private String profileImageName;
+  private String profileImageUrl;
 
   // 닉네임
   private String nickname;

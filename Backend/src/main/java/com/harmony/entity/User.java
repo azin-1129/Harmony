@@ -47,7 +47,7 @@ public class User extends BaseTime {
   @Column(name = "password", nullable = false, length=255)
   private String password;
 
-  @Column(name = "profile_image_name", nullable = false, length=255)
+  @Column(name = "profile_image_name", nullable = true, length=255)
   private String profileImageName;
 
   @Column(name = "nickname", nullable = true, length=10)
