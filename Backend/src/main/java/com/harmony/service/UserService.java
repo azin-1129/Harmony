@@ -5,13 +5,11 @@ import com.harmony.dto.response.SelectUserInfoResponseDto;
 import com.harmony.entity.User;
 import com.harmony.exception.DuplicatedUserNicknameException;
 import com.harmony.exception.DuplicatedUserPasswordException;
-import com.harmony.exception.SecurityContextNotFoundException;
 import com.harmony.exception.UserAlreadyWithdrawException;
 import com.harmony.global.response.code.ErrorCode;
 import com.harmony.global.response.exception.EntityNotFoundException;
 import com.harmony.global.response.exception.InvalidArgumentException;
 import com.harmony.repository.UserRepository;
-import com.harmony.security.utils.SecurityUtil;
 import jakarta.transaction.Transactional;
 import java.util.HashMap;
 import java.util.Optional;
@@ -75,6 +73,7 @@ public class UserService {
 
     SelectUserInfoResponseDto selectUserInfoResponseDto=
         SelectUserInfoResponseDto.builder()
+            .userId(user.getUserId())
             .email(user.getEmail())
             .userIdentifier(user.getUserIdentifier())
             .profileImageUrl(awsS3Service.getUserProfileImageUrl(user.getProfileImageName()))
