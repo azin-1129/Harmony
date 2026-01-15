@@ -14,6 +14,7 @@
         <div class="comment-content">
           <div class="comment-header">
             <span class="nickname">{{ c.nickname }}</span>
+            <span v-if="c.writerIdentifier === props.currentUserIdentifier" class="author-badge">작성자</span>
             <span class="timestamp">{{ formatTime(c.createdAt) }}</span>
             <button 
               v-if="hoveredCommentId === index && c.writerIdentifier === props.currentUserIdentifier"
@@ -260,6 +261,15 @@ onMounted(async () => {
 .nickname {
   font-weight: bold;
   font-size: 0.9em;
+}
+
+.author-badge {
+  background: #FF6B6B;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75em;
+  font-weight: 600;
 }
 
 .timestamp {
