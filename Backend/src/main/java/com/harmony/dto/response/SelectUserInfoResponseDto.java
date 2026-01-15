@@ -1,6 +1,5 @@
 package com.harmony.dto.response;
 
-import com.harmony.entity.User;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +13,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SelectUserInfoResponseDto {
+  private Long userId;
   // 이메일
   private String email;
 
