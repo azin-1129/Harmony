@@ -45,6 +45,7 @@ import MyPage from '@/components/MyPage.vue'
 import Search from '@/components/Search.vue'
 import CreatePost from '@/components/CreatePost.vue'
 import Settings from '@/components/Settings.vue'
+import ArticleDetail from '@/components/ArticleDetail.vue'
 
 const routes = [
   {
@@ -64,7 +65,8 @@ const routes = [
       { path: 'chat', component: Chat, meta: { requiresAuth: true } },
       { path: 'mypage', component: MyPage, meta: { requiresAuth: true } },
       { path: 'create', component: CreatePost, meta: { requiresAuth: true } },
-      { path: 'settings', component: Settings, meta: { requiresAuth: true } }
+      { path: 'settings', component: Settings, meta: { requiresAuth: true } },
+      { path: 'article/:id', component: ArticleDetail, meta: { requiresAuth: true } }
     ]
   }
 ]
