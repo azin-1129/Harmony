@@ -80,7 +80,6 @@
     </div>
 
     <p v-if="error" class="error-msg">{{ error }}</p>
-    <p v-if="success" class="success-msg">게시물이 작성되었습니다!</p>
 
     <!-- Confirm Modal -->
     <div v-if="showConfirmModal" class="modal-overlay" @click="showConfirmModal = false">
@@ -93,19 +92,57 @@
         </div>
       </div>
     </div>
+
+    <!-- Result Modal (Loading/Success/Error) -->
+    <div v-if="showResultModal" class="modal-overlay" @click.stop>
+      <div class="modal-content result-modal" @click.stop>
+        <div v-if="resultModalType === 'loading'" class="result-content">
+          <div class="spinner"></div>
+          <p>{{ resultModalMessage }}</p>
+        </div>
+        <div v-else class="result-content">
+          <h2>{{ resultModalMessage }}</h2>
+          <div class="modal-actions">
+            <button @click="closeResultModal" class="modal-confirm-btn">확인</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Confirmation Modal -->
+    <div v-if="showNavigationModal" class="modal-overlay" @click.stop>
+      <div class="modal-content" @click.stop>
+        <h2>페이지를 이동하시겠습니까?</h2>
+        <p>작성중인 내용이 초기화될 수 있습니다. 이동하시겠습니까?</p>
+        <div class="modal-actions">
+          <button @click="confirmNavigation" class="modal-confirm-btn">예</button>
+          <button @click="cancelNavigation" class="modal-cancel-btn">아니오</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { apiFetch } from '../utils/apiClient'
+import { onBeforeRouteLeave } from 'vue-router'
 
 const router = useRouter()
 const loading = ref(false)
 const error = ref('')
-const success = ref(false)
 const showConfirmModal = ref(false)
+const showResultModal = ref(false)
+const resultModalType = ref('') // 'loading', 'success', 'error'
+const resultModalMessage = ref('')
+const showNavigationModal = ref(false)
+let pendingNavigation = null
+
+// 작성 중인 내용이 있는지 확인
+const hasContent = computed(() => {
+  return formData.value.content.trim() !== '' || formData.value.image !== null
+})
 
 const formData = ref({
   content: '',
@@ -149,7 +186,11 @@ const handleCreatePost = async () => {
 
   loading.value = true
   error.value = ''
-  success.value = false
+  
+  // 로딩 팝업 표시
+  resultModalType.value = 'loading'
+  resultModalMessage.value = '게시물을 작성하는 중입니다...'
+  showResultModal.value = true
 
   try {
     const formDataToSend = new FormData()
@@ -177,14 +218,14 @@ const handleCreatePost = async () => {
     const result = await response.json()
     console.log('게시물 작성 성공:', result)
     
-    success.value = true
-    setTimeout(() => {
-      resetForm()
-      router.push('/home')
-    }, 1500)
+    // 성공 팝업 표시
+    resultModalType.value = 'success'
+    resultModalMessage.value = '게시물 작성에 성공했습니다.'
   } catch (err) {
     console.error('게시물 작성 오류:', err)
-    error.value = err.message || '게시물 작성에 실패했습니다.'
+    // 실패 팝업 표시
+    resultModalType.value = 'error'
+    resultModalMessage.value = '게시물 작성에 실패했습니다.'
   } finally {
     loading.value = false
   }
@@ -201,7 +242,6 @@ const resetForm = () => {
     fileInput.value.value = ''
   }
   error.value = ''
-  success.value = false
 }
 
 const handleCancel = () => {
@@ -212,6 +252,43 @@ const confirmCancel = () => {
   showConfirmModal.value = false
   resetForm()
   router.back()
+}
+
+const closeResultModal = () => {
+  showResultModal.value = false
+  if (resultModalType.value === 'success') {
+    resetForm()
+    router.push('/mypage')
+  }
+  // error인 경우 그대로 유지
+}
+
+// 다른 페이지로 이동하기 전에 확인
+onBeforeRouteLeave((to, from, next) => {
+  // 작성 중인 내용이 있고, 결과 팝업이 닫혀있을 때만 확인
+  if (hasContent.value && !showResultModal.value) {
+    showNavigationModal.value = true
+    pendingNavigation = next
+  } else {
+    next()
+  }
+})
+
+const confirmNavigation = () => {
+  showNavigationModal.value = false
+  resetForm()
+  if (pendingNavigation) {
+    pendingNavigation()
+    pendingNavigation = null
+  }
+}
+
+const cancelNavigation = () => {
+  showNavigationModal.value = false
+  if (pendingNavigation) {
+    pendingNavigation(false)
+    pendingNavigation = null
+  }
 }
 </script>
 
@@ -448,15 +525,6 @@ form {
   margin-top: 15px;
 }
 
-.success-msg {
-  color: #388e3c;
-  text-align: center;
-  padding: 12px;
-  background-color: #e8f5e9;
-  border-radius: 8px;
-  margin-top: 15px;
-}
-
 /* Modal */
 .modal-overlay {
   position: fixed;
@@ -525,6 +593,36 @@ form {
 
 .modal-cancel-btn:hover {
   background-color: #e0e0e0;
+}
+
+/* Result Modal */
+.result-modal .result-content {
+  text-align: center;
+}
+
+.result-modal .result-content h2 {
+  margin-bottom: 25px;
+}
+
+.result-modal .result-content p {
+  margin-bottom: 0;
+  font-size: 1em;
+}
+
+/* Loading Spinner */
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007aff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Responsive Design */

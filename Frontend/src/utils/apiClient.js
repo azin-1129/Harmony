@@ -56,6 +56,11 @@ export const apiFetch = async (url, options = {}, retry = true) => {
 
   const headers = { ...(options.headers || {}) }
   if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`
+  
+  // FormData인 경우 Content-Type을 설정하지 않음 (브라우저가 자동으로 multipart/form-data 설정)
+  if (options.body instanceof FormData) {
+    delete headers['Content-Type']
+  }
 
   const response = await fetch(`${BACKEND_URL}${url}`, { ...options, headers })
 
