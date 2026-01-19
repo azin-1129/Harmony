@@ -33,6 +33,6 @@ public interface FriendshipRequestRepository extends JpaRepository<FriendshipReq
 
   @Transactional
   @Modifying(clearAutomatically=true)
-  @Query("DELETE FROM FriendshipRequest fr WHERE fr.friendshipRequestSender.userId in :ids OR fr.friendshipRequestReceiver.userId in :ids")
+  @Query("DELETE FROM FriendshipRequest fr WHERE fr.friendshipRequestId in :ids")
   void deleteFriendshipRequestBulk(@Param("ids") List<Long> ids);
 }

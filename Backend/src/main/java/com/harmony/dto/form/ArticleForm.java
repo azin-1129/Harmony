@@ -14,8 +14,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ArticleForm {
-  @Schema(description="수정할 게시물 image", defaultValue = "potato.png")
-  private String articleMediaUrl;
   @Schema(description="수정할 게시물 text", defaultValue = "생각해 보니 감자가 낫네요.")
   private String articleText;
 }

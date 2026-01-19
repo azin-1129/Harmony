@@ -40,8 +40,8 @@ public class Article extends BaseTime {
   @JoinColumn(name="user_id")
   private User author;
 
-  @Column(name="article_media_url", nullable=false, length=255)
-  private String articleMediaUrl;
+  @Column(name="article_media_name", nullable=false, length=255)
+  private String articleMediaName;
 
   @Enumerated(EnumType.STRING)
   @Column(name="article_media_type", nullable=false)
@@ -65,10 +65,28 @@ public class Article extends BaseTime {
   @OneToMany(fetch= FetchType.LAZY, mappedBy="article", cascade= CascadeType.ALL, orphanRemoval=true)
   private List<Comment> comments;
 
+  @Column(name="is_deleted", nullable=false)
+  private Boolean isDeleted;
+
   // update
-  public void updateContents(ArticleForm articleForm){
-    this.articleMediaUrl = articleForm.getArticleMediaUrl();
-    this.articleText = articleForm.getArticleText();
+  public void updateArticleMediaName(String newArticleMediaName){
+    this.articleMediaName = newArticleMediaName;
+  }
+
+  public void updateArticleText(String newArticleText){
+    this.articleText = newArticleText;
+  }
+
+  public void updateIsDeleted(Boolean isDeleted){
+    this.isDeleted = isDeleted;
+  }
+
+  public void updateArticleCommentCount(boolean commentStatus){
+    if(commentStatus){
+      this.articleCommentCount++;
+    }else{
+      this.articleCommentCount--;
+    }
   }
 
   public void updateArticleLikeCount(boolean heartStatus){
