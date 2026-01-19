@@ -83,13 +83,27 @@ public class ArticleController {
 
   // TODO: 수정 or 삭제 시, 작성자 id와 일치하지 않으면 반려
   // 게시물 수정
-  @PostMapping("/update/{articleId}")
+  @PostMapping("/update/media/{articleId}")
   @Operation(summary="게시물 수정", description = "게시물 수정 API")
   @ApiResponses(value = {
       @ApiResponse(responseCode="200", description = "게시물 수정에 성공했습니다."),
       @ApiResponse(responseCode = "404", description="존재하지 않는 게시물입니다.")
   })
-  public ResponseEntity<Object> updateArticle(@PathVariable Long articleId, @RequestBody ArticleForm articleForm){
+  public ResponseEntity<Object> updateArticleMedia(@PathVariable Long articleId, MultipartFile multipartFile){
+    articleService.updateArticle(articleId, multipartFile);
+
+    return SuccessResponse.createSuccess(
+        SuccessCode.ARTICLE_UPDATE_SUCCESS
+    );
+  }
+  // 게시물 수정
+  @PostMapping("/update/text/{articleId}")
+  @Operation(summary="게시물 수정", description = "게시물 수정 API")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode="200", description = "게시물 수정에 성공했습니다."),
+      @ApiResponse(responseCode = "404", description="존재하지 않는 게시물입니다.")
+  })
+  public ResponseEntity<Object> updateArticleText(@PathVariable Long articleId, @RequestBody ArticleForm articleForm){
     articleService.updateArticle(articleId, articleForm);
 
     return SuccessResponse.createSuccess(

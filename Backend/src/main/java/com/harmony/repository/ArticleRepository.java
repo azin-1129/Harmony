@@ -27,8 +27,9 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
   @Query("SELECT a FROM Article a WHERE a.author.userId = :authorId")
   List<Article> findArticlesByAuthorId(@Param("authorId") Long authorId);
 
+  List<Article> findByIsDeleted(Boolean isDeleted);
   @Transactional
   @Modifying(clearAutomatically = true)
   @Query("DELETE FROM Article a WHERE a.articleId in :ids")
-  void deleteArticleBulk(@Param("ids") List<Long> ids);
+  void deleteArticlesBulk(@Param("ids") List<Long> ids);
 }

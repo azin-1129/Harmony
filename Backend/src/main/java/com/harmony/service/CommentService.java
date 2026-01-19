@@ -31,6 +31,7 @@ public class CommentService {
         .orElseThrow(()->new EntityNotFoundException(
             ErrorCode.ARTICLE_NOT_FOUND
         ));
+    article.updateArticleCommentCount(true);
 
     User writer=userService.getUserById(givenUserId);
 

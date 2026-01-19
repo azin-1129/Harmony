@@ -35,12 +35,13 @@ public class ArticleService {
     String articleImageName= awsS3Service.uploadArticleImage(multipartFile);
     Article article=Article.builder()
         .author(author)
-        .articleMediaUrl(articleImageName)
+        .articleMediaName(articleImageName)
         .articleMediaType(ArticleMediaType.IMAGE)
         .articleText(writeArticleRequestDto.getArticleText())
         .articleCommentCount(0)
         .isCommentDisabled(false)
         .articleLikeCount(0)
+        .isDeleted(false)
         .build();
 
     articleRepository.save(article);
@@ -57,12 +58,12 @@ public class ArticleService {
     List<SelectFollowingUserArticlesResponseDto> selectFollowingUserArticlesResponseDtos=new ArrayList<>();
 
     for(Article article:articles){
-      String articleImageUrl=awsS3Service.getArticleImageUrl(article.getArticleMediaUrl());
-      String authorProfileImageUrl=awsS3Service.getAuthorProfileImageUrl(article.getAuthor().getProfileImageName());
+      String articleImageUrl=awsS3Service.getArticleImageUrl(article.getArticleMediaName());
+      String authorProfileImageName=article.getAuthor().getProfileImageName();
       SelectFollowingUserArticlesResponseDto selectFollowingUserArticlesResponseDto=SelectFollowingUserArticlesResponseDto.builder()
           .articleId(article.getArticleId())
           .authorIdentifier(article.getAuthor().getUserIdentifier())
-          .authorProfileImageUrl(authorProfileImageUrl)
+          .authorProfileImageUrl(authorProfileImageName==null?null:awsS3Service.getAuthorProfileImageUrl(authorProfileImageName))
           .articleMediaUrl(articleImageUrl)
           .articleText(article.getArticleText())
           .articleCommentCount(article.getArticleCommentCount())
@@ -91,12 +92,12 @@ public class ArticleService {
     List<SelectAuthorArticlesResponseDto> selectUserArticlesResponseDtos=new ArrayList<>();
 
     for(Article article:articles){
-      String articleImageUrl=awsS3Service.getArticleImageUrl(article.getArticleMediaUrl());
-      String authorProfileImageUrl=awsS3Service.getAuthorProfileImageUrl(article.getAuthor().getProfileImageName());
+      String articleImageUrl=awsS3Service.getArticleImageUrl(article.getArticleMediaName());
+      String authorProfileImageName=article.getAuthor().getProfileImageName();
       SelectAuthorArticlesResponseDto selectUserArticlesResponseDto= SelectAuthorArticlesResponseDto.builder()
           .articleId(article.getArticleId())
           .authorIdentifier(article.getAuthor().getUserIdentifier())
-          .authorProfileImageUrl(authorProfileImageUrl)
+          .authorProfileImageUrl(authorProfileImageName==null?null:awsS3Service.getAuthorProfileImageUrl(authorProfileImageName))
           .articleMediaUrl(articleImageUrl)
           .articleText(article.getArticleText())
           .articleCommentCount(article.getArticleCommentCount())
@@ -112,11 +113,22 @@ public class ArticleService {
   }
 
   // 게시물 수정
+  public void updateArticle(Long articleId, MultipartFile multipartFile){
+    Article article=articleRepository.findArticleByArticleId(articleId).orElseThrow(
+        () -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND)
+    );
+    String originArticleMediaName=article.getArticleMediaName();
+    awsS3Service.deleteProfileImage(originArticleMediaName);
+    String newArticleMediaName=awsS3Service.uploadArticleImage(multipartFile);
+    article.updateArticleMediaName(newArticleMediaName);
+  }
+
   public void updateArticle(Long articleId, ArticleForm articleForm){
     Article article=articleRepository.findArticleByArticleId(articleId).orElseThrow(
         () -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND)
     );
-    article.updateContents(articleForm);
+
+    article.updateArticleText(articleForm.getArticleText());
   }
 
   // 게시물 삭제
@@ -124,6 +136,6 @@ public class ArticleService {
     Article article=articleRepository.findArticleByArticleId(articleId).orElseThrow(
         () -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND)
     );
-    articleRepository.delete(article);
+    article.updateIsDeleted(true);
   }
 }
