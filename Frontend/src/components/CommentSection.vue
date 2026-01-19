@@ -10,7 +10,7 @@
         @mouseenter="hoveredCommentId = index"
         @mouseleave="hoveredCommentId = -1"
       >
-        <img :src="c.writerProfileImageUrl" :alt="c.nickname" class="comment-profile" />
+        <img :src="c.writerProfileImageUrl" :alt="c.nickname" class="comment-profile" @error="handleImageError" />
         <div class="comment-content">
           <div class="comment-header">
             <span class="nickname">{{ c.nickname }}</span>
@@ -67,6 +67,11 @@ const loading = ref(false)
 const isSubmitting = ref(false)
 const hoveredCommentId = ref(-1)
 const deletingCommentId = ref(null)
+
+// 이미지 로드 실패 시 기본 이미지로 대체
+const handleImageError = (event) => {
+  event.target.src = DEFAULT_PROFILE_IMAGE
+}
 
 // createdAt을 보기 좋은 시간 형식으로 변환
 const formatTime = (createdAtString) => {
@@ -156,10 +161,11 @@ const addComment = async () => {
 
     // 현재 사용자 정보를 이용해 댓글 추가 (맨 위에 추가)
     if (props.currentUserInfo) {
+      const userProfileImage = props.currentUserInfo.profileImage || props.currentUserInfo.profileImageUrl
       comments.value.unshift({
         commentId: newCommentData.commentId,
         writerIdentifier: props.currentUserIdentifier || '',
-        writerProfileImageUrl: getProfileImageUrl(props.currentUserInfo.profileImageUrl),
+        writerProfileImageUrl: getProfileImageUrl(userProfileImage),
         nickname: props.currentUserInfo.nickname || 'Unknown',
         commentText: newCommentData.commentText,
         createdAt: newCommentData.createdAt
