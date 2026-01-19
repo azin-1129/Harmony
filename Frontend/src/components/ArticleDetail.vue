@@ -25,7 +25,10 @@
             alt="프로필" 
             class="profile-image"
           />
-          <span class="author-nickname">{{ article.authorNickname }}</span>
+          <div class="author-info">
+            <span class="author-nickname">{{ article.authorNickname }}</span>
+            <span v-if="article.createdAt" class="created-at">{{ formatTime(article.createdAt) }}</span>
+          </div>
           
           <!-- 편집 모드가 아닐 때: 메뉴 버튼 -->
           <template v-if="!isEditMode">
@@ -124,6 +127,38 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'update-article', 'refresh-articles'])
 
+// createdAt을 보기 좋은 시간 형식으로 변환
+const formatTime = (createdAtString) => {
+  try {
+    const date = new Date(createdAtString)
+    const now = new Date()
+    const diffMs = now - date
+    const diffSecs = Math.floor(diffMs / 1000)
+    const diffMins = Math.floor(diffSecs / 60)
+    const diffHours = Math.floor(diffMins / 60)
+    const diffDays = Math.floor(diffHours / 24)
+
+    if (diffSecs < 60) {
+      return '방금 전'
+    } else if (diffMins < 60) {
+      return `${diffMins}분 전`
+    } else if (diffHours < 24) {
+      return `${diffHours}시간 전`
+    } else if (diffDays < 7) {
+      return `${diffDays}일 전`
+    } else {
+      // 날짜 포맷팅
+      return date.toLocaleDateString('ko-KR', {
+        month: 'short',
+        day: 'numeric'
+      })
+    }
+  } catch (err) {
+    console.error('Error formatting time', err)
+    return ''
+  }
+}
+
 const article = ref(null)
 const loading = ref(false)
 const error = ref('')
@@ -153,7 +188,8 @@ watch(() => props.article, (newArticle) => {
       articleText: newArticle.articleText,
       articleLikeCount: newArticle.articleLikeCount,
       articleCommentCount: newArticle.articleCommentCount,
-      isLiked: newArticle.isLiked === true || newArticle.isLiked === 'true'
+      isLiked: newArticle.isLiked === true || newArticle.isLiked === 'true',
+      createdAt: newArticle.createdAt
     }
     console.log('[ArticleDetail] Article loaded from props:', article.value)
   }
@@ -543,10 +579,21 @@ onMounted(async () => {
   object-fit: cover;
 }
 
+.author-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
 .author-nickname {
   font-weight: 600;
   font-size: 1.1em;
-  flex: 1;
+}
+
+.created-at {
+  font-size: 0.85em;
+  color: #999;
 }
 
 /* 메뉴 버튼 */
