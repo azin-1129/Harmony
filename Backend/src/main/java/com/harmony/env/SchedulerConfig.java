@@ -25,9 +25,10 @@ public class SchedulerConfig {
     private final ArticleRepository articleRepository;
     private final BlockRepository blockRepository;
     private final CommentRepository commentRepository;
+    private final HeartRepository heartRepository;
 
     // 하루마다 새벽에.
-    @Scheduled(cron="00 05 14 * * *")
+    @Scheduled(cron="00 40 20 * * *")
     public void softDeleteWithdrawnUsersData(){
         // withdrawn_at이 30일 지난 user들을 찾는다.
 //        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(31);
@@ -77,10 +78,25 @@ public class SchedulerConfig {
             blockRepository.deleteBlockBulk(blockIds);
             log.info("해당 유저와 관련된 차단 이력을 모두 삭제했습니다.");
 
+            // TODO: heart bulk delete 추가
+            // 좋아요 했던 게시물들을 찾는다.
+            List<Heart> hearts=heartRepository.findHeartsByUserId(userId);
+            List<Long> heartIds=new ArrayList<>();
+            for(Heart heart: hearts){
+                Article releatedArticle=heart.getArticle();
+                releatedArticle.updateArticleLikeCount(false);
+                heartIds.add(heart.getHeartId());
+            }
+            heartRepository.deleteHeartsBulk(heartIds);
+
+            // 댓글 달았던 게시물들을 찾는다.
+            // TODO: heart Count, comment Count --해야할 듯
             // comments
             List<Comment> comments=commentRepository.findCommentsByUserId(userId);
             List<Long> commentIds=new ArrayList<>();
             for(Comment comment: comments){
+                Article releatedArticle=comment.getArticle();
+                releatedArticle.updateArticleCommentCount(false);
                 commentIds.add(comment.getCommentId());
             }
             commentRepository.deleteCommentsBulk(commentIds);
@@ -91,17 +107,45 @@ public class SchedulerConfig {
             for(Article article: articles){
                 articleIds.add(article.getArticleId());
             }
-            articleRepository.deleteArticleBulk(articleIds);
+            articleRepository.deleteArticlesBulk(articleIds);
             log.info("해당 유저가 작성한 게시물을 모두 삭제했습니다.");
 
             withdrawnUserIds.add(userId);
+            user.updateWithDraw(false); // 다음 스케줄에 처리하지 않도록 방지
         }
 
         // user의 email, identifier, nickname 제거
         if(!withdrawnUserIds.isEmpty()){
             userRepository.deleteWithdrawnUserInfoBulk(withdrawnUserIds);
-            log.info("해당 유저의 email, identifier, nickname을 모두 제거했습니다.");
+            log.info("해당 유저의 email, identifier, nickname, pw를 모두 제거했습니다.");
         }
+    }
+
+    // 삭제 예정인 게시물 하루마다 정리.
+    @Scheduled(cron="00 41 20 * * *")
+    public void deleteArticlesInfo(){
+        List<Article> articles=articleRepository.findByIsDeleted(true);
+        List<Long> articleIds=new ArrayList<>();
+        List<Long> heartIds=new ArrayList<>();
+        List<Long> commentIds=new ArrayList<>();
+        for(Article article: articles){
+            Long articleId=article.getArticleId();
+            articleIds.add(articleId);
+
+            List<Heart> hearts=heartRepository.findHeartsByArticleId(articleId);
+            for(Heart heart: hearts){
+                heartIds.add(heart.getHeartId());
+            }
+
+            List<Comment> comments=commentRepository.findCommentsByArticleId(articleId);
+            for(Comment comment: comments){
+                commentIds.add(comment.getCommentId());
+            }
+
+            heartRepository.deleteHeartsBulk(heartIds);
+            commentRepository.deleteCommentsBulk(commentIds);
+        }
+        articleRepository.deleteArticlesBulk(articleIds);
     }
 
     // 한 달마다 새벽 3시에. cron=0 0 3 1 * ?
