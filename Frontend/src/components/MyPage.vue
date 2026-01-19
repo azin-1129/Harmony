@@ -1,10 +1,11 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { apiFetch } from '../utils/apiClient'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import ArticleDetail from './ArticleDetail.vue'
 
 const router = useRouter()
+const route = useRoute()
 
 // 내 프로필 정보
 const myProfile = ref({
@@ -115,11 +116,13 @@ const fetchMyArticles = async (userId) => {
     console.log('[MyPage] Articles response:', result)
     
     const articles = result.data || []
-    // 좋아요 여부 추가
+    // 좋아요 여부 및 nickname 추가
     myArticles.value = articles.map(article => ({
       ...article,
       isLiked: likedArticleIds.value.includes(article.articleId),
-      articleCommentCount: article.articleCommentCount || 0
+      articleCommentCount: article.articleCommentCount || 0,
+      authorNickname: article.nickname || article.authorNickname || myProfile.value.nickname,
+      nickname: article.nickname || article.authorNickname || myProfile.value.nickname
     }))
     console.log('[MyPage] Articles loaded successfully, count:', myArticles.value.length)
     
@@ -165,10 +168,43 @@ const closeArticleDetail = () => {
   selectedArticle.value = null
 }
 
+// 게시물 업데이트 핸들러
+const handleArticleUpdate = (updatedArticle) => {
+  // 팝업의 selectedArticle 업데이트
+  selectedArticle.value = updatedArticle
+  
+  // myArticles 배열에서 해당 게시물도 업데이트
+  const index = myArticles.value.findIndex(a => a.articleId === updatedArticle.articleId)
+  if (index !== -1) {
+    myArticles.value[index] = { ...myArticles.value[index], ...updatedArticle }
+    console.log('[MyPage] Article updated in list:', updatedArticle.articleId)
+  }
+}
+
+// 게시물 목록 새로고침
+const refreshMyArticles = async () => {
+  console.log('[MyPage] Refreshing articles after edit...')
+  if (myProfile.value.userId) {
+    await fetchLikedArticles()
+    await fetchMyArticles(myProfile.value.userId)
+  }
+}
+
 onMounted(async () => {
   // 좋아요 목록을 먼저 조회
   await fetchLikedArticles()
   await fetchMyProfile()
+})
+
+// 라우트 변경 감지 - 페이지 재진입 시 데이터 새로고침
+watch(() => route.path, async (newPath, oldPath) => {
+  if (newPath === '/mypage' && oldPath !== '/mypage') {
+    console.log('[MyPage] Route re-entered, refreshing data...')
+    await fetchLikedArticles()
+    if (myProfile.value.userId) {
+      await fetchMyArticles(myProfile.value.userId)
+    }
+  }
 })
 </script>
 
@@ -253,9 +289,11 @@ onMounted(async () => {
     <ArticleDetail 
       v-if="selectedArticle"
       :article="selectedArticle"
+      :currentUserInfo="myProfile"
       :currentUserIdentifier="myProfile.userIdentifier"
       @close="closeArticleDetail"
-      @update-article="(article) => selectedArticle = article"
+      @update-article="handleArticleUpdate"
+      @refresh-articles="refreshMyArticles"
     />
   </div>
 </template>

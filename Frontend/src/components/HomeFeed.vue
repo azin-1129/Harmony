@@ -30,12 +30,23 @@ const currentUserIdentifier = ref('')
 const currentUserInfo = ref({})
 const likedArticleIds = ref([])
 
+// 기본 프로필 사진
+const DEFAULT_PROFILE_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTBFMEUwIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjOTk5Ii8+CjxwYXRoIGQ9Ik0yMCA2NSBDMjAgNjAgMzAgNTAgNTAgNTAgQzcwIDUwIDgwIDYwIDgwIDY1IiBmaWxsPSIjOTk5Ii8+Cjwvc3ZnPg=='
+
+// 프로필 이미지 URL 정규화
+const getProfileImageUrl = (imageUrl) => {
+  if (!imageUrl || imageUrl === null || (typeof imageUrl === 'string' && !imageUrl.trim())) {
+    return DEFAULT_PROFILE_IMAGE
+  }
+  return imageUrl
+}
+
 const mapArticleToFeed = (item, idx) => {
   return {
     id: item.articleId || item.id || `${item.authorIdentifier}-${item.createdAt}-${idx}`,
     author: {
       name: item.authorIdentifier,
-      profileImage: item.authorProfileImageUrl
+      profileImage: getProfileImageUrl(item.authorProfileImageUrl)
     },
     text: item.articleText,
     imageUrl: item.articleMediaUrl || item.articleThumbnailUrl || '',
