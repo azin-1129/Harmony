@@ -22,6 +22,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   @Transactional
   @Modifying(clearAutomatically=true)
-  @Query("UPDATE User u SET u.email=null, u.userIdentifier=null, u.nickname=null, u.password=null WHERE u.userId in :ids")
-  void deleteWithdrawnUserInfoBulk(@Param("ids") List<Long> ids);
+  @Query("DELETE FROM User u WHERE u.userId in :ids")
+  void deleteWithdrawnUserBulk(@Param("ids") List<Long> ids);
 }
