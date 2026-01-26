@@ -92,6 +92,7 @@
           :feedId="article.articleId" 
           :currentUserInfo="props.currentUserInfo"
           :currentUserIdentifier="props.currentUserIdentifier"
+          :articleAuthorIdentifier="article.authorIdentifier"
           @update-comment-count="updateCommentCount"
         />
       </div>
