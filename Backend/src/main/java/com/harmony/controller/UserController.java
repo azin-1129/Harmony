@@ -4,6 +4,7 @@ import com.harmony.dto.form.NicknameForm;
 import com.harmony.dto.form.PasswordForm;
 import com.harmony.dto.form.ProfileImageForm;
 import com.harmony.dto.request.RegisterRequestDto;
+import com.harmony.dto.request.SearchUserRequestDto;
 import com.harmony.global.annotation.CurrentUserId;
 import com.harmony.global.response.code.ErrorCode;
 import com.harmony.global.response.code.SuccessCode;
@@ -19,7 +20,6 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,6 +41,14 @@ public class UserController {
   public ResponseEntity<Object> test(@CurrentUserId Long userId) {
     log.info("user id: {}", userId);
     return ResponseEntity.ok(userId);
+  }
+
+  @PostMapping("/search")
+  public ResponseEntity<Object> searchUser(@RequestBody SearchUserRequestDto searchUserRequestDto){
+    return SuccessResponse.createSuccess(
+        SuccessCode.USER_SEARCH_SUCCESS,
+        userService.searchUser(searchUserRequestDto)
+    );
   }
 
   // TODO: userId 처리, Password 암호화
@@ -86,6 +94,14 @@ public class UserController {
     return SuccessResponse.createSuccess(
         SuccessCode.USER_INFO_READ_SUCCESS,
         userService.findUserInfo(userId)
+    );
+  }
+
+  @GetMapping("/profile/{userId}")
+  public ResponseEntity<Object> selectProfile(@PathVariable Long userId){
+    return SuccessResponse.createSuccess(
+        SuccessCode.USER_PROFILE_READ_SUCCESS,
+        userService.selectProfile(userId)
     );
   }
 

@@ -1,6 +1,9 @@
 package com.harmony.service;
 
 import com.harmony.dto.request.RegisterRequestDto;
+import com.harmony.dto.request.SearchUserRequestDto;
+import com.harmony.dto.response.SearchUserResponseDto;
+import com.harmony.dto.response.SelectProfileResponseDto;
 import com.harmony.dto.response.SelectUserInfoResponseDto;
 import com.harmony.entity.User;
 import com.harmony.exception.DuplicatedUserNicknameException;
@@ -11,7 +14,9 @@ import com.harmony.global.response.exception.EntityNotFoundException;
 import com.harmony.global.response.exception.InvalidArgumentException;
 import com.harmony.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +69,24 @@ public class UserService {
     }
   }
 
+  public List<SearchUserResponseDto> searchUser(SearchUserRequestDto searchUserRequestDto){
+    String nicknameOrUserIdentifier= searchUserRequestDto.getNicknameOrUserIdentifier();
+    List<User> searchUserResult=userRepository.findByNicknameContainsOrUserIdentifierContains(nicknameOrUserIdentifier, nicknameOrUserIdentifier);
+    List<SearchUserResponseDto> searchUserResponseDtos=new ArrayList<>();
+    for(User user:searchUserResult){
+      String authorProfileImageName=user.getProfileImageName();
+      SearchUserResponseDto searchUserResponseDto=SearchUserResponseDto.builder()
+          .userId(user.getUserId())
+          .profileImageUrl(authorProfileImageName==null? null:awsS3Service.getUserProfileImageUrl(user.getProfileImageName()))
+          .nickname(user.getNickname())
+          .userIdentifier(user.getUserIdentifier())
+          .build();
+      searchUserResponseDtos.add(searchUserResponseDto);
+    }
+
+    return searchUserResponseDtos;
+  }
+
   public SelectUserInfoResponseDto findUserInfo(Long userId){
     User user=userRepository.findByUserId(userId).orElseThrow(
         ()->new EntityNotFoundException(
@@ -81,6 +104,22 @@ public class UserService {
             .build();
 
     return selectUserInfoResponseDto;
+  }
+
+  public SelectProfileResponseDto selectProfile(Long userId){
+    User user=userRepository.findByUserId(userId).orElseThrow(
+        ()->new EntityNotFoundException(
+            ErrorCode.USER_NOT_FOUND
+        )
+    );
+
+    SelectProfileResponseDto selectProfileResponseDto=SelectProfileResponseDto.builder()
+        .profileImageUrl(awsS3Service.getUserProfileImageUrl(user.getProfileImageName()))
+        .nickname(user.getNickname())
+        .userIdentifier(user.getUserIdentifier())
+        .build();
+
+    return selectProfileResponseDto;
   }
 
   public User getUserById(Long userId){

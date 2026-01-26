@@ -20,6 +20,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
   List<User> findByWithdrawnAtBefore(LocalDateTime cutoffDate);
   List<User> findByWithdraw(Boolean withdraw);
 
+  List<User> findByNicknameContainsOrUserIdentifierContains(String nickname, String userIdentifier);
+
   @Transactional
   @Modifying(clearAutomatically=true)
   @Query("DELETE FROM User u WHERE u.userId in :ids")
