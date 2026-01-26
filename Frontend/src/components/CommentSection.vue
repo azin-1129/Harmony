@@ -14,7 +14,7 @@
         <div class="comment-content">
           <div class="comment-header">
             <span class="nickname">{{ c.nickname }}</span>
-            <span v-if="c.writerIdentifier === props.currentUserIdentifier" class="author-badge">작성자</span>
+            <span v-if="c.writerIdentifier === props.articleAuthorIdentifier" class="author-badge">작성자</span>
             <span class="timestamp">{{ formatTime(c.createdAt) }}</span>
             <button 
               v-if="hoveredCommentId === index && c.writerIdentifier === props.currentUserIdentifier"
@@ -45,7 +45,8 @@ import { apiFetch } from '@/utils/apiClient'
 const props = defineProps({
   feedId: Number,
   currentUserInfo: Object,
-  currentUserIdentifier: String
+  currentUserIdentifier: String,
+  articleAuthorIdentifier: String // 게시물 작성자 identifier
 })
 
 const emit = defineEmits(['update-comment-count'])
