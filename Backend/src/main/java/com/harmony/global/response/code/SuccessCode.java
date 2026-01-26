@@ -13,6 +13,8 @@ public enum SuccessCode implements ResponseCode {
 
   // READ
   USER_INFO_READ_SUCCESS(HttpStatus.OK, "내 정보 조회에 성공했습니다."),
+  USER_SEARCH_SUCCESS(HttpStatus.OK, "유저 검색에 성공했습니다."),
+  USER_PROFILE_READ_SUCCESS(HttpStatus.OK, "유저 프로필 정보 검색에 성공했습니다."),
 
   // UPDATE
   USER_UPDATE_PASSWORD_SUCCESS(HttpStatus.OK, "비밀번호를 변경했습니다."),
