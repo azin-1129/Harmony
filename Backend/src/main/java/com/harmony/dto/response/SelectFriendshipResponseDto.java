@@ -16,6 +16,6 @@ import lombok.ToString;
 public class SelectFriendshipResponseDto {
   private String friendIdentifier;
   private String nickname;
-  private String profileImageName;
+  private String profileImageUrl;
   private FriendType friendType;
 }

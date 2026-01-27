@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class FriendshipService {
   private final FriendshipRepository friendshipRepository;
   private final UserService userService;
+  private final AwsS3Service awsS3Service;
 
   // TODO: 페이징 처리, 프론트에서 친구 검색
   public List<SelectFriendshipResponseDto> selectFriendships(Long userId){
@@ -27,10 +28,11 @@ public class FriendshipService {
 
     List<SelectFriendshipResponseDto> friendshipResponseDtos=new ArrayList<>();
     for(Friendship friendship:friendships){
+      String profileImageName=friendship.getFriend().getProfileImageName();
       SelectFriendshipResponseDto friendshipResponseDto= SelectFriendshipResponseDto.builder()
           .friendIdentifier(friendship.getFriend().getUserIdentifier())
           .nickname(friendship.getFriend().getNickname())
-          .profileImageName(friendship.getFriend().getProfileImageName())
+          .profileImageUrl(profileImageName==null?null:awsS3Service.getUserProfileImageUrl(profileImageName))
           .friendType(friendship.getFriendType())
           .build();
       friendshipResponseDtos.add(friendshipResponseDto);
