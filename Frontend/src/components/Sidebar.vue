@@ -15,6 +15,9 @@
         <li :class="{ active: isActive('/chat') }" @click="go('/chat')">
           <span class="icon">💬</span> 채팅
         </li>
+        <li :class="{ active: isActive('/friends') }" @click="go('/friends')">
+          <span class="icon">👥</span> 친구
+        </li>
         <li :class="{ active: isActive('/mypage') }" @click="go('/mypage')">
           <span class="icon">👤</span> 마이페이지
         </li>
