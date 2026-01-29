@@ -13,6 +13,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReceivedFriendshipRequestResponseDto {
+  private String friendshipRequestSenderNickname;
   private String friendshipRequestSenderIdentifier;
-  private String friendshipRequestReceiverIdentifier;
+  private Long friendshipRequestSenderId;
+  private String friendshipRequestSenderProfileImageUrl;
 }
