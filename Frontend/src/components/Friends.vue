@@ -2,9 +2,26 @@
   <div class="friends-container">
     <h1>친구 관리</h1>
 
-    <!-- 친구 목록 섹션 -->
-    <section class="section">
-      <h2>친구 목록</h2>
+    <!-- 상위 탭 -->
+    <div class="main-tabs">
+      <button 
+        class="tab-btn"
+        :class="{ active: activeMainTab === 'friends' }"
+        @click="activeMainTab = 'friends'"
+      >
+        친구 목록
+      </button>
+      <button 
+        class="tab-btn"
+        :class="{ active: activeMainTab === 'requests' }"
+        @click="activeMainTab = 'requests'"
+      >
+        친구 요청 목록
+      </button>
+    </div>
+
+    <!-- 친구 목록 -->
+    <section v-if="activeMainTab === 'friends'" class="section">
       <div v-if="loadingFriends" class="loading">로딩 중...</div>
       <div v-else-if="friends.length === 0" class="empty">친구가 없습니다.</div>
       <div v-else class="friends-list">
@@ -40,13 +57,28 @@
       </div>
     </section>
 
-    <!-- 친구 요청 섹션 -->
-    <section class="section">
-      <h2>친구 요청</h2>
-      
+    <!-- 친구 요청 목록 -->
+    <section v-if="activeMainTab === 'requests'" class="section">
+      <!-- 서브 탭 -->
+      <div class="sub-tabs">
+        <button 
+          class="sub-tab-btn"
+          :class="{ active: activeRequestTab === 'received' }"
+          @click="activeRequestTab = 'received'"
+        >
+          받은 요청
+        </button>
+        <button 
+          class="sub-tab-btn"
+          :class="{ active: activeRequestTab === 'sent' }"
+          @click="activeRequestTab = 'sent'"
+        >
+          보낸 요청
+        </button>
+      </div>
+
       <!-- 받은 친구 요청 -->
-      <div class="subsection">
-        <h3>받은 요청</h3>
+      <div v-if="activeRequestTab === 'received'" class="request-content">
         <div v-if="loadingReceivedRequests" class="loading">로딩 중...</div>
         <div v-else-if="receivedRequests.length === 0" class="empty">받은 요청이 없습니다.</div>
         <div v-else class="request-list">
@@ -55,17 +87,31 @@
             :key="request.friendshipRequestSenderIdentifier"
             class="request-item"
           >
-            <span class="identifier">{{ request.friendshipRequestSenderIdentifier }}</span>
+            <div class="request-info" @click="goToSenderProfile(request)" style="cursor: pointer;">
+              <div class="profile-image-wrapper">
+                <div v-if="!request.friendshipRequestSenderProfileImageUrl" class="profile-image default-profile">
+                  👤
+                </div>
+                <img 
+                  v-else
+                  :src="request.friendshipRequestSenderProfileImageUrl" 
+                  :alt="request.friendshipRequestSenderNickname"
+                  class="profile-image"
+                  @error="handleImageError"
+                />
+              </div>
+              <span class="nickname">{{ request.friendshipRequestSenderNickname }}</span>
+            </div>
             <div class="button-group">
               <button 
                 class="accept-btn"
-                @click="acceptRequest(request.friendshipRequestSenderIdentifier)"
+                @click.stop="acceptRequest(request.friendshipRequestSenderIdentifier)"
               >
                 수락
               </button>
               <button 
                 class="reject-btn"
-                @click="rejectRequest(request.friendshipRequestSenderIdentifier)"
+                @click.stop="rejectRequest(request.friendshipRequestSenderIdentifier)"
               >
                 거절
               </button>
@@ -75,8 +121,7 @@
       </div>
 
       <!-- 보낸 친구 요청 -->
-      <div class="subsection">
-        <h3>보낸 요청</h3>
+      <div v-if="activeRequestTab === 'sent'" class="request-content">
         <div v-if="loadingSentRequests" class="loading">로딩 중...</div>
         <div v-else-if="sentRequests.length === 0" class="empty">보낸 요청이 없습니다.</div>
         <div v-else class="request-list">
@@ -85,10 +130,24 @@
             :key="request.friendshipRequestReceiverIdentifier"
             class="request-item"
           >
-            <span class="identifier">{{ request.friendshipRequestReceiverIdentifier }}</span>
+            <div class="request-info" @click="goToReceiverProfile(request)" style="cursor: pointer;">
+              <div class="profile-image-wrapper">
+                <div v-if="!request.friendshipRequestReceiverProfileImageUrl" class="profile-image default-profile">
+                  👤
+                </div>
+                <img 
+                  v-else
+                  :src="request.friendshipRequestReceiverProfileImageUrl" 
+                  :alt="request.friendshipRequestReceiverNickname"
+                  class="profile-image"
+                  @error="handleImageError"
+                />
+              </div>
+              <span class="nickname">{{ request.friendshipRequestReceiverNickname }}</span>
+            </div>
             <button 
               class="cancel-btn"
-              @click="cancelRequest(request.friendshipRequestReceiverIdentifier)"
+              @click.stop="cancelRequest(request.friendshipRequestReceiverIdentifier)"
             >
               취소
             </button>
@@ -117,6 +176,10 @@ import api from '@/services/api'
 
 const router = useRouter()
 
+// 탭 상태
+const activeMainTab = ref('friends')
+const activeRequestTab = ref('received')
+
 // 친구 목록 관련
 const friends = ref([])
 const loadingFriends = ref(true)
@@ -131,6 +194,16 @@ const loadingReceivedRequests = ref(true)
 // 삭제 확인 팝업
 const showDeleteConfirm = ref(false)
 const friendToDelete = ref(null)
+
+// 이미지 로드 실패 시 처리
+const handleImageError = (event) => {
+  event.target.style.display = 'none'
+  const wrapper = event.target.parentElement
+  const defaultProfile = wrapper.querySelector('.default-profile')
+  if (defaultProfile) {
+    defaultProfile.style.display = 'flex'
+  }
+}
 
 // 친구 목록 조회
 const loadFriends = async () => {
@@ -180,9 +253,36 @@ const loadReceivedRequests = async () => {
   }
 }
 
-// 프로필 페이지로 이동
+// 프로필 페이지로 이동 (친구 목록용)
 const goToProfile = (identifier) => {
+  console.log('[Friends] 친구 목록에서 프로필로 이동:', identifier)
   router.push(`/profile/${identifier}`)
+}
+
+// 받은 친구 요청에서 프로필로 이동 (Sender 정보 사용)
+const goToSenderProfile = (request) => {
+  const userId = request.friendshipRequestSenderId
+  const identifier = request.friendshipRequestSenderIdentifier
+  console.log('[Friends] 받은 요청에서 Sender 프로필로 이동:', { userId, identifier }, request)
+  if (userId) {
+    // userId를 직접 사용 (검색 API 거치지 않음)
+    router.push(`/profile/${userId}`)
+  } else {
+    console.error('[Friends] Sender userId가 없습니다:', request)
+  }
+}
+
+// 보낸 친구 요청에서 프로필로 이동 (Receiver 정보 사용)
+const goToReceiverProfile = (request) => {
+  const userId = request.friendshipRequestReceiverId
+  const identifier = request.friendshipRequestReceiverIdentifier
+  console.log('[Friends] 보낸 요청에서 Receiver 프로필로 이동:', { userId, identifier }, request)
+  if (userId) {
+    // userId를 직접 사용 (검색 API 거치지 않음)
+    router.push(`/profile/${userId}`)
+  } else {
+    console.error('[Friends] Receiver userId가 없습니다:', request)
+  }
 }
 
 // 친구 삭제 확인
@@ -279,28 +379,75 @@ onMounted(() => {
 }
 
 h1 {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
   font-size: 1.8em;
 }
 
-.section {
-  margin-bottom: 48px;
+/* 상위 탭 스타일 */
+.main-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #e0e0e0;
 }
 
-.section h2 {
-  font-size: 1.4em;
-  margin-bottom: 16px;
+.tab-btn {
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 500;
+  color: #666;
+  transition: all 0.3s;
+  margin-bottom: -2px;
+}
+
+.tab-btn:hover {
   color: #333;
+  background-color: #f5f5f5;
 }
 
-.subsection {
-  margin-top: 24px;
+.tab-btn.active {
+  color: #6b6bff;
+  border-bottom-color: #6b6bff;
 }
 
-.subsection h3 {
-  font-size: 1.1em;
-  margin-bottom: 12px;
-  color: #555;
+/* 서브 탭 스타일 */
+.sub-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.sub-tab-btn {
+  padding: 8px 20px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.95em;
+  font-weight: 500;
+  color: #666;
+  transition: all 0.3s;
+}
+
+.sub-tab-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.sub-tab-btn.active {
+  background-color: #6b6bff;
+  color: white;
+}
+
+.section {
+  margin-bottom: 24px;
+}
+
+.request-content {
+  margin-top: 16px;
 }
 
 .loading,
@@ -339,6 +486,13 @@ h1 {
   gap: 12px;
 }
 
+.profile-image-wrapper {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
 .profile-image {
   width: 40px;
   height: 40px;
@@ -348,11 +502,15 @@ h1 {
 }
 
 .default-profile {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5em;
   color: #999;
+  background-color: #e0e0e0;
   flex-shrink: 0;
 }
 
@@ -390,6 +548,12 @@ h1 {
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   background-color: #fafafa;
+}
+
+.request-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .identifier {
