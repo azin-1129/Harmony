@@ -21,7 +21,13 @@
           @error="handleImageError"
         />
         <div class="profile-info">
-          <h2>{{ userProfile.nickname }}</h2>
+          <div class="nickname-row">
+            <h2>{{ userProfile.nickname }}</h2>
+            <!-- 친구 관계 상태 표시 -->
+            <span v-if="friendshipStatus === 'friend'" class="status-badge friend">친구</span>
+            <span v-else-if="friendshipStatus === 'sent'" class="status-badge sent">요청 보냄</span>
+            <span v-else-if="friendshipStatus === 'received'" class="status-badge received">요청 받음</span>
+          </div>
           <p class="user-identifier">@{{ userProfile.userIdentifier }}</p>
           <div class="friend-info">
             친구 {{ userProfile.friendCount || 0 }}명
@@ -103,12 +109,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { apiFetch } from '../utils/apiClient'
 import ArticleDetail from './ArticleDetail.vue'
+import { useFriendship } from '../composables/useFriendship'
+import { useCurrentUser } from '../composables/useCurrentUser'
 
 const route = useRoute()
+
+// 전역 상태 관리
+const { getFriendshipStatus } = useFriendship()
+const { currentUser, loadCurrentUser } = useCurrentUser()
 
 // 기본 프로필 사진
 const DEFAULT_PROFILE_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTBFMEUwIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjOTk5Ii8+CjxwYXRoIGQ9Ik0yMCA2NSBDMjAgNjAgMzAgNTAgNTAgNTAgQzcwIDUwIDgwIDYwIDgwIDY1IiBmaWxsPSIjOTk5Ii8+Cjwvc3ZnPg=='
@@ -132,6 +144,12 @@ const currentLoginUser = ref({
   profileImage: ''
 })
 
+// 친구 관계 상태 계산
+const friendshipStatus = computed(() => {
+  if (!userProfile.value) return null
+  return getFriendshipStatus(userProfile.value.userId, userProfile.value.userIdentifier)
+})
+
 // 프로필 이미지 URL 정규화
 const getProfileImageUrl = (imageUrl) => {
   if (!imageUrl || imageUrl === null || (typeof imageUrl === 'string' && !imageUrl.trim())) {
@@ -145,28 +163,17 @@ const handleImageError = (event) => {
   event.target.src = DEFAULT_PROFILE_IMAGE
 }
 
-// 현재 로그인한 사용자 정보 조회
+// 현재 로그인한 사용자 정보 조회 (전역 상태 사용)
 const fetchCurrentUserInfo = async () => {
-  try {
-    const response = await apiFetch('/user/info', { method: 'GET' })
-    if (!response.ok) {
-      console.error('[UserProfile] Failed to fetch current user info:', response.status)
-      return
-    }
-    
-    const result = await response.json()
-    const userData = result.data
-    
+  const user = await loadCurrentUser()
+  if (user) {
     currentLoginUser.value = {
-      userId: userData.userId,
-      nickname: userData.nickname,
-      userIdentifier: userData.userIdentifier,
-      profileImage: userData.profileImageUrl || ''
+      userId: user.userId,
+      nickname: user.nickname,
+      userIdentifier: user.userIdentifier,
+      profileImage: user.profileImageUrl || ''
     }
-    
     console.log('[UserProfile] Current user info loaded:', currentLoginUser.value)
-  } catch (err) {
-    console.error('[UserProfile] Error fetching current user info:', err)
   }
 }
 
@@ -194,8 +201,14 @@ const fetchUserProfile = async (identifier) => {
     
     let userId = identifier
     
+    // route.state에서 userId가 전달되었는지 확인 (검색 결과에서 온 경우)
+    const stateUserId = history.state?.userId
+    if (stateUserId) {
+      console.log('[UserProfile] Using userId from route state:', stateUserId)
+      userId = stateUserId
+    }
     // identifier가 숫자가 아니면 friendIdentifier로 간주하고 검색 API로 userId를 찾음
-    if (isNaN(identifier)) {
+    else if (isNaN(identifier)) {
       console.log('[UserProfile] Searching for user with identifier:', identifier)
       const searchResponse = await apiFetch('/user/search', {
         method: 'POST',
@@ -301,6 +314,9 @@ const fetchUserArticles = async (userId) => {
       articleCommentCount: article.articleCommentCount || 0,
       nickname: article.nickname || userProfile.value?.nickname,
       authorNickname: article.authorNickname || userProfile.value?.nickname,
+      authorIdentifier: article.authorIdentifier || userProfile.value?.userIdentifier,
+      profileImageUrl: article.authorProfileImageUrl || userProfile.value?.profileImageUrl,
+      authorProfileImageUrl: article.authorProfileImageUrl || userProfile.value?.profileImageUrl,
       isLiked: likedArticleIds.value.includes(article.articleId)
     }))
   } catch (err) {
@@ -313,20 +329,40 @@ const fetchUserArticles = async (userId) => {
 
 // 게시물 상세 보기
 const viewArticleDetail = async (articleId) => {
+  console.log('[UserProfile] Opening article detail:', articleId)
   try {
-    const response = await apiFetch(`/article/detail/${articleId}`, { method: 'GET' })
-    if (!response.ok) {
-      console.error('[UserProfile] Failed to fetch article detail')
-      return
-    }
-    const result = await response.json()
-    const article = result.data
-    
-    selectedArticle.value = {
-      ...article,
-      isLiked: likedArticleIds.value.includes(article.articleId),
-      nickname: article.nickname || article.authorNickname || userProfile.value?.nickname,
-      authorNickname: article.authorNickname || article.nickname || userProfile.value?.nickname
+    // 먼저 목록에서 해당 게시물을 찾아서 설정
+    const article = userArticles.value.find(a => a.articleId === articleId)
+    if (article) {
+      selectedArticle.value = {
+        ...article,
+        isLiked: likedArticleIds.value.includes(article.articleId),
+        authorIdentifier: article.authorIdentifier || userProfile.value?.userIdentifier,
+        profileImageUrl: article.authorProfileImageUrl || article.profileImageUrl || userProfile.value?.profileImageUrl,
+        nickname: article.nickname || userProfile.value?.nickname,
+        authorNickname: article.authorNickname || userProfile.value?.nickname
+      }
+      console.log('[UserProfile] Article detail set from list:', selectedArticle.value)
+    } else {
+      // 목록에 없으면 API로 조회
+      const response = await apiFetch(`/article/detail/${articleId}`, { method: 'GET' })
+      if (!response.ok) {
+        console.error('[UserProfile] Failed to fetch article detail')
+        return
+      }
+      const result = await response.json()
+      const articleData = result.data
+      
+      selectedArticle.value = {
+        ...articleData,
+        isLiked: likedArticleIds.value.includes(articleData.articleId),
+        authorIdentifier: articleData.authorIdentifier || userProfile.value?.userIdentifier,
+        profileImageUrl: articleData.authorProfileImageUrl || articleData.profileImageUrl || userProfile.value?.profileImageUrl,
+        authorProfileImageUrl: articleData.authorProfileImageUrl || articleData.profileImageUrl || userProfile.value?.profileImageUrl,
+        nickname: articleData.nickname || articleData.authorNickname || userProfile.value?.nickname,
+        authorNickname: articleData.authorNickname || articleData.nickname || userProfile.value?.nickname
+      }
+      console.log('[UserProfile] Article detail fetched from API:', selectedArticle.value)
     }
   } catch (err) {
     console.error('[UserProfile] Error fetching article detail:', err)
@@ -425,6 +461,15 @@ onMounted(async () => {
 .profile-info h2 {
   font-size: 1.8em;
   margin-bottom: 8px;
+  margin: 0;
+}
+
+/* 닉네임과 배지를 가로로 배치 */
+.nickname-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
 }
 
 .user-identifier {
@@ -436,6 +481,31 @@ onMounted(async () => {
 .friend-info {
   font-size: 1em;
   color: #333;
+}
+
+/* 친구 관계 상태 */
+.status-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-size: 0.75em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-badge.friend {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.status-badge.sent {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.status-badge.received {
+  background-color: #e8f5e9;
+  color: #388e3c;
 }
 
 /* 탭 버튼 */
