@@ -30,6 +30,7 @@ public class FriendshipService {
     for(Friendship friendship:friendships){
       String profileImageName=friendship.getFriend().getProfileImageName();
       SelectFriendshipResponseDto friendshipResponseDto= SelectFriendshipResponseDto.builder()
+          .friendUserId(friendship.getFriend().getUserId())
           .friendIdentifier(friendship.getFriend().getUserIdentifier())
           .nickname(friendship.getFriend().getNickname())
           .profileImageUrl(profileImageName==null?null:awsS3Service.getUserProfileImageUrl(profileImageName))

@@ -29,8 +29,8 @@ import org.springframework.stereotype.Service;
 public class FriendshipRequestService {
   private final UserService userService;
   private final FriendshipRequestRepository friendshipRequestRepository;
-  // TODO: 아래 레포지토리를 꼭 의존해야 하는가..?
   private final FriendshipRepository friendshipRepository;
+  private final AwsS3Service awsS3Service;
 
   public void createFriendshipRequest(Long fromUserId, CreateFriendshipRequestDto createToFriendshipRequestDto){
     String receiverIdentifier=createToFriendshipRequestDto.getReceiverIdentifier();
@@ -79,9 +79,12 @@ public class FriendshipRequestService {
 
     List<SentFriendshipRequestResponseDto> sentFriendshipRequestResponseDtos=new ArrayList<SentFriendshipRequestResponseDto>();
     for(FriendshipRequest sentFriendshipRequest:sentFriendshipRequests){
+      User sentFriendshipRequestReceiver=sentFriendshipRequest.getFriendshipRequestReceiver();
       SentFriendshipRequestResponseDto sentFriendshipRequestDto=SentFriendshipRequestResponseDto.builder()
-          .friendshipRequestSenderIdentifier(sentFriendshipRequest.getFriendshipRequestSender().getUserIdentifier())
-          .friendshipRequestReceiverIdentifier(sentFriendshipRequest.getFriendshipRequestReceiver().getUserIdentifier())
+          .friendshipRequestReceiverNickname(sentFriendshipRequestReceiver.getNickname())
+          .friendshipRequestReceiverIdentifier(sentFriendshipRequestReceiver.getUserIdentifier())
+          .friendshipRequestReceiverId(sentFriendshipRequestReceiver.getUserId())
+          .friendshipRequestReceiverProfileImageUrl(awsS3Service.getUserProfileImageUrl(sentFriendshipRequestReceiver.getProfileImageName()))
           .build();
       sentFriendshipRequestResponseDtos.add(sentFriendshipRequestDto);
     }
@@ -95,9 +98,12 @@ public class FriendshipRequestService {
 
     List<ReceivedFriendshipRequestResponseDto> receivedFriendshipRequestResponseDtos=new ArrayList<ReceivedFriendshipRequestResponseDto>();
     for(FriendshipRequest receivedFriendshipRequest:receivedFriendshipRequests){
+      User receivedFriendshipRequestSender=receivedFriendshipRequest.getFriendshipRequestReceiver();
       ReceivedFriendshipRequestResponseDto receivedFriendshipRequestDto=ReceivedFriendshipRequestResponseDto.builder()
-          .friendshipRequestReceiverIdentifier(receivedFriendshipRequest.getFriendshipRequestSender().getUserIdentifier())
-          .friendshipRequestSenderIdentifier(receivedFriendshipRequest.getFriendshipRequestReceiver().getUserIdentifier())
+          .friendshipRequestSenderNickname(receivedFriendshipRequestSender.getNickname())
+          .friendshipRequestSenderIdentifier(receivedFriendshipRequestSender.getUserIdentifier())
+          .friendshipRequestSenderId(receivedFriendshipRequestSender.getUserId())
+          .friendshipRequestSenderProfileImageUrl(awsS3Service.getUserProfileImageUrl(receivedFriendshipRequestSender.getProfileImageName()))
           .build();
       receivedFriendshipRequestResponseDtos.add(receivedFriendshipRequestDto);
     }
