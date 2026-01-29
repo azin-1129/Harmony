@@ -3,13 +3,16 @@
     <!-- 검색 입력 -->
     <div class="search-header">
       <h1>검색</h1>
-      <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="닉네임 또는 아이디로 사용자 검색..."
-        class="search-input"
-        @input="handleSearch"
-      />
+      <div class="search-input-wrapper">
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="닉네임 또는 아이디로 사용자 검색..."
+          class="search-input"
+          @keyup.enter="handleSearch"
+        />
+        <button class="search-button" @click="handleSearch">🔍</button>
+      </div>
     </div>
 
     <!-- 사용자 프로필 상세 뷰 -->
@@ -108,7 +111,7 @@
     </div>
 
     <!-- 검색 결과 목록 -->
-    <div v-else-if="searchQuery" class="search-results">
+    <div v-else-if="searchExecuted" class="search-results">
       <p v-if="loading" class="loading">검색 중...</p>
       <p v-else-if="!searchResults.length" class="no-results">검색 결과가 없습니다.</p>
       <div v-else class="results-list">
@@ -116,7 +119,7 @@
           v-for="user in searchResults" 
           :key="user.userIdentifier" 
           class="user-result-item"
-          @click="viewUserProfile(user)"
+          @click="goToUserProfile(user)"
         >
           <img 
             :src="user.profileImageUrl" 
@@ -136,11 +139,16 @@
 
 <script setup>
 import { ref, watch, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { apiFetch } from '../utils/apiClient'
 import ArticleDetail from './ArticleDetail.vue'
+import { useCurrentUser } from '../composables/useCurrentUser'
 
 const route = useRoute()
+const router = useRouter()
+
+// 전역 사용자 정보 관리
+const { currentUser, loadCurrentUser } = useCurrentUser()
 
 // 기본 프로필 사진 - 회색 배경에 사람 아이콘
 const DEFAULT_PROFILE_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTBFMEUwIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjOTk5Ii8+CjxwYXRoIGQ9Ik0yMCA2NSBDMjAgNjAgMzAgNTAgNTAgNTAgQzcwIDUwIDgwIDYwIDgwIDY1IiBmaWxsPSIjOTk5Ii8+Cjwvc3ZnPg=='
@@ -148,6 +156,7 @@ const DEFAULT_PROFILE_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiB
 const searchQuery = ref('')
 const searchResults = ref([])
 const loading = ref(false)
+const searchExecuted = ref(false) // 검색이 실행되었는지 추적
 
 // 선택된 사용자 프로필
 const selectedUser = ref(null)
@@ -179,28 +188,41 @@ const handleImageError = (event) => {
   event.target.src = DEFAULT_PROFILE_IMAGE
 }
 
-// 현재 로그인한 사용자 정보 조회
+// 현재 로그인한 사용자 정보 조회 (전역 상태 사용)
 const fetchCurrentUserInfo = async () => {
-  try {
-    const response = await apiFetch('/user/info', { method: 'GET' })
-    if (!response.ok) {
-      console.error('[Search] Failed to fetch current user info:', response.status)
-      return
-    }
-    
-    const result = await response.json()
-    const userData = result.data
-    
+  const user = await loadCurrentUser()
+  if (user) {
     currentLoginUser.value = {
-      userId: userData.userId,
-      nickname: userData.nickname,
-      userIdentifier: userData.userIdentifier,
-      profileImage: userData.profileImageUrl || ''
+      userId: user.userId,
+      nickname: user.nickname,
+      userIdentifier: user.userIdentifier,
+      profileImage: user.profileImageUrl || ''
     }
-    
     console.log('[Search] Current user info loaded:', currentLoginUser.value)
-  } catch (err) {
-    console.error('[Search] Error fetching current user info:', err)
+  }
+}
+
+// 사용자 프로필 페이지로 이동
+const goToUserProfile = (user) => {
+  const userIdentifier = user.userIdentifier
+  const userId = user.userId
+  console.log('[Search] 검색 결과에서 프로필로 이동:', { userIdentifier, userId }, user)
+  
+  // 자기 자신인 경우 마이페이지로 이동
+  if (userId === currentLoginUser.value.userId) {
+    console.log('[Search] 자신의 프로필입니다. 마이페이지로 이동합니다.')
+    router.push('/mypage')
+    return
+  }
+  
+  if (userIdentifier && userId) {
+    // URL은 userIdentifier로 깔끔하게, userId는 state로 전달하여 정확한 프로필 조회
+    router.push({
+      path: `/profile/${userIdentifier}`,
+      state: { userId }
+    })
+  } else {
+    console.error('[Search] userIdentifier 또는 userId가 없습니다:', user)
   }
 }
 
@@ -208,9 +230,11 @@ const fetchCurrentUserInfo = async () => {
 const handleSearch = async () => {
   if (!searchQuery.value.trim()) {
     searchResults.value = []
+    searchExecuted.value = false
     return
   }
 
+  searchExecuted.value = true
   loading.value = true
   try {
     // POST 방식으로 검색 요청
@@ -429,19 +453,54 @@ watch(() => route.path, (newPath, oldPath) => {
   margin-bottom: 15px;
 }
 
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+}
+
 .search-input {
   width: 100%;
-  max-width: 500px;
-  padding: 10px 15px;
+  padding: 10px 42px 10px 15px;
   border: 1px solid #ddd;
   border-radius: 20px;
   font-size: 0.95em;
   outline: none;
   transition: border 0.2s;
+  box-sizing: border-box;
 }
 
 .search-input:focus {
   border-color: #007aff;
+}
+
+.search-button {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background-color: transparent;
+  color: #666;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.1em;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-button:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.search-button:active {
+  background-color: #e0e0e0;
 }
 
 /* 검색 결과 */
