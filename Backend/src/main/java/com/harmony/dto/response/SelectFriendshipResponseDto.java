@@ -14,6 +14,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SelectFriendshipResponseDto {
+  private Long friendUserId;
   private String friendIdentifier;
   private String nickname;
   private String profileImageUrl;
