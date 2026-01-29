@@ -39,6 +39,9 @@ public class AwsS3Service {
 
   // TODO: 리팩토링. 메소드 중복됨
   public String getUserProfileImageUrl(String profileImageName){
+    if(profileImageName==null){
+      return null;
+    }
     return amazonS3.getUrl(bucket, profileImageName).toString();
   }
 
