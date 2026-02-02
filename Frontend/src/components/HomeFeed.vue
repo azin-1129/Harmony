@@ -22,6 +22,8 @@ import { ref, onMounted } from 'vue'
 import FeedItem from './FeedItem.vue'
 import { apiFetch } from '@/utils/apiClient'
 import { getAccessToken } from '@/utils/tokenService'
+import { useFriendship } from '@/composables/useFriendship'
+import { useCurrentUser } from '@/composables/useCurrentUser'
 
 const feeds = ref([])
 const loading = ref(false)
@@ -29,6 +31,10 @@ const friendList = ref([])
 const currentUserIdentifier = ref('')
 const currentUserInfo = ref({})
 const likedArticleIds = ref([])
+
+// 전역 상태 관리
+const { loadAllFriendshipData } = useFriendship()
+const { currentUser, loadCurrentUser } = useCurrentUser()
 
 // 기본 프로필 사진
 const DEFAULT_PROFILE_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTBFMEUwIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjOTk5Ii8+CjxwYXRoIGQ9Ik0yMCA2NSBDMjAgNjAgMzAgNTAgNTAgNTAgQzcwIDUwIDgwIDYwIDgwIDY1IiBmaWxsPSIjOTk5Ii8+Cjwvc3ZnPg=='
@@ -57,24 +63,15 @@ const mapArticleToFeed = (item, idx) => {
   }
 }
 
-// 현재 사용자 정보 조회
+// 현재 사용자 정보 조회 (전역 상태 사용)
 const fetchCurrentUser = async () => {
-  try {
-    const res = await apiFetch('/user/info', { method: 'GET' })
-    if (!res || !res.ok) {
-      console.error('Failed to load current user')
-      return
+  const user = await loadCurrentUser()
+  if (user) {
+    currentUserIdentifier.value = user.userIdentifier
+    currentUserInfo.value = {
+      profileImageUrl: user.profileImageUrl || '',
+      nickname: user.nickname || user.userIdentifier
     }
-    const body = await res.json()
-    if (body.data?.userIdentifier) {
-      currentUserIdentifier.value = body.data.userIdentifier
-      currentUserInfo.value = {
-        profileImageUrl: body.data.profileImageUrl || '',
-        nickname: body.data.nickname || body.data.userIdentifier
-      }
-    }
-  } catch (err) {
-    console.error('Error fetching current user', err)
   }
 }
 
@@ -142,6 +139,9 @@ onMounted(async () => {
     await fetchCurrentUser()
     await fetchFriendList()
     await fetchLikedArticles()
+    
+    // 전역 친구 관계 데이터 로드 (친구 목록, 보낸/받은 요청)
+    await loadAllFriendshipData()
     
     // 피드 로드
     const res = await apiFetch('/article/following', { method: 'GET' })

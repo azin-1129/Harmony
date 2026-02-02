@@ -59,5 +59,23 @@ cancelFriendRequest(receiverIdentifier) {
 },
 rejectFriendRequest(senderIdentifier) { 
   return api.post('/friendship-request/reject', { senderIdentifier }) 
+},
+
+// User Settings (사용자 설정)
+updatePassword(payload) {
+  return api.post('/user/update/password', payload)
+},
+updateNickname(payload) {
+  return api.post('/user/update/nickname', payload)
+},
+uploadProfileImage(formData) {
+  return api.post('/media', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+},
+deleteProfileImage() {
+  return api.delete('/media')
 }
 }
