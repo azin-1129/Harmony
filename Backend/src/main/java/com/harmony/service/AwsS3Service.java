@@ -57,7 +57,7 @@ public class AwsS3Service {
   public String uploadProfileImage(UserDetailsImpl userDetailsImpl, MultipartFile multipartFile){
     String originalProfileImageName=userDetailsImpl.getProfileImageName();
     // TODO: User profileImageName 초기값은 null로 바꿔야함
-    if(!originalProfileImageName.equals("")){ // 기존 프사가 존재해서 삭제
+    if(originalProfileImageName!=null){ // 기존 프사가 존재해서 삭제
       log.info("기존 프사가 존재하네요?"+originalProfileImageName);
       deleteProfileImage(originalProfileImageName);
     }
@@ -123,6 +123,11 @@ public class AwsS3Service {
           ErrorCode.INVALID_FILE
       );
     }
+  }
+
+  // TODO: 이미지 별 CRUD 경로 분기
+  public void deleteArticleImage(String fileName){
+    amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
   }
 
   public void deleteProfileImage(String fileName){

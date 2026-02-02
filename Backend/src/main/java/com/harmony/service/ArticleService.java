@@ -118,7 +118,7 @@ public class ArticleService {
         () -> new EntityNotFoundException(ErrorCode.ARTICLE_NOT_FOUND)
     );
     String originArticleMediaName=article.getArticleMediaName();
-    awsS3Service.deleteProfileImage(originArticleMediaName);
+    awsS3Service.deleteArticleImage(originArticleMediaName);
     String newArticleMediaName=awsS3Service.uploadArticleImage(multipartFile);
     article.updateArticleMediaName(newArticleMediaName);
   }

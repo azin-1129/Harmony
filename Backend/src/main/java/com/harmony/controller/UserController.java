@@ -172,24 +172,6 @@ public class UserController {
     );
   }
 
-  // 프사 업뎃
-  // TODO: 지원하지 않는 이미지 형식?
-  // TODO: 이미지 @Valid도 있나..? Dto에는 없음
-  @PostMapping("/update/profile-image")
-  @Operation(summary="프로필 사진 변경", description="프로필 사진 변경 API")
-  @ApiResponses(value={
-      @ApiResponse(responseCode="200", description="프로필 사진 변경 성공"),
-      @ApiResponse(responseCode="400", description="입력 양식이 잘못되었습니다.")
-  })
-  public ResponseEntity<Object> updateUserProfileImageName(@CurrentUserId Long userId, @RequestBody @Valid ProfileImageForm profileImageForm){
-    userService.updateUserProfileImage(userId, profileImageForm.getNewProfileImageName());
-
-    // TODO: S3에 이미지 저장
-    return SuccessResponse.createSuccess(
-        SuccessCode.USER_UPDATE_PROFILE_IMAGE_SUCCESS
-    );
-  }
-
   // 탈퇴 취소
 //  public ResponseEntity<Object> activateUser(){
 //    // withdraw=false, withdrawn_at=null
@@ -198,6 +180,7 @@ public class UserController {
 //            SuccessCode.USER_ACTIVATE_SUCCESS
 //    );
 //  }
+
   // 탈퇴
   @DeleteMapping
   @Operation(summary="회원탈퇴", description="회원탈퇴 API")
