@@ -146,7 +146,7 @@ public class UserService {
           ErrorCode.DUPLICATED_USER_PASSWORD
       );
     }
-    user.updatePassword(newPassword);
+    user.updatePassword(passwordEncoder.encode(newPassword));
   }
 
   // 닉넴 업뎃
@@ -158,12 +158,6 @@ public class UserService {
       );
     }
     user.updateNickname(newNickname);
-  }
-
-  // 프사 업뎃
-  public void updateUserProfileImage(Long userId, String newProfileImageName) {
-    User user=userRepository.findById(userId).orElse(null);
-    user.updateProfileImage(newProfileImageName);
   }
 
   // TODO: withdraw 값 기준으로 벌크 연산
