@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -33,6 +34,7 @@ public class ParticipantService {
   private final ParticipantRepository participantRepository;
   private final ChatRoomService chatRoomService;
   private final UserService userService;
+  private final AwsS3Service awsS3Service;
 
   // 생성+참여
   // 없던 개인 채팅방 생성+참여
@@ -185,12 +187,14 @@ public class ParticipantService {
     List<SelectParticipatedChatRoomsResponseDto> filteredChatRooms=new ArrayList<>();
 
     for(ChatRoom chatRoom:chatRooms){
+      Long chatRoomId=chatRoom.getChatRoomId();
       SelectParticipatedChatRoomsResponseDto chatRoomInfo=SelectParticipatedChatRoomsResponseDto.builder()
-          .chatRoomId(chatRoom.getChatRoomId())
+          .chatRoomId(chatRoomId)
           .chatRoomName(chatRoom.getChatRoomName())
           .chatRoomCount(chatRoom.getChatRoomCount())
           .chatRoomCountMax(chatRoom.getChatRoomCountMax())
           .chatRoomType(chatRoom.getChatRoomType())
+          .chatRoomParticipants(selectSomeChatRoomParticipants(chatRoomId))
           .build();
 
       filteredChatRooms.add(chatRoomInfo);
@@ -199,12 +203,10 @@ public class ParticipantService {
     return filteredChatRooms;
   }
 
-  // 특정 채팅방의 참가자 목록 조회
-  public List<SelectChatRoomParticipantsResponseDto> selectChatRoomParticipants(
-      SelectChatRoomParticipantsRequestDto selectChatRoomParticipantsRequestDto){
-    Long chatRoomId=selectChatRoomParticipantsRequestDto.getChatRoomId();
-
-    List<User> participants=participantRepository.findUsersByChatroomId(chatRoomId);
+  // 특정 채팅방의 일부 참가자 목록 조회(채팅방 썸네일)
+  public List<SelectChatRoomParticipantsResponseDto> selectSomeChatRoomParticipants(
+      Long chatRoomId){
+    List<User> participants=participantRepository.findSomeUsersByChatroomId(chatRoomId, PageRequest.of(0, 5));
 
     // 중요한 정보를 제외하고 반환
     List<SelectChatRoomParticipantsResponseDto> filteredParticipants=new ArrayList<>();
@@ -212,7 +214,29 @@ public class ParticipantService {
     for(User participant:participants){
       SelectChatRoomParticipantsResponseDto userInfo= SelectChatRoomParticipantsResponseDto.builder()
           .userIdentifier(participant.getUserIdentifier())
-          .profileImageName(participant.getProfileImageName())
+          .profileImageUrl(awsS3Service.getUserProfileImageUrl(participant.getProfileImageName()))
+          .nickname(participant.getNickname())
+          .build();
+
+      filteredParticipants.add(userInfo);
+    }
+
+    return filteredParticipants;
+  }
+
+  // 특정 채팅방의 참가자 목록 조회
+  public List<SelectChatRoomParticipantsResponseDto> selectChatRoomParticipants(
+      SelectChatRoomParticipantsRequestDto selectChatRoomParticipantsRequestDto){
+    List<User> participants=participantRepository.findUsersByChatroomId(
+        selectChatRoomParticipantsRequestDto.getChatRoomId());
+
+    // 중요한 정보를 제외하고 반환
+    List<SelectChatRoomParticipantsResponseDto> filteredParticipants=new ArrayList<>();
+
+    for(User participant:participants){
+      SelectChatRoomParticipantsResponseDto userInfo= SelectChatRoomParticipantsResponseDto.builder()
+          .userIdentifier(participant.getUserIdentifier())
+          .profileImageUrl(awsS3Service.getUserProfileImageUrl(participant.getProfileImageName()))
           .nickname(participant.getNickname())
           .build();
 

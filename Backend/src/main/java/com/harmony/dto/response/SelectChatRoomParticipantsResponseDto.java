@@ -14,7 +14,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SelectChatRoomParticipantsResponseDto {
   private String userIdentifier;
-  private String profileImageName;
+  private String profileImageUrl;
   private String nickname;
 
 }
