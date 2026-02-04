@@ -1,6 +1,7 @@
 package com.harmony.dto.response;
 
 import com.harmony.entity.ChatRoomType;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,4 +20,5 @@ public class SelectParticipatedChatRoomsResponseDto {
   private Integer chatRoomCount;
   private Integer chatRoomCountMax;
   private ChatRoomType chatRoomType;
+  private List<SelectChatRoomParticipantsResponseDto> chatRoomParticipants;
 }

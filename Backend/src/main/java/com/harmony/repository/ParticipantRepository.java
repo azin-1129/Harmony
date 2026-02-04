@@ -8,6 +8,7 @@ import com.harmony.entity.User;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -25,6 +26,10 @@ public interface ParticipantRepository extends JpaRepository<Participant, Partic
 
   @Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END FROM Participant p WHERE p.participantId.userId = :userId AND p.participantId.chatroomId = :chatroomId")
   Boolean existsByUserIdAndChatroomId(@Param("userId") Long userId, @Param("chatroomId") Long chatroomId);
+
+  @Query("SELECT u FROM User u WHERE u.userId IN (" +
+      "SELECT p.participantId.userId FROM Participant p WHERE p.participantId.chatroomId = :chatroomId)")
+  List<User> findSomeUsersByChatroomId(@Param("chatroomId") Long chatroomId, Pageable pageable);
 
   @Query("SELECT u FROM User u WHERE u.userId IN (" +
       "SELECT p.participantId.userId FROM Participant p WHERE p.participantId.chatroomId = :chatroomId)")
