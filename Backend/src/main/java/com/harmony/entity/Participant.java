@@ -7,7 +7,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,4 +35,11 @@ public class Participant {
   @ManyToOne
   @JoinColumn(name="chatroom_id")
   private ChatRoom chatRoom;
+
+  @Column(name="is_exited", nullable = false)
+  private Boolean isExited;
+
+  public void updateIsExited(Boolean isExited) {
+    this.isExited = isExited;
+  }
 }
