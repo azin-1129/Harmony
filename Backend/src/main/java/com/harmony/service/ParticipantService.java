@@ -80,12 +80,14 @@ public class ParticipantService {
         .participantId(participantUserId)
         .user(user)
         .chatRoom(createdPersonalChatRoom)
+        .isExited(false)
         .build();
 
     Participant participantPartner=Participant.builder()
         .participantId(participantPartnerId)
         .user(partner)
         .chatRoom(createdPersonalChatRoom)
+        .isExited(false)
         .build();
 
     participantRepository.save(participantUser);
@@ -112,6 +114,7 @@ public class ParticipantService {
         .participantId(participantUserId)
         .user(user)
         .chatRoom(createdGroupChatRoom)
+        .isExited(false)
         .build();
 
     participantRepository.save(participantUser);
@@ -127,19 +130,24 @@ public class ParticipantService {
   public Long participateGroupChatRoom(Long userId, ParticipateGroupChatRoomRequestDto participateGroupChatRoomRequestDto) {
     Long groupChatRoomId=participateGroupChatRoomRequestDto.getChatroomId();
 
-    // 이미 그룹 채팅에 참가했다면 그냥 그룹 채팅방 id 반환
+    ParticipantId participantUserId = ParticipantId.builder()
+        .userId(userId)
+        .chatroomId(groupChatRoomId)
+        .build();
+    // 재참가라면 isExited=false 설정 후, 그룹 채팅방 id 반환
     if(checkAlreadyParticipatedGroupChatRoom(userId, groupChatRoomId)){
+      Participant participant=participantRepository.findByParticipantId(participantUserId);
+      participant.updateIsExited(false);
       return groupChatRoomId;
     }
-    Optional<ChatRoom> optionalGroupChatRoom=chatRoomService.getChatRoomById(groupChatRoomId);
 
+    Optional<ChatRoom> optionalGroupChatRoom=chatRoomService.getChatRoomById(groupChatRoomId);
     // 참여하려는 채팅방이 사라짐
     if(!optionalGroupChatRoom.isPresent()){
       throw new EntityNotFoundException(
           ErrorCode.CHATROOM_NOT_FOUND
       );
     }
-
     ChatRoom groupChatRoom=optionalGroupChatRoom.get();
 
     // 참가자가 없어 비활성화된 방
@@ -162,15 +170,11 @@ public class ParticipantService {
     // 그룹 채팅 참가 처리, 채팅방 id 반환
     User user=userService.getUserById(userId);
 
-    ParticipantId participantUserId = ParticipantId.builder()
-        .userId(userId)
-        .chatroomId(groupChatRoomId)
-        .build();
-
     Participant participant=Participant.builder()
         .participantId(participantUserId)
         .user(user)
         .chatRoom(groupChatRoom)
+        .isExited(false)
         .build();
 
     participantRepository.save(participant);
@@ -235,6 +239,7 @@ public class ParticipantService {
 
     for(User participant:participants){
       SelectChatRoomParticipantsResponseDto userInfo= SelectChatRoomParticipantsResponseDto.builder()
+          .userId(participant.getUserId())
           .userIdentifier(participant.getUserIdentifier())
           .profileImageUrl(awsS3Service.getUserProfileImageUrl(participant.getProfileImageName()))
           .nickname(participant.getNickname())
@@ -273,7 +278,9 @@ public class ParticipantService {
         .userId(userId)
         .chatroomId(chatRoomId)
         .build();
-    participantRepository.deleteById(participantId);
+
+    Participant participant=participantRepository.findByParticipantId(participantId);
+    participant.updateIsExited(true);
   }
 
   // 강제 퇴장
@@ -289,18 +296,19 @@ public class ParticipantService {
       );
     }
 
-    ParticipantId participantId=ParticipantId.builder()
-        .userId(userId)
-        .chatroomId(chatRoomId)
-        .build();
-
     // TODO: isPresent() 갈아 끼우기
     ChatRoom chatRoom=chatRoomService.getChatRoomById(chatRoomId).get();
 
     // 인원 수 감소
     chatRoom.updateChatRoomCountNegative();
-    System.out.println("현재 인원 수:"+chatRoom.getChatRoomCount());
-    participantRepository.deleteById(participantId);
+
+    ParticipantId participantId=ParticipantId.builder()
+        .userId(userId)
+        .chatroomId(chatRoomId)
+        .build();
+
+    Participant participant=participantRepository.findByParticipantId(participantId);
+    participant.updateIsExited(true);
   }
 
   public Optional<Long> getAlreadyCreatedPersonalChatRoomId(Long userId, Long partnerId){

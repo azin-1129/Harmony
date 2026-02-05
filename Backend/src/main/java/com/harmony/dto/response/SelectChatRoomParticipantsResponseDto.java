@@ -13,6 +13,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SelectChatRoomParticipantsResponseDto {
+  private Long userId;
   private String userIdentifier;
   private String profileImageUrl;
   private String nickname;
