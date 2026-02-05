@@ -22,7 +22,7 @@ public interface HeartRepository extends JpaRepository<Heart, Long> {
   List<Heart> findHeartsByArticleId(@Param("articleId") Long articleId);
 
   @Transactional
-  @Modifying(clearAutomatically = true)
+  @Modifying(clearAutomatically = false)
   @Query("DELETE FROM Heart h WHERE h.heartId in :ids")
   void deleteHeartsBulk(@Param("ids") List<Long> ids);
 }

@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     @Transactional
-    @Modifying(clearAutomatically=true)
+    @Modifying(clearAutomatically=false)
     @Query("update ChatRoom c set c.chatRoomCount=c.chatRoomCount-1 where c.chatRoomId in :chatRoomIds")
     void minusChatRoomCountBulk(@Param("chatRoomIds") List<Long> chatRoomIds);
 

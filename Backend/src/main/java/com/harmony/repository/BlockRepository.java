@@ -24,7 +24,7 @@ public interface BlockRepository extends JpaRepository<Block, BlockId> {
   List<Block> findBlocksByUserId(@Param("userId") Long userId);
 
   @Transactional
-  @Modifying(clearAutomatically = true)
+  @Modifying(clearAutomatically = false)
   @Query("DELETE FROM Block b WHERE b.blockId in :ids")
   void deleteBlockBulk(@Param("ids") List<BlockId> ids);
 }
