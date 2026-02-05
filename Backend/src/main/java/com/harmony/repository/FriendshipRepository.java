@@ -28,7 +28,7 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long>,
   List<Friendship> findFriendshipsByUserId(@Param("userId") Long userId);
 
   @Transactional
-  @Modifying(clearAutomatically = true)
+  @Modifying(clearAutomatically = false)
   @Query("DELETE FROM Friendship f WHERE f.friendshipId in:ids")
   void deleteFriendshipBulk(@Param("ids") List<Long> ids);
 }

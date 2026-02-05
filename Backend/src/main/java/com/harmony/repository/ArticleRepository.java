@@ -30,17 +30,17 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
   List<Article> findByIsDeleted(Boolean isDeleted);
 
   @Transactional
-  @Modifying(clearAutomatically = true)
+  @Modifying(clearAutomatically = false)
   @Query("DELETE FROM Article a WHERE a.articleId in :ids")
   void deleteArticlesBulk(@Param("ids") List<Long> ids);
 
   @Transactional
-  @Modifying(clearAutomatically = true)
+  @Modifying(clearAutomatically = false)
   @Query("UPDATE Article a SET a.articleCommentCount=a.articleCommentCount-1 WHERE a.articleId in :ids")
   void updateArticleCommentCountsBulk(@Param("ids") List<Long> ids);
 
   @Transactional
-  @Modifying(clearAutomatically = true)
+  @Modifying(clearAutomatically = false)
   @Query("UPDATE Article a SET a.articleLikeCount=a.articleLikeCount-1 WHERE a.articleId in :ids")
   void updateArticleLikeCountsBulk(@Param("ids") List<Long> ids);
 }

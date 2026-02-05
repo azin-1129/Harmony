@@ -23,6 +23,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
   List<User> findByNicknameContainsOrUserIdentifierContains(String nickname, String userIdentifier);
 
   @Transactional
+  @Modifying(clearAutomatically = true)
+  @Query("UPDATE User u SET u.nickname=null, u.userIdentifier=null, u.profileImageName=null, u.email=null  WHERE u.userId IN :ids")
+  void updateWithdrawnUserBulk(@Param("ids") List<Long> ids);
+
+  @Transactional
   @Modifying(clearAutomatically=true)
   @Query("DELETE FROM User u WHERE u.userId in :ids")
   void deleteWithdrawnUserBulk(@Param("ids") List<Long> ids);
