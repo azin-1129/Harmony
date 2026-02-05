@@ -17,6 +17,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ParticipantRepository extends JpaRepository<Participant, ParticipantId> {
+  Participant findByParticipantId(ParticipantId participantId);
+
   @Query("SELECT cr.chatRoomId FROM ChatRoom cr WHERE cr.chatRoomType = :chatRoomType " +
       "AND cr.chatRoomId IN " +
       "(SELECT p1.participantId.chatroomId FROM Participant p1 WHERE p1.participantId.userId = :userId) " +
@@ -28,19 +30,24 @@ public interface ParticipantRepository extends JpaRepository<Participant, Partic
   Boolean existsByUserIdAndChatroomId(@Param("userId") Long userId, @Param("chatroomId") Long chatroomId);
 
   @Query("SELECT u FROM User u WHERE u.userId IN (" +
-      "SELECT p.participantId.userId FROM Participant p WHERE p.participantId.chatroomId = :chatroomId)")
+      "SELECT p.participantId.userId FROM Participant p WHERE p.participantId.chatroomId = :chatroomId AND p.isExited=false)")
   List<User> findSomeUsersByChatroomId(@Param("chatroomId") Long chatroomId, Pageable pageable);
 
   @Query("SELECT u FROM User u WHERE u.userId IN (" +
-      "SELECT p.participantId.userId FROM Participant p WHERE p.participantId.chatroomId = :chatroomId)")
+      "SELECT p.participantId.userId FROM Participant p WHERE p.participantId.chatroomId = :chatroomId AND p.isExited=false)")
   List<User> findUsersByChatroomId(@Param("chatroomId") Long chatroomId);
 
   @Query("SELECT c FROM ChatRoom c WHERE c.chatRoomId IN (" +
-      "SELECT p.participantId.chatroomId FROM Participant p WHERE p.participantId.userId = :userId)")
+      "SELECT p.participantId.chatroomId FROM Participant p WHERE p.participantId.userId = :userId AND p.isExited=false)")
   List<ChatRoom> findChatRoomsByUserId(@Param("userId") Long userId);
 
   @Query("SELECT p FROM Participant p WHERE p.participantId.userId IN :userIds AND p.participantId.chatroomId IN :chatRoomIds")
   List<Participant> findSoftDeletedParticipants(@Param("userIds") List<Long> userIds, @Param("chatRoomIds") List<Long> chatRoomIds);
+
+  @Transactional
+  @Modifying(clearAutomatically = false)
+  @Query("UPDATE Participant p SET p.isExited=true WHERE p.participantId in :ids")
+  void updateIsExitedBulk(@Param("ids") List<ParticipantId> ids);
 
   @Transactional
   @Modifying(clearAutomatically=true)
