@@ -52,6 +52,7 @@ public class SchedulerUtil {
     List<User> withdrawnUsers = userRepository.findByWithdrawnAtBefore(cutoffDate);
     List<Long> withdrawnUserIds=new ArrayList<>();
     for(User user: withdrawnUsers){
+      user.updateWithDrawnAt(null); // 다음 스케줄에 처리하지 않도록 방지
       Long userId=user.getUserId();
 
       // heart
@@ -59,11 +60,12 @@ public class SchedulerUtil {
       List<Long> heartIds=new ArrayList<>();
       List<Long> releatedArticleIds=new ArrayList<>();
       for(Heart heart: hearts) {
-        log.info(heart.toString());
         heartIds.add(heart.getHeartId());
         Article relatedArticle = heart.getArticle();
         releatedArticleIds.add(relatedArticle.getArticleId());
       }
+      articleRepository.updateArticleLikeCountsBulk(releatedArticleIds);
+      heartRepository.deleteHeartsBulk(heartIds);
 
       // comments
       List<Comment> comments=commentRepository.findCommentsByUserId(userId);
@@ -75,20 +77,25 @@ public class SchedulerUtil {
         log.debug("댓글 카운트를 감소했습니다:"+relatedArticle.getArticleCommentCount());
         commentIds.add(comment.getCommentId());
       }
-
-      // 업데이트 작업 먼저
       articleRepository.updateArticleCommentCountsBulk(releatedArticleIds);
-      articleRepository.updateArticleLikeCountsBulk(releatedArticleIds);
       commentRepository.deleteCommentsBulk(commentIds);
-      heartRepository.deleteHeartsBulk(heartIds);
 
       // chatrooms
       List<ChatRoom> chatRooms=participantRepository.findChatRoomsByUserId(userId);
+      List<ParticipantId> participantIds=new ArrayList<>();
       List<Long> chatroomIds=new ArrayList<>();
       // 해당 채팅방 참여자 count 모두 -1
       for(ChatRoom chatRoom: chatRooms){
-        chatroomIds.add(chatRoom.getChatRoomId());
+        Long chatRoomId=chatRoom.getChatRoomId();
+        chatroomIds.add(chatRoomId);
+        ParticipantId participantId=ParticipantId.builder()
+            .userId(userId)
+            .chatroomId(chatRoomId)
+            .build();
+        participantIds.add(participantId);
       }
+      participantRepository.updateIsExitedBulk(participantIds);
+      log.info("해당 유저가 참가한 채팅방의 퇴장 상태를 true로 설정했습니다.");
       chatRoomRepository.minusChatRoomCountBulk(chatroomIds);
       log.info("해당 유저가 참여한 채팅방의 참여자 수를 마이너스했습니다.");
 
@@ -129,13 +136,12 @@ public class SchedulerUtil {
       log.info("해당 유저가 작성한 게시물을 모두 삭제했습니다.");
 
       withdrawnUserIds.add(userId);
-      user.updateWithDraw(false); // 다음 스케줄에 처리하지 않도록 방지
     }
 
-    // user 제거
+    // user info 제거
     if(!withdrawnUserIds.isEmpty()){
-            userRepository.deleteWithdrawnUserBulk(withdrawnUserIds);
-      log.info("탈퇴 유저 데이터를 제거했습니다.");
+      userRepository.updateWithdrawnUserBulk(withdrawnUserIds);
+      log.info("탈퇴 유저의 일부 데이터를 제거했습니다.");
     }
   }
 
@@ -194,5 +200,8 @@ public class SchedulerUtil {
 
     chatRoomRepository.deleteChatRoomsBulk(chatRoomIds);
     log.info("참가자 수가 0인 채팅방 데이터를 제거했습니다.");
+
+    userRepository.deleteWithdrawnUserBulk(withdrawnUserIds);
+    log.info("탈퇴자의 데이터를 완전 제거했습니다.");
   }
 }
