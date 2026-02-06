@@ -134,6 +134,13 @@ public class AwsS3Service {
     amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
   }
 
+  public void deleteImageBulk(List<String> ImageNames){
+    // TODO: DeleteObjectsRequest 이용
+    for(String imageName:ImageNames){
+      amazonS3.deleteObject(new DeleteObjectRequest(bucket, imageName));
+    }
+  }
+
   public String createFileName(String fileName){
     log.info("원래 파일 이름입니다:"+fileName);
     return UUID.randomUUID().toString().concat(".").concat(FilenameUtils.getExtension(fileName));
