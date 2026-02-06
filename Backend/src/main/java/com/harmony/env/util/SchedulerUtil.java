@@ -20,6 +20,7 @@ import com.harmony.repository.FriendshipRequestRepository;
 import com.harmony.repository.HeartRepository;
 import com.harmony.repository.ParticipantRepository;
 import com.harmony.repository.UserRepository;
+import com.harmony.service.AwsS3Service;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ public class SchedulerUtil {
   private final ArticleRepository articleRepository;
   private final HeartRepository heartRepository;
   private final CommentRepository commentRepository;
+  private final AwsS3Service awsS3Service;
 
   public void deleteWithdrawnUsersDataWithoutChatInfo(){
     // 참여 정보 등은 채팅 데이터 삭제 스케줄에서 처리
@@ -51,6 +53,7 @@ public class SchedulerUtil {
     LocalDateTime cutoffDate = LocalDateTime.now().minusDays(0);
     List<User> withdrawnUsers = userRepository.findByWithdrawnAtBefore(cutoffDate);
     List<Long> withdrawnUserIds=new ArrayList<>();
+    List<String> imageNames = new ArrayList<>();
     for(User user: withdrawnUsers){
       user.updateWithDrawnAt(null); // 다음 스케줄에 처리하지 않도록 방지
       Long userId=user.getUserId();
@@ -131,9 +134,16 @@ public class SchedulerUtil {
       List<Long> articleIds=new ArrayList<>();
       for(Article article: articles){
         articleIds.add(article.getArticleId());
+        imageNames.add(article.getArticleMediaName());
       }
       articleRepository.deleteArticlesBulk(articleIds);
       log.info("해당 유저가 작성한 게시물을 모두 삭제했습니다.");
+
+      imageNames.add(user.getProfileImageName());
+
+      // image
+      awsS3Service.deleteImageBulk(imageNames);
+      log.info("해당 유저와 관련된 이미지를 모두 삭제했습니다.");
 
       withdrawnUserIds.add(userId);
     }
