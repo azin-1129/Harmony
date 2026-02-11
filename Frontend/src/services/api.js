@@ -36,9 +36,18 @@ likePost(postId) { return api.post(`/posts/${postId}/like`) },
 commentPost(postId, payload) { return api.post(`/posts/${postId}/comments`, payload) },
 
 
-// Chat REST endpoints (if any)
-getChatRooms() { return api.get('/chats/rooms') },
-getMessages(roomId, page = 0) { return api.get(`/chats/${roomId}/messages`, { params: { page } }) },
+// Chat REST endpoints
+getParticipatedChatRooms() { return api.get('/participate/participated') },
+getChatMessages(chatRoomId, chatMessageId = null, size = 15) { 
+  const params = { size, sort: 'chatMessageId,desc' }
+  if (chatMessageId) {
+    params.chatMessageId = chatMessageId
+  }
+  return api.get(`/chat/${chatRoomId}`, { params }) 
+},
+leaveChatRoom(chatRoomId) { 
+  return api.delete('/participate/leave', { data: { chatRoomId } }) 
+},
 
 // Friendship (친구)
 getFriendsList() { return api.get('/friendship/friendships') },
