@@ -1,25 +1,24 @@
 <template>
   <div class="chat-page">
-    <!-- 좌측 친구 목록 -->
+    <!-- 좌측 채팅방 목록 -->
     <ChatSidebar
-      :friends="friends"
-      :selectedFriend="selectedFriend"
-      @select-friend="selectFriend"
+      :key="chatSidebarKey"
+      :selectedRoomId="selectedRoom?.chatRoomId"
+      @select-room="selectRoom"
     />
     
     <!-- 우측 채팅창 -->
     <ChatWindow
-      v-if="selectedFriend"
-      :selectedFriend="selectedFriend"
+      v-if="selectedRoom"
+      :selectedRoom="selectedRoom"
       :stompClient="stompClient"
-      :myId="myId"
-      :messages="messages"
-      @message-sent="addMessage"
+      @message-sent="handleMessageSent"
+      @room-left="handleRoomLeft"
     />
     
-    <!-- 선택된 친구 없을 때 안내 문구 -->
+    <!-- 선택된 채팅방 없을 때 안내 문구 -->
     <div v-else class="chat-placeholder">
-      채팅할 친구를 선택하세요
+      채팅방을 선택하세요
     </div>
   </div>
 </template>
@@ -29,37 +28,39 @@ import { ref } from 'vue'
 import ChatSidebar from '@/components/chat/ChatSidebar.vue'
 import ChatWindow from '@/components/chat/ChatWindow.vue'
 
-const friends = ref([
-  { id: 1, name: 'hana', profileImage: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&q=80' },
-  { id: 2, name: 'minho', profileImage: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?ixlib=rb-4.0.3&auto=format&fit=crop&w=36&q=80' }
-])
+const selectedRoom = ref(null)
+const stompClient = ref(null) // TODO: STOMP 연결 구현
+const chatSidebarKey = ref(0)
 
-const selectedFriend = ref(null)
-const myId = ref(99)
-const messages = ref([])
-
-// 선택된 친구 변경
-const selectFriend = (friend) => {
-  selectedFriend.value = friend
-  messages.value = [
-    { id: 1, senderId: friend.id, content: "안녕하세요!", timestamp: new Date().toISOString(), senderProfileImage: friend.profileImage },
-    { id: 2, senderId: myId.value, content: "안녕하세요 반가워요!", timestamp: new Date().toISOString(), senderProfileImage: '' }
-  ]
+// 채팅방 선택
+const selectRoom = (room) => {
+  selectedRoom.value = room
 }
 
-// 새 메시지 추가
-const addMessage = (msg) => {
-  messages.value.push(msg)
+// 메시지 전송 처리
+const handleMessageSent = (message) => {
+  console.log('Message sent:', message)
+  // TODO: STOMP를 통한 실제 메시지 전송 구현
 }
 
-// STOMP는 아직 더미 상태
-const stompClient = null
+// 채팅방 나가기 처리
+const handleRoomLeft = (roomId) => {
+  console.log('Left room:', roomId)
+  selectedRoom.value = null
+  chatSidebarKey.value++ // ChatSidebar 새로고침
+}
+
+// TODO: STOMP 연결 초기화
+// onMounted(() => {
+//   stompClient.value = connectStomp()
+// })
 </script>
 
 <style scoped>
 .chat-page {
   display: flex;
-  height: 80vh;          /* 충분히 높이 확보 */
+  height: calc(100vh - 32px);
+  margin: 16px;
   border-radius: 12px;
   background: #fff;
   overflow: hidden;
