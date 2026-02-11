@@ -217,6 +217,7 @@ public class ParticipantService {
 
     for(User participant:participants){
       SelectChatRoomParticipantsResponseDto userInfo= SelectChatRoomParticipantsResponseDto.builder()
+          .userId(participant.getUserId())
           .userIdentifier(participant.getUserIdentifier())
           .profileImageUrl(awsS3Service.getUserProfileImageUrl(participant.getProfileImageName()))
           .nickname(participant.getNickname())
@@ -251,6 +252,7 @@ public class ParticipantService {
     return filteredParticipants;
   }
 
+  // TODO: is_exited 기반 수정
   // 스스로 퇴장
   public void leaveChatRoom(Long userId, LeaveChatRoomRequestDto leaveChatRoomRequestDto){
     Long chatRoomId=leaveChatRoomRequestDto.getChatRoomId();
