@@ -40,9 +40,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import api from '@/services/api'
+import { onMounted } from 'vue'
 import { useCurrentUser } from '@/composables/useCurrentUser'
+import { useChatRooms } from '@/composables/useChatRooms'
 
 const props = defineProps({
   selectedRoomId: Number
@@ -51,28 +51,14 @@ const props = defineProps({
 const emit = defineEmits(['select-room'])
 
 const { currentUser, loadCurrentUser } = useCurrentUser()
-const chatRooms = ref([])
-const loading = ref(false)
-const error = ref(null)
+const { chatRooms, isLoading, error: chatRoomsError, loadChatRooms } = useChatRooms()
+const loading = isLoading
+const error = chatRoomsError
 
 onMounted(async () => {
   await loadCurrentUser()
-  await fetchChatRooms()
+  await loadChatRooms()
 })
-
-const fetchChatRooms = async () => {
-  loading.value = true
-  error.value = null
-  try {
-    const response = await api.getParticipatedChatRooms()
-    chatRooms.value = response.data.data
-  } catch (err) {
-    console.error('Failed to fetch chat rooms:', err)
-    error.value = '채팅방 목록을 불러오지 못했습니다.'
-  } finally {
-    loading.value = false
-  }
-}
 
 // 로그인한 사용자를 제외한 참가자 필터링
 const getDisplayParticipants = (room) => {

@@ -11,7 +11,7 @@
     <ChatWindow
       v-if="selectedRoom"
       :selectedRoom="selectedRoom"
-      :stompClient="stompClient"
+      :stompConnected="stompConnected"
       @message-sent="handleMessageSent"
       @room-left="handleRoomLeft"
     />
@@ -24,17 +24,43 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, watch, onBeforeUnmount } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import ChatSidebar from '@/components/chat/ChatSidebar.vue'
 import ChatWindow from '@/components/chat/ChatWindow.vue'
+import api from '@/services/api'
+import { useChatRooms } from '@/composables/useChatRooms'
+import stompService from '@/services/stompService'
+import { getAccessToken } from '@/utils/tokenService'
+import { apiUrl } from '@/utils/config'
 
+const route = useRoute()
+const router = useRouter()
 const selectedRoom = ref(null)
-const stompClient = ref(null) // TODO: STOMP 연결 구현
+const stompConnected = ref(false)
 const chatSidebarKey = ref(0)
+
+const { chatRooms, loadChatRooms, refreshChatRooms, findPersonalRoomWithUser } = useChatRooms()
+const isDirectChatLoading = ref(false)
+const lastDirectPartner = ref('')
 
 // 채팅방 선택
 const selectRoom = (room) => {
+  console.log('[Chat] Selected room:', room.chatRoomId, room)
   selectedRoom.value = room
+}
+
+const selectRoomById = (roomId) => {
+  if (!roomId) return
+  const targetId = Number(roomId)
+  if (!targetId) return
+  // 다른 방으로 변경될 때만 설정
+  if (selectedRoom.value?.chatRoomId === targetId) return
+  const room = chatRooms.value.find(r => r.chatRoomId === targetId)
+  if (room) {
+    console.log('[Chat] selectRoomById:', targetId)
+    selectedRoom.value = room
+  }
 }
 
 // 메시지 전송 처리
@@ -44,10 +70,89 @@ const handleMessageSent = (message) => {
 }
 
 // 채팅방 나가기 처리
-const handleRoomLeft = (roomId) => {
+const handleRoomLeft = async (roomId) => {
   console.log('Left room:', roomId)
   selectedRoom.value = null
+  await refreshChatRooms()
   chatSidebarKey.value++ // ChatSidebar 새로고침
+}
+
+onMounted(async () => {
+  stompService.connect({
+    url: apiUrl('/ws'),
+    useSockJS: true,
+    connectHeaders: {
+      Authorization: `Bearer ${getAccessToken() || ''}`
+    },
+    onConnect: () => {
+      stompConnected.value = true
+      console.log('[Chat] STOMP connected')
+    },
+    onStompError: (frame) => {
+      console.error('[Chat] STOMP error:', frame)
+    }
+  })
+  await loadChatRooms()
+  selectRoomById(route.query.roomId)
+  await handleDirectChatEntry()
+})
+
+onBeforeUnmount(() => {
+  stompService.disconnect()
+  stompConnected.value = false
+})
+
+watch(() => route.query.roomId, (roomId) => {
+  selectRoomById(roomId)
+})
+
+watch(
+  () => [route.query.partnerIdentifier, route.query.partnerUserId],
+  async () => {
+    await handleDirectChatEntry()
+  }
+)
+
+watch(chatRooms, () => {
+  selectRoomById(route.query.roomId)
+})
+
+const handleDirectChatEntry = async () => {
+  const partnerIdentifier = route.query.partnerIdentifier
+  const partnerUserId = route.query.partnerUserId
+  if (!partnerIdentifier) return
+  if (isDirectChatLoading.value) return
+
+  const partnerKey = `${partnerIdentifier}-${partnerUserId || ''}`
+  if (lastDirectPartner.value === partnerKey) return
+  lastDirectPartner.value = partnerKey
+
+  isDirectChatLoading.value = true
+  try {
+    await loadChatRooms()
+
+    let room = null
+    if (partnerUserId) {
+      room = findPersonalRoomWithUser(Number(partnerUserId))
+    }
+
+    if (!room) {
+      const response = await api.createPersonalChatRoom(partnerIdentifier)
+      const createdRoomId = response.data.data
+      await refreshChatRooms()
+      room = chatRooms.value.find(r => r.chatRoomId === createdRoomId) || null
+    }
+
+    if (room) {
+      // selectedRoom 직접 설정하고 URL 업데이트
+      selectedRoom.value = room
+      await router.replace({ path: '/chat', query: { roomId: room.chatRoomId } })
+    }
+  } catch (err) {
+    console.error('[Chat] Failed to open direct chat:', err)
+  } finally {
+    isDirectChatLoading.value = false
+  }
 }
 
 // TODO: STOMP 연결 초기화

@@ -32,6 +32,23 @@
           <div class="friend-info">
             친구 {{ userProfile.friendCount || 0 }}명
           </div>
+          <div v-if="showProfileActions" class="profile-actions">
+            <button
+              v-if="showAddFriendButton"
+              class="action-btn add-friend"
+              :disabled="isSendingFriendRequest"
+              @click="sendFriendRequest"
+            >
+              친구 추가
+            </button>
+            <button
+              class="action-btn send-message"
+              :disabled="isOpeningChat"
+              @click="openChatWithUser"
+            >
+              메시지 보내기
+            </button>
+          </div>
         </div>
       </div>
 
@@ -109,18 +126,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { apiFetch } from '../utils/apiClient'
+import api from '@/services/api'
 import ArticleDetail from './ArticleDetail.vue'
 import { useFriendship } from '../composables/useFriendship'
 import { useCurrentUser } from '../composables/useCurrentUser'
+import { useChatRooms } from '../composables/useChatRooms'
 
 const route = useRoute()
+const router = useRouter()
 
 // 전역 상태 관리
-const { getFriendshipStatus } = useFriendship()
+const { getFriendshipStatus, loadAllFriendshipData } = useFriendship()
 const { currentUser, loadCurrentUser } = useCurrentUser()
+const { chatRooms, loadChatRooms, refreshChatRooms, findPersonalRoomWithUser } = useChatRooms()
 
 // 기본 프로필 사진
 const DEFAULT_PROFILE_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTBFMEUwIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjOTk5Ii8+CjxwYXRoIGQ9Ik0yMCA2NSBDMjAgNjAgMzAgNTAgNTAgNTAgQzcwIDUwIDgwIDYwIDgwIDY1IiBmaWxsPSIjOTk5Ii8+Cjwvc3ZnPg=='
@@ -135,6 +156,8 @@ const articlesError = ref('')
 const activeTab = ref('post')
 const selectedArticle = ref(null)
 const likedArticleIds = ref([])
+const isSendingFriendRequest = ref(false)
+const isOpeningChat = ref(false)
 
 // 현재 로그인한 사용자 정보
 const currentLoginUser = ref({
@@ -148,6 +171,19 @@ const currentLoginUser = ref({
 const friendshipStatus = computed(() => {
   if (!userProfile.value) return null
   return getFriendshipStatus(userProfile.value.userId, userProfile.value.userIdentifier)
+})
+
+const isMyProfile = computed(() => {
+  if (!userProfile.value) return false
+  return userProfile.value.userId === currentUser.value.userId
+})
+
+const showProfileActions = computed(() => {
+  return !isMyProfile.value
+})
+
+const showAddFriendButton = computed(() => {
+  return showProfileActions.value && friendshipStatus.value === 'none'
 })
 
 // 프로필 이미지 URL 정규화
@@ -398,6 +434,47 @@ const refreshUserArticles = async () => {
   }
 }
 
+const sendFriendRequest = async () => {
+  if (!userProfile.value?.userIdentifier || !userProfile.value?.userId) return
+  if (isSendingFriendRequest.value) return
+
+  isSendingFriendRequest.value = true
+  try {
+    const response = await api.sendFriendRequest(userProfile.value.userIdentifier)
+    if (response.data.code === 'FRIENDSHIP_REQUEST_CREATE_SUCCESS') {
+      // 로컬 상태 업데이트: sentRequests 배열에 새로운 요청 추가
+      const { addLocalSentRequest } = useFriendship()
+      addLocalSentRequest(userProfile.value.userId, userProfile.value.userIdentifier)
+      alert('친구 요청을 보냈습니다.')
+    } else {
+      alert('친구 요청에 실패했습니다.')
+    }
+  } catch (err) {
+    console.error('[UserProfile] Failed to send friend request:', err)
+    alert('친구 요청에 실패했습니다.')
+  } finally {
+    isSendingFriendRequest.value = false
+  }
+}
+
+const openChatWithUser = async () => {
+  if (!userProfile.value?.userId || !userProfile.value?.userIdentifier) return
+  if (isOpeningChat.value) return
+
+  isOpeningChat.value = true
+  try {
+    router.push({
+      path: '/chat',
+      query: {
+        partnerIdentifier: userProfile.value.userIdentifier,
+        partnerUserId: userProfile.value.userId
+      }
+    })
+  } finally {
+    isOpeningChat.value = false
+  }
+}
+
 // 컴포넌트 마운트 시 실행
 onMounted(async () => {
   const identifier = route.params.id
@@ -411,6 +488,9 @@ onMounted(async () => {
   
   // 현재 로그인한 사용자 정보 조회
   await fetchCurrentUserInfo()
+
+  // 친구 관련 데이터 로드 (항상 최신 상태를 유지하기 위해 강제 새로고침)
+  await loadAllFriendshipData(true)
   
   // 좋아요 목록 조회
   await fetchLikedArticles()
@@ -481,6 +561,51 @@ onMounted(async () => {
 .friend-info {
   font-size: 1em;
   color: #333;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 600;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.action-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.action-btn.add-friend {
+  background-color: #1e88e5;
+  border-color: #1e88e5;
+  color: #fff;
+}
+
+.action-btn.add-friend:hover:not(:disabled) {
+  background-color: #1976d2;
+  border-color: #1976d2;
+}
+
+.action-btn.send-message {
+  background-color: #6b6bff;
+  border-color: #6b6bff;
+  color: #fff;
+}
+
+.action-btn.send-message:hover:not(:disabled) {
+  background-color: #5555ff;
+  border-color: #5555ff;
 }
 
 /* 친구 관계 상태 */

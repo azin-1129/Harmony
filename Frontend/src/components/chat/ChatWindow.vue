@@ -98,13 +98,14 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick, onMounted } from 'vue'
+import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import api from '@/services/api'
 import { useCurrentUser } from '@/composables/useCurrentUser'
+import stompService from '@/services/stompService'
 
 const props = defineProps({
   selectedRoom: Object,
-  stompClient: null
+  stompConnected: Boolean
 })
 
 const emit = defineEmits(['message-sent', 'room-left'])
@@ -118,6 +119,7 @@ const hasNext = ref(false)
 const lastContentId = ref(null)
 const messagesContainer = ref(null)
 const isInitialLoad = ref(true)
+const subscriptionRef = ref(null)
 
 const myId = computed(() => currentUser.value.userId)
 
@@ -158,20 +160,69 @@ const roomTitle = computed(() => {
   return names
 })
 
-// 채팅방 변경 시 메시지 로드
-watch(() => props.selectedRoom, async (newRoom, oldRoom) => {
-  if (newRoom && newRoom !== oldRoom) {
+onMounted(async () => {
+  await loadCurrentUser()
+  // ChatWindow 마운트 되면서 selectedRoom이 있으면 메시지 로드
+  if (props.selectedRoom?.chatRoomId) {
+    console.log('[ChatWindow] onMounted: loading messages for room:', props.selectedRoom.chatRoomId)
     await loadMessages(true)
+    await subscribeToRoom(props.selectedRoom.chatRoomId)
   }
 })
 
-onMounted(async () => {
-  await loadCurrentUser()
-  // 이미 선택된 채팅방이 있으면 메시지 로드
-  if (props.selectedRoom) {
-    await loadMessages(true)
-  }
+onBeforeUnmount(() => {
+  unsubscribeFromRoom()
 })
+
+// 채팅방 변경 시 메시지 로드
+watch(
+  () => props.selectedRoom?.chatRoomId,
+  async (newRoomId, oldRoomId) => {
+    // 방이 변경될 때만 로드 (초기값은 onMounted에서 처리)
+    if (newRoomId && newRoomId !== oldRoomId) {
+      console.log('[ChatWindow] Room changed:', oldRoomId, '->', newRoomId, '- loading messages')
+      await loadMessages(true)
+      await subscribeToRoom(newRoomId)
+    }
+  }
+)
+
+watch(
+  () => props.stompConnected,
+  async (connected) => {
+    if (connected && props.selectedRoom?.chatRoomId) {
+      await subscribeToRoom(props.selectedRoom.chatRoomId)
+    }
+  }
+)
+
+const unsubscribeFromRoom = () => {
+  if (subscriptionRef.value) {
+    subscriptionRef.value.unsubscribe()
+    subscriptionRef.value = null
+  }
+}
+
+const subscribeToRoom = async (roomId) => {
+  if (!roomId) return
+  if (!stompService.isConnected()) return
+
+  unsubscribeFromRoom()
+
+  const headers = {}
+  const destination = `/sub/${roomId}`
+
+  subscriptionRef.value = stompService.subscribe(destination, async (body) => {
+    if (!body) return
+    const normalized = {
+      ...body,
+      createdAt: body.createdAt || new Date().toISOString()
+    }
+    messages.value.push(normalized)
+    await nextTick()
+    scrollToBottom()
+  }, headers)
+}
 
 const loadMessages = async (isInitial = false) => {
   if (!props.selectedRoom) return
@@ -250,25 +301,22 @@ const leaveChatRoom = async () => {
 
 const sendMessage = () => {
   if (!newMessage.value.trim() || isUserLeft.value) return
-  
-  // TODO: 실제로는 STOMP를 통해 전송해야 함
-  // 여기서는 임시로 메시지만 추가
-  const msg = {
-    chatMessageId: Date.now(),
-    chatMessageType: 'SEND',
-    senderId: myId.value,
-    chatMessage: newMessage.value,
-    createdAt: new Date().toISOString()
+
+  if (!props.selectedRoom?.chatRoomId) return
+  if (!stompService.isConnected()) {
+    alert('채팅 서버에 연결되지 않았습니다. 잠시 후 다시 시도해 주세요.')
+    return
   }
-  
-  messages.value.push(msg)
+
+  const destination = `/pub/${props.selectedRoom.chatRoomId}`
+  const payload = {
+    chatMessageType: 'SEND',
+    chatMessage: newMessage.value.trim()
+  }
+
+  stompService.send(destination, payload)
+  emit('message-sent', payload)
   newMessage.value = ''
-  
-  nextTick(() => {
-    scrollToBottom()
-  })
-  
-  emit('message-sent', msg)
 }
 
 const formatTime = (timestamp) => {
@@ -392,10 +440,16 @@ const getAvatarStyle = (index, total) => {
   display: flex;
   align-items: flex-end;
   gap: 6px;
+  width: 100%;
 }
 
 .my-msg {
   justify-content: flex-end;
+}
+
+.my-msg .bubble-time-wrapper {
+  justify-content: flex-end;
+  width: 100%;
 }
 
 .friend-msg {
@@ -413,6 +467,10 @@ const getAvatarStyle = (index, total) => {
   padding: 8px 12px;
   border-radius: 12px;
   background: #eee;
+}
+
+.my-msg .message-time {
+  margin-right: 6px;
 }
 
 .my-msg .message-bubble {
