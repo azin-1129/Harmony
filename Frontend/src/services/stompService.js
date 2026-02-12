@@ -8,7 +8,7 @@ let connected = false
 
 
 const stompService = {
-connect({ url, onConnect, onStompError, useSockJS = true }) {
+connect({ url, onConnect, onStompError, useSockJS = true, connectHeaders = {} }) {
 if (client) {
 console.warn('STOMP client already exists')
 return
@@ -22,7 +22,7 @@ client = new Client({
 // If using SockJS set brokerURL to undefined and provide webSocketFactory
 brokerURL: useSockJS ? undefined : brokerURL,
 webSocketFactory: useSockJS ? () => new SockJS(brokerURL) : undefined,
-connectHeaders: {},
+connectHeaders,
 debug: function (str) {
 // console.log(str)
 },

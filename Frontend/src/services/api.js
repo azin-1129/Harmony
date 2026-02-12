@@ -69,6 +69,14 @@ cancelFriendRequest(receiverIdentifier) {
 rejectFriendRequest(senderIdentifier) { 
   return api.post('/friendship-request/reject', { senderIdentifier }) 
 },
+sendFriendRequest(receiverIdentifier) {
+  return api.post('/friendship-request/send', { receiverIdentifier })
+},
+
+// Personal Chatroom
+createPersonalChatRoom(partnerIdentifier) {
+  return api.post('/participate/init/personal', { partnerIdentifier })
+},
 
 // User Settings (사용자 설정)
 updatePassword(payload) {

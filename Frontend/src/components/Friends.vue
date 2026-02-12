@@ -170,11 +170,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import api from '@/services/api'
+import { useFriendship } from '@/composables/useFriendship'
 
 const router = useRouter()
+const route = useRoute()
+
+// 전역 친구 상태 관리
+const { removeSentRequest } = useFriendship()
 
 // 탭 상태
 const activeMainTab = ref('friends')
@@ -320,9 +325,17 @@ const cancelRequest = async (receiverIdentifier) => {
     const response = await api.cancelFriendRequest(receiverIdentifier)
     if (response.data.code === 'FRIENDSHIP_REQUEST_CANCEL_SUCCESS') {
       alert('친구 요청을 취소했습니다.')
+      // 로컬 상태 업데이트
+      const canceledRequest = sentRequests.value.find(
+        r => r.friendshipRequestReceiverIdentifier === receiverIdentifier
+      )
       sentRequests.value = sentRequests.value.filter(
         r => r.friendshipRequestReceiverIdentifier !== receiverIdentifier
       )
+      // 전역 친구 상태 업데이트
+      if (canceledRequest) {
+        removeSentRequest(canceledRequest.friendshipRequestReceiverId, receiverIdentifier)
+      }
     }
   } catch (error) {
     console.error('친구 요청 취소 실패:', error)
@@ -368,6 +381,16 @@ onMounted(() => {
   loadFriends()
   loadSentRequests()
   loadReceivedRequests()
+})
+
+// 친구 탭 재진입 시 데이터 새로고침
+watch(() => route.path, (newPath, oldPath) => {
+  if (newPath === '/friends' && oldPath && oldPath !== '/friends') {
+    console.log('[Friends] Tab re-entered, refreshing data')
+    loadFriends()
+    loadSentRequests()
+    loadReceivedRequests()
+  }
 })
 </script>
 

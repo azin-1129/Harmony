@@ -105,13 +105,50 @@ export function useFriendship() {
     await loadAllFriendshipData(true)
   }
 
+  // 보낸 요청만 새로고침
+  const refreshSentRequests = async () => {
+    await loadSentRequests()
+  }
+
+  // 새로운 보낸 친구 요청을 로컬 상태에 추가
+  const addLocalSentRequest = (receiverId, receiverIdentifier) => {
+    const newRequest = {
+      friendshipRequestReceiverId: receiverId,
+      friendshipRequestReceiverIdentifier: receiverIdentifier
+    }
+    // 중복 확인
+    const alreadyExists = sentRequests.value.some(req =>
+      req.friendshipRequestReceiverId === receiverId ||
+      req.friendshipRequestReceiverIdentifier === receiverIdentifier
+    )
+    if (!alreadyExists) {
+      sentRequests.value.push(newRequest)
+    }
+    console.log('[useFriendship] 보낸 요청 추가:', newRequest)
+  }
+
+  // 보낸 친구 요청을 로컬 상태에서 제거
+  const removeSentRequest = (receiverId, receiverIdentifier) => {
+    const initialLength = sentRequests.value.length
+    sentRequests.value = sentRequests.value.filter(req =>
+      req.friendshipRequestReceiverId !== receiverId &&
+      req.friendshipRequestReceiverIdentifier !== receiverIdentifier
+    )
+    console.log('[useFriendship] 보낸 요청 제거:', receiverIdentifier, 
+      `(${initialLength} -> ${sentRequests.value.length})`)
+  }
+
   return {
     friends,
     sentRequests,
     receivedRequests,
     isLoaded,
     loadAllFriendshipData,
+    loadSentRequests,
     getFriendshipStatus,
-    refreshFriendshipData
+    refreshFriendshipData,
+    refreshSentRequests,
+    addLocalSentRequest,
+    removeSentRequest
   }
 }
