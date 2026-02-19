@@ -45,22 +45,26 @@
         메시지가 없습니다. 첫 메시지를 보내보세요!
       </div>
 
-      <div
-        v-for="msg in messages"
-        :key="msg.chatMessageId"
-        :class="['message-wrapper', msg.senderId === myId ? 'my-msg' : 'friend-msg']"
-      >
+      <template v-for="item in messagesWithDateHeaders" :key="item.key">
+        <div v-if="item.type === 'date'" class="date-separator">
+          <span>{{ item.label }}</span>
+        </div>
+
+        <div
+          v-else
+          :class="['message-wrapper', item.message.senderId === myId ? 'my-msg' : 'friend-msg']"
+        >
         <!-- 친구 프로필 사진 -->
-        <template v-if="msg.senderId !== myId">
+        <template v-if="item.message.senderId !== myId">
           <div
-            v-if="!getParticipantProfile(msg.senderId)"
+            v-if="!getParticipantProfile(item.message.senderId)"
             class="msg-avatar default-profile"
           >
             👤
           </div>
           <img
             v-else
-            :src="getParticipantProfile(msg.senderId)"
+            :src="getParticipantProfile(item.message.senderId)"
             alt="프로필"
             class="msg-avatar"
           />
@@ -68,22 +72,23 @@
 
         <!-- 말풍선 + 시간 wrapper -->
         <div class="bubble-time-wrapper">
-          <template v-if="msg.senderId === myId">
+          <template v-if="item.message.senderId === myId">
             <!-- 내 메시지: 시간 왼쪽, 버블 오른쪽 -->
-            <span class="message-time">{{ formatTime(msg.createdAt) }}</span>
+            <span class="message-time">{{ formatTime(item.message.createdAt) }}</span>
             <div class="message-bubble">
-              <span class="message-text">{{ msg.chatMessage }}</span>
+              <span class="message-text">{{ item.message.chatMessage }}</span>
             </div>
           </template>
           <template v-else>
             <!-- 친구 메시지: 버블 왼쪽, 시간 오른쪽 -->
             <div class="message-bubble">
-              <span class="message-text">{{ msg.chatMessage }}</span>
+              <span class="message-text">{{ item.message.chatMessage }}</span>
             </div>
-            <span class="message-time">{{ formatTime(msg.createdAt) }}</span>
+            <span class="message-time">{{ formatTime(item.message.createdAt) }}</span>
           </template>
         </div>
       </div>
+      </template>
     </div>
 
     <form @submit.prevent="sendMessage" class="chat-input">
@@ -122,6 +127,49 @@ const isInitialLoad = ref(true)
 const subscriptionRef = ref(null)
 
 const myId = computed(() => currentUser.value.userId)
+
+const getDateKey = (timestamp) => {
+  if (!timestamp) return ''
+  const date = new Date(timestamp)
+  if (Number.isNaN(date.getTime())) return ''
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+const formatDateLabel = (timestamp) => {
+  if (!timestamp) return ''
+  const date = new Date(timestamp)
+  if (Number.isNaN(date.getTime())) return ''
+  return `${date.getMonth() + 1}월 ${date.getDate()}일`
+}
+
+const messagesWithDateHeaders = computed(() => {
+  const result = []
+  let previousDateKey = ''
+
+  for (const message of messages.value) {
+    const currentDateKey = getDateKey(message.createdAt)
+
+    if (currentDateKey && currentDateKey !== previousDateKey) {
+      result.push({
+        type: 'date',
+        key: `date-${currentDateKey}`,
+        label: formatDateLabel(message.createdAt)
+      })
+      previousDateKey = currentDateKey
+    }
+
+    result.push({
+      type: 'message',
+      key: `msg-${message.chatMessageId}-${message.createdAt || ''}`,
+      message
+    })
+  }
+
+  return result
+})
 
 const displayParticipants = computed(() => {
   if (!props.selectedRoom) return []
@@ -434,6 +482,20 @@ const getAvatarStyle = (index, total) => {
   text-align: center;
   padding: 40px 20px;
   color: #888;
+}
+
+.date-separator {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0 6px;
+}
+
+.date-separator span {
+  font-size: 12px;
+  color: #777;
+  background: #f3f3f3;
+  padding: 4px 10px;
+  border-radius: 999px;
 }
 
 .message-wrapper {
