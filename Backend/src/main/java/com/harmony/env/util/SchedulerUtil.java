@@ -13,6 +13,7 @@ import com.harmony.entity.ParticipantId;
 import com.harmony.entity.User;
 import com.harmony.repository.ArticleRepository;
 import com.harmony.repository.BlockRepository;
+import com.harmony.repository.ChatMessageRepository;
 import com.harmony.repository.ChatRoomRepository;
 import com.harmony.repository.CommentRepository;
 import com.harmony.repository.FriendshipRepository;
@@ -44,6 +45,7 @@ public class SchedulerUtil {
   private final HeartRepository heartRepository;
   private final CommentRepository commentRepository;
   private final AwsS3Service awsS3Service;
+  private final ChatMessageRepository chatMessageRepository;
 
   public void deleteWithdrawnUsersDataWithoutChatInfo(){
     // 참여 정보 등은 채팅 데이터 삭제 스케줄에서 처리
@@ -187,14 +189,14 @@ public class SchedulerUtil {
     for(ChatRoom chatRoom: chatRooms){
       chatRoomIds.add(chatRoom.getChatRoomId());
     }
-
+    log.info("제거할 채팅방 목록:"+chatRoomIds);
     // 탈퇴자들 정보
     List<User> withdrawnUsers=userRepository.findByWithdraw(true);
     List<Long> withdrawnUserIds=new ArrayList<>();
     for(User user: withdrawnUsers){
       withdrawnUserIds.add(user.getUserId());
     }
-
+    log.info("탈퇴자 목록:"+withdrawnUserIds);
     // 탈퇴자들의 id가 포함되고+참여자 수가 0인 채팅방들의 id가 포함되는 참여자 정보 조회
     List<Participant> softDeletedParticipants=participantRepository.findSoftDeletedParticipants(withdrawnUserIds, chatRoomIds);
     log.info("soft delete된 participant read 완료");
@@ -204,14 +206,11 @@ public class SchedulerUtil {
       log.info("participants id 정보 추가중 ...");
     }
 
-    // 참여자 정보 먼저 delete
+    chatMessageRepository.deleteChatMessagesBulk(chatRoomIds);
+    log.info(chatRoomIds+"방의 메시지들을 제거했어요.");
     participantRepository.deleteSoftDeletedParticipantsBulk(softDeletedParticipantIds);
-    log.info("soft delete된 participant 정보를 제거했습니다.");
-
+    log.info(softDeletedParticipantIds+"참가 정보 제거");
     chatRoomRepository.deleteChatRoomsBulk(chatRoomIds);
-    log.info("참가자 수가 0인 채팅방 데이터를 제거했습니다.");
-
     userRepository.deleteWithdrawnUserBulk(withdrawnUserIds);
-    log.info("탈퇴자의 데이터를 완전 제거했습니다.");
   }
 }

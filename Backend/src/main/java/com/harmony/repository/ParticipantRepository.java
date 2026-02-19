@@ -41,7 +41,7 @@ public interface ParticipantRepository extends JpaRepository<Participant, Partic
       "SELECT p.participantId.chatroomId FROM Participant p WHERE p.participantId.userId = :userId AND p.isExited=false)")
   List<ChatRoom> findChatRoomsByUserId(@Param("userId") Long userId);
 
-  @Query("SELECT p FROM Participant p WHERE p.participantId.userId IN :userIds AND p.participantId.chatroomId IN :chatRoomIds")
+  @Query("SELECT p FROM Participant p WHERE p.participantId.userId IN :userIds OR p.participantId.chatroomId IN :chatRoomIds")
   List<Participant> findSoftDeletedParticipants(@Param("userIds") List<Long> userIds, @Param("chatRoomIds") List<Long> chatRoomIds);
 
   @Transactional
@@ -50,7 +50,7 @@ public interface ParticipantRepository extends JpaRepository<Participant, Partic
   void updateIsExitedBulk(@Param("ids") List<ParticipantId> ids);
 
   @Transactional
-  @Modifying(clearAutomatically=true)
+  @Modifying(clearAutomatically=false)
   @Query("DELETE FROM Participant p WHERE p.participantId in :ids")
   void deleteSoftDeletedParticipantsBulk(@Param("ids") List<ParticipantId> ids);
 }
