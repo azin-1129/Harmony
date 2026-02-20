@@ -1,6 +1,7 @@
 package com.harmony.repository;
 
 import com.harmony.entity.Article;
+import com.harmony.repository.querydsl.DslArticleRepository;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,7 +13,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ArticleRepository extends JpaRepository<Article, Long> {
+public interface ArticleRepository extends JpaRepository<Article, Long>,
+    DslArticleRepository {
   @Query("SELECT a FROM Article a WHERE a.author.userId IN (" +
       "SELECT f.friend.userId FROM Friendship f WHERE f.user.userId = :userId AND f.friend.withdraw=false)"
       + "ORDER BY a.createdAt DESC")

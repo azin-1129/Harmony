@@ -4,6 +4,7 @@ import com.harmony.dto.form.ArticleForm;
 import com.harmony.dto.request.WriteArticleRequestDto;
 import com.harmony.dto.response.SelectFollowingUserArticlesResponseDto;
 import com.harmony.dto.response.SelectAuthorArticlesResponseDto;
+import com.harmony.dto.response.SlicedResponseDto;
 import com.harmony.entity.Article;
 import com.harmony.entity.ArticleMediaType;
 import com.harmony.entity.User;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -52,30 +54,8 @@ public class ArticleService {
   // 게시물 조회
 
   // 조회 1. 팔로잉 피드 최신순 정렬
-  public List<SelectFollowingUserArticlesResponseDto> selectFollowingUserArticles(Long givenUserId){
-    List<Article> articles=articleRepository.findArticlesByFriendsOfUserOrderByCreatedAtDesc(givenUserId);
-
-    List<SelectFollowingUserArticlesResponseDto> selectFollowingUserArticlesResponseDtos=new ArrayList<>();
-
-    for(Article article:articles){
-      String articleImageUrl=awsS3Service.getArticleImageUrl(article.getArticleMediaName());
-      String authorProfileImageName=article.getAuthor().getProfileImageName();
-      SelectFollowingUserArticlesResponseDto selectFollowingUserArticlesResponseDto=SelectFollowingUserArticlesResponseDto.builder()
-          .articleId(article.getArticleId())
-          .authorIdentifier(article.getAuthor().getUserIdentifier())
-          .authorProfileImageUrl(authorProfileImageName==null?null:awsS3Service.getAuthorProfileImageUrl(authorProfileImageName))
-          .articleMediaUrl(articleImageUrl)
-          .articleText(article.getArticleText())
-          .articleCommentCount(article.getArticleCommentCount())
-          .articleLikeCount(article.getArticleLikeCount())
-          .articleThumbnailUrl(articleImageUrl) // TODO: 썸네일 생성
-          .createdAt(article.getCreatedAt())
-          .build();
-
-      selectFollowingUserArticlesResponseDtos.add(selectFollowingUserArticlesResponseDto);
-    }
-
-    return selectFollowingUserArticlesResponseDtos;
+  public SlicedResponseDto<SelectFollowingUserArticlesResponseDto> selectFollowingUserArticles(Long userId, Long articleId, Pageable pageable){
+     return articleRepository.findArticleSliceByFriendsOfUserOrderByCreatedAtDesc(userId, articleId, pageable);
   }
 
   // 조회 2. 특정 유저가 작성한 피드 최신순 정렬
