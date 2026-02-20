@@ -88,6 +88,7 @@ public class ArticleController {
   // TODO: 게시물 조회(비디오)
 
   // TODO: 수정 or 삭제 시, 작성자 id와 일치하지 않으면 반려
+  // TODO: 게시물 이미지, 텍스트 한 번에 수정하는 게 낫나??
   // 게시물 수정
   @PostMapping("/update/media/{articleId}")
   @Operation(summary="게시물 수정", description = "게시물 수정 API")
@@ -102,6 +103,7 @@ public class ArticleController {
         SuccessCode.ARTICLE_UPDATE_SUCCESS
     );
   }
+
   // 게시물 수정
   @PostMapping("/update/text/{articleId}")
   @Operation(summary="게시물 수정", description = "게시물 수정 API")
