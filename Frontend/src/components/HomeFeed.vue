@@ -13,24 +13,31 @@
         @add-friend="handleAddFriend"
       />
       <div v-if="feeds.length === 0">팔로잉한 사용자의 게시물이 없습니다.</div>
+      <div v-if="loadingMore" class="loading-more">피드를 불러오는 중...</div>
+      <div ref="loadMoreTrigger" class="load-more-trigger" aria-hidden="true"></div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import FeedItem from './FeedItem.vue'
 import { apiFetch } from '@/utils/apiClient'
-import { getAccessToken } from '@/utils/tokenService'
 import { useFriendship } from '@/composables/useFriendship'
 import { useCurrentUser } from '@/composables/useCurrentUser'
 
 const feeds = ref([])
 const loading = ref(false)
+const loadingMore = ref(false)
 const friendList = ref([])
 const currentUserIdentifier = ref('')
 const currentUserInfo = ref({})
 const likedArticleIds = ref([])
+const hasNext = ref(false)
+const lastContentId = ref(null)
+const loadMoreTrigger = ref(null)
+const FOLLOWING_PAGE_SIZE = 5
+let observer = null
 
 // 전역 상태 관리
 const { loadAllFriendshipData } = useFriendship()
@@ -61,6 +68,87 @@ const mapArticleToFeed = (item, idx) => {
     commentCount: item.articleCommentCount || 0,
     raw: item
   }
+}
+
+const parseFollowingResponse = (body) => {
+  const payload = body?.data || {}
+  const rawContent = Array.isArray(payload.content) ? payload.content : []
+  const content = rawContent.slice(0, FOLLOWING_PAGE_SIZE)
+  const nextCursor = payload.lastContentId ?? null
+  const nextExists = payload.hasNext === true
+
+  return { content, nextCursor, nextExists }
+}
+
+const mergeUniqueFeeds = (existingFeeds, incomingArticles) => {
+  const existingIds = new Set(existingFeeds.map((feed) => feed.id))
+  const uniqueArticles = incomingArticles.filter((article) => {
+    const articleId = article.articleId || article.id
+    if (articleId == null) return true
+    return !existingIds.has(articleId)
+  })
+
+  const startIndex = existingFeeds.length
+  const mapped = uniqueArticles.map((it, i) => mapArticleToFeed(it, startIndex + i))
+  return [...existingFeeds, ...mapped]
+}
+
+const fetchFollowingArticles = async ({ articleId } = {}) => {
+  const query = articleId != null ? `?articleId=${encodeURIComponent(articleId)}` : ''
+  const res = await apiFetch(`/article/following${query}`, { method: 'GET' })
+  if (!res || !res.ok) {
+    console.error('Failed to load following articles', res?.status)
+    return null
+  }
+
+  const body = await res.json()
+  return parseFollowingResponse(body)
+}
+
+const loadInitialFeed = async () => {
+  const result = await fetchFollowingArticles()
+  if (!result) return
+
+  feeds.value = result.content.map((it, i) => mapArticleToFeed(it, i))
+  lastContentId.value = result.nextCursor
+  hasNext.value = result.nextExists
+}
+
+const loadMoreFeed = async () => {
+  if (loading.value || loadingMore.value) return
+  if (!hasNext.value) return
+  if (lastContentId.value == null) return
+
+  loadingMore.value = true
+  try {
+    const result = await fetchFollowingArticles({ articleId: lastContentId.value })
+    if (!result) return
+
+    feeds.value = mergeUniqueFeeds(feeds.value, result.content)
+    lastContentId.value = result.nextCursor
+    hasNext.value = result.nextExists
+  } catch (err) {
+    console.error('Error fetching more feed', err)
+  } finally {
+    loadingMore.value = false
+  }
+}
+
+const setupInfiniteScroll = async () => {
+  await nextTick()
+  if (!loadMoreTrigger.value) return
+
+  observer = new IntersectionObserver(
+    (entries) => {
+      const [entry] = entries
+      if (entry?.isIntersecting) {
+        loadMoreFeed()
+      }
+    },
+    { root: null, rootMargin: '200px 0px', threshold: 0 }
+  )
+
+  observer.observe(loadMoreTrigger.value)
 }
 
 // 현재 사용자 정보 조회 (전역 상태 사용)
@@ -142,21 +230,21 @@ onMounted(async () => {
     
     // 전역 친구 관계 데이터 로드 (친구 목록, 보낸/받은 요청)
     await loadAllFriendshipData()
-    
-    // 피드 로드
-    const res = await apiFetch('/article/following', { method: 'GET' })
-    if (!res) return
-    if (!res.ok) {
-      console.error('Failed to load following articles', res.status)
-      return
-    }
-    const body = await res.json()
-    const list = Array.isArray(body.data) ? body.data : []
-    feeds.value = list.map((it, i) => mapArticleToFeed(it, i))
+
+    await loadInitialFeed()
   } catch (err) {
     console.error('Error fetching feed', err)
   } finally {
     loading.value = false
+  }
+
+  await setupInfiniteScroll()
+})
+
+onUnmounted(() => {
+  if (observer) {
+    observer.disconnect()
+    observer = null
   }
 })
 
@@ -165,5 +253,15 @@ onMounted(async () => {
 <style scoped>
 .page {
   padding: 20px;
+}
+
+.loading-more {
+  text-align: center;
+  color: #666;
+  margin: 12px 0;
+}
+
+.load-more-trigger {
+  height: 1px;
 }
 </style>

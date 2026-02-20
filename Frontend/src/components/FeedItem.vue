@@ -44,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import CommentSection from './CommentSection.vue'
 import { apiFetch } from '@/utils/apiClient'
 
@@ -112,28 +112,6 @@ const onAddFriend = () => {
   console.log('친구 추가 요청:', receiverIdentifier)
   emit('add-friend', receiverIdentifier)
 }
-
-// 댓글 개수 조회 (초기 로드)
-const fetchCommentCount = async () => {
-  try {
-    const res = await apiFetch(`/comment/${props.feed.id}`, { method: 'GET' })
-    if (!res || !res.ok) {
-      console.error('Failed to load comment count', res?.status)
-      return
-    }
-    const body = await res.json()
-    const count = Array.isArray(body.data) ? body.data.length : 0
-    props.feed.commentCount = count
-    console.log('Comment count loaded:', count)
-  } catch (err) {
-    console.error('Error fetching comment count', err)
-  }
-}
-
-// 마운트 시 댓글 개수 조회
-onMounted(() => {
-  fetchCommentCount()
-})
 </script>
 
 <style scoped>
