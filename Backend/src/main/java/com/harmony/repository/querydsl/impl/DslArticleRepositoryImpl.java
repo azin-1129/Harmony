@@ -5,6 +5,7 @@ import com.harmony.dto.response.SlicedResponseDto;
 import com.harmony.entity.Article;
 import static com.harmony.entity.QArticle.article;
 import static com.harmony.entity.QFriendship.friendship;
+import static com.harmony.entity.QUser.user;
 
 import com.harmony.repository.querydsl.DslArticleRepository;
 import com.harmony.service.AwsS3Service;
@@ -24,7 +25,9 @@ public class DslArticleRepositoryImpl implements DslArticleRepository {
   @Override
   public SlicedResponseDto<SelectFollowingUserArticlesResponseDto> findArticleSliceByFriendsOfUserOrderByCreatedAtDesc(Long userId, Long articleId, Pageable pageable){
     List<Article> articles=qf
-        .selectFrom(article)
+        .selectDistinct(article)
+        .from(article)
+        .join(article.author, user).fetchJoin()
         .where(
             article.author.userId.in(
               JPAExpressions
