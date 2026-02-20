@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,20 +54,23 @@ public class ArticleController {
   // TODO: 게시물 작성(비디오)
 
   // 게시물 조회
-  // TODO: 날짜 필드 추가
+  // TODO: 5개씩 슬라이스
   // 조회 1. 팔로잉 피드 최신순 정렬
   @GetMapping("/following")
   @Operation(summary="팔로잉 피드 최신순 정렬", description = "팔로잉 피드 최신순 정렬 API")
   @ApiResponses(value = {
       @ApiResponse(responseCode="200", description = "팔로잉 피드 최신순 정렬에 성공했습니다.")
   })
-  public ResponseEntity<Object> selectFollowingUserArticles(@CurrentUserId Long userId){
+  public ResponseEntity<Object> selectFollowingUserArticles(@CurrentUserId Long userId,
+  @RequestParam(required=false) Long articleId,
+      @PageableDefault(size=5) Pageable pageable){
     return SuccessResponse.createSuccess(
         SuccessCode.FOLLOWING_USER_ARTICLES_READ_SUCCESS,
-        articleService.selectFollowingUserArticles(userId)
+        articleService.selectFollowingUserArticles(userId, articleId, pageable)
     );
   }
 
+  // TODO: 9개씩 슬라이스
   // 조회 2. 특정 유저가 작성한 피드 최신순 정렬
   @GetMapping("/{userId}")
   @Operation(summary="특정 유저가 작성한 피드 최신순 정렬", description = "특정 유저가 작성한 피드 최신순 정렬 API")
