@@ -198,6 +198,7 @@ public class ParticipantService {
           .chatRoomCount(chatRoom.getChatRoomCount())
           .chatRoomCountMax(chatRoom.getChatRoomCountMax())
           .chatRoomType(chatRoom.getChatRoomType())
+          .lastChatMessageId(chatRoom.getLastChatMessageId())
           .chatRoomParticipants(selectSomeChatRoomParticipants(chatRoomId))
           .build();
 
