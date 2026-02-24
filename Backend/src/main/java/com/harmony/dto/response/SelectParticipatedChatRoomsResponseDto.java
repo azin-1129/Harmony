@@ -20,5 +20,6 @@ public class SelectParticipatedChatRoomsResponseDto {
   private Integer chatRoomCount;
   private Integer chatRoomCountMax;
   private ChatRoomType chatRoomType;
+  private Long lastChatMessageId;
   private List<SelectChatRoomParticipantsResponseDto> chatRoomParticipants;
 }

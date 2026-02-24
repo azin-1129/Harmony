@@ -43,6 +43,9 @@ public class ChatRoom extends BaseTime {
   @Column(name="chatroom_type", nullable = false)
   private ChatRoomType chatRoomType;
 
+  @Column(name="last_chatMessage_id", nullable=true)
+  private Long lastChatMessageId;
+
   // update
   public void updateChatRoomName(String newChatRoomName) {
     this.chatRoomName = newChatRoomName;
@@ -54,5 +57,9 @@ public class ChatRoom extends BaseTime {
 
   public void updateChatRoomCountNegative() {
     this.chatRoomCount-=1;
+  }
+
+  public void updateLastChatMessageId(Long newLastChatMessageId) {
+    this.lastChatMessageId = newLastChatMessageId;
   }
 }
