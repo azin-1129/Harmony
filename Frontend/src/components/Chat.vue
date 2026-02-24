@@ -54,8 +54,6 @@ const selectRoomById = (roomId) => {
   if (!roomId) return
   const targetId = Number(roomId)
   if (!targetId) return
-  // 다른 방으로 변경될 때만 설정
-  if (selectedRoom.value?.chatRoomId === targetId) return
   const room = chatRooms.value.find(r => r.chatRoomId === targetId)
   if (room) {
     console.log('[Chat] selectRoomById:', targetId)
@@ -92,7 +90,7 @@ onMounted(async () => {
       console.error('[Chat] STOMP error:', frame)
     }
   })
-  await loadChatRooms()
+  await loadChatRooms(true)
   selectRoomById(route.query.roomId)
   await handleDirectChatEntry()
 })
@@ -129,7 +127,7 @@ const handleDirectChatEntry = async () => {
 
   isDirectChatLoading.value = true
   try {
-    await loadChatRooms()
+    await loadChatRooms(true)
 
     let room = null
     if (partnerUserId) {

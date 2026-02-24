@@ -224,11 +224,15 @@ onBeforeUnmount(() => {
 
 // 채팅방 변경 시 메시지 로드
 watch(
-  () => props.selectedRoom?.chatRoomId,
-  async (newRoomId, oldRoomId) => {
-    // 방이 변경될 때만 로드 (초기값은 onMounted에서 처리)
-    if (newRoomId && newRoomId !== oldRoomId) {
-      console.log('[ChatWindow] Room changed:', oldRoomId, '->', newRoomId, '- loading messages')
+  () => {
+    if (!props.selectedRoom) return null
+    return `${props.selectedRoom.chatRoomId}-${props.selectedRoom.lastChatMessageId ?? 'null'}`
+  },
+  async (newRoomKey, oldRoomKey) => {
+    if (newRoomKey && newRoomKey !== oldRoomKey) {
+      const newRoomId = props.selectedRoom?.chatRoomId
+      if (!newRoomId) return
+      console.log('[ChatWindow] Room changed:', oldRoomKey, '->', newRoomKey, '- loading messages')
       await loadMessages(true)
       await subscribeToRoom(newRoomId)
     }
@@ -281,14 +285,25 @@ const loadMessages = async (isInitial = false) => {
     lastContentId.value = null
     hasNext.value = false
     isInitialLoad.value = true
+
+    const initialChatMessageId = props.selectedRoom.lastChatMessageId
+    if (initialChatMessageId == null) {
+      isInitialLoad.value = false
+      loading.value = false
+      return
+    }
   } else {
     loadingMore.value = true
   }
 
   try {
+    const chatMessageId = isInitial
+      ? props.selectedRoom.lastChatMessageId
+      : lastContentId.value
+
     const response = await api.getChatMessages(
       props.selectedRoom.chatRoomId,
-      lastContentId.value
+      chatMessageId
     )
     
     const data = response.data.data
