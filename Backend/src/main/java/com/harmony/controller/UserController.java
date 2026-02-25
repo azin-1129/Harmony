@@ -2,7 +2,6 @@ package com.harmony.controller;
 
 import com.harmony.dto.form.NicknameForm;
 import com.harmony.dto.form.PasswordForm;
-import com.harmony.dto.form.ProfileImageForm;
 import com.harmony.dto.request.RegisterRequestDto;
 import com.harmony.dto.request.SearchUserRequestDto;
 import com.harmony.global.annotation.CurrentUserId;
