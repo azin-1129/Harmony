@@ -5,6 +5,7 @@ import com.harmony.dto.request.SearchUserRequestDto;
 import com.harmony.dto.response.SearchUserResponseDto;
 import com.harmony.dto.response.SelectProfileResponseDto;
 import com.harmony.dto.response.SelectUserInfoResponseDto;
+import com.harmony.entity.Role;
 import com.harmony.entity.User;
 import com.harmony.exception.DuplicatedUserNicknameException;
 import com.harmony.exception.DuplicatedUserPasswordException;
@@ -37,7 +38,7 @@ public class UserService {
     log.info("user Service 진입");
     HashMap<String, String> validateResult=new HashMap<>();
 
-    // TODO: 이거 내용 따로 뺄 수 없나?
+    // TODO: 따로 확인 버튼으로 빼기
     if(!userRepository.findByEmail(registerRequestDto.getEmail()).isEmpty()) {
       validateResult.put("email", "이 이메일은 이미 등록되어 있습니다.");
     }
@@ -54,10 +55,10 @@ public class UserService {
           .email(registerRequestDto.getEmail())
           .userIdentifier(registerRequestDto.getUserIdentifier())
           .password(passwordEncoder.encode(registerRequestDto.getPassword()))
-          .profileImageName(null) // TODO: 기본 프사 넣어줘야 할 듯?
+          .profileImageName(null) //
           .nickname(registerRequestDto.getNickname())
           .withdraw(false)
-          .role(registerRequestDto.getRole())
+          .role(Role.ROLE_MEMBER)
           .build();
 
       userRepository.save(user);
