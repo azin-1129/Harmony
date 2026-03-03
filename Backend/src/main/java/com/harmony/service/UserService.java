@@ -7,6 +7,7 @@ import com.harmony.dto.response.SelectProfileResponseDto;
 import com.harmony.dto.response.SelectUserInfoResponseDto;
 import com.harmony.entity.Role;
 import com.harmony.entity.User;
+import com.harmony.exception.DuplicatedUserInfoException;
 import com.harmony.exception.DuplicatedUserNicknameException;
 import com.harmony.exception.DuplicatedUserPasswordException;
 import com.harmony.exception.UserAlreadyWithdrawException;
@@ -86,6 +87,30 @@ public class UserService {
     }
 
     return searchUserResponseDtos;
+  }
+
+  public void checkValidEmail(String email) {
+    if(userRepository.existsByEmail(email)){
+      throw new DuplicatedUserInfoException(
+          ErrorCode.USER_INVALID_EMAIL
+      );
+    }
+  }
+
+  public void checkValidUserIdentifier(String userIdentifier) {
+    if(userRepository.existsByUserIdentifier(userIdentifier)){
+      throw new DuplicatedUserInfoException(
+          ErrorCode.USER_INVALID_IDENTIFIER
+      );
+    }
+  }
+
+  public void checkValidNickname(String nickname) {
+    if(userRepository.existsByNickname(nickname)){
+      throw new DuplicatedUserInfoException(
+          ErrorCode.USER_INVALID_NICKNAME
+      );
+    }
   }
 
   public SelectUserInfoResponseDto findUserInfo(Long userId){
