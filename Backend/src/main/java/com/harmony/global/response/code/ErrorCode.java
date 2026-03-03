@@ -14,6 +14,9 @@ public enum ErrorCode implements ResponseCode {
   USER_ALREADY_REGISTERED(HttpStatus.BAD_REQUEST, "이미 가입한 회원입니다."),
 
   // READ
+  USER_INVALID_EMAIL(HttpStatus.BAD_REQUEST, "이미 사용중인 이메일입니다."),
+  USER_INVALID_IDENTIFIER(HttpStatus.BAD_REQUEST, "이미 사용중인 식별자입니다."),
+  USER_INVALID_NICKNAME(HttpStatus.BAD_REQUEST, "이미 사용중인 닉네임입니다."),
 
   // UPDATE
   DUPLICATED_USER_PASSWORD(HttpStatus.BAD_REQUEST, "이미 사용하고 있는 비밀번호입니다."),

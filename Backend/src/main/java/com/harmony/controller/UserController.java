@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -83,6 +84,33 @@ public class UserController {
 
     return SuccessResponse.createSuccess(
         SuccessCode.USER_REGISTER_SUCCESS
+    );
+  }
+
+  // 이메일 중복 검사
+  @GetMapping("/validate/email")
+  public ResponseEntity<Object> checkValidEmail(@RequestParam String email){
+    userService.checkValidEmail(email);
+    return SuccessResponse.createSuccess(
+        SuccessCode.USER_VALID_EMAIL
+    );
+  }
+
+  // 식별자 중복 검사
+  @GetMapping("/validate/userIdentifier")
+  public ResponseEntity<Object> checkValidIdentifier(@RequestParam String userIdentifier){
+    userService.checkValidUserIdentifier(userIdentifier);
+    return SuccessResponse.createSuccess(
+        SuccessCode.USER_VALID_IDENTIFIER
+    );
+  }
+
+  // 닉네임 중복 검사
+  @GetMapping("/validate/nickname")
+  public ResponseEntity<Object> checkValidNickname(@RequestParam String nickname){
+    userService.checkValidNickname(nickname);
+    return SuccessResponse.createSuccess(
+        SuccessCode.USER_VALID_NICKNAME
     );
   }
 
