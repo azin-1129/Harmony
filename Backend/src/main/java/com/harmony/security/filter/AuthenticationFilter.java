@@ -31,15 +31,14 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     log.info("request URL:"+request.getRequestURL());
     log.info("jwt token:"+jwt);
-    log.info("Authentication Filter");
-    if (StringUtils.isNotBlank(jwt)) {
+    if (StringUtils.isNotBlank(jwt)) { // Token Provider에 넣으면 permit 경로 통과 시 exception 남
       if (tokenUtils.isValidToken(jwt)) {
         Authentication authentication = tokenUtils.getAuthentication(jwt);
         SecurityContextHolder.getContext().setAuthentication(authentication);
         log.info("JWT 인증을 완료하여, SecurityContext에 정보를 등록했습니다.");
       }
     }else{
-      log.warn("JWT 인증이 정상적으로 수행되지 않았습니다.");
+      log.info("Token이 비어 인증을 진행하지 않습니다.");
     }
 
     filterChain.doFilter(request, response);
@@ -53,6 +52,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         return bearerToken.substring(7);
       }
     }
-    return null; // TODO: null 반환해도 되나?
+    return null;
   }
 }

@@ -2,7 +2,6 @@ package com.harmony.controller;
 
 import com.harmony.dto.form.NicknameForm;
 import com.harmony.dto.form.PasswordForm;
-import com.harmony.dto.form.ProfileImageForm;
 import com.harmony.dto.request.RegisterRequestDto;
 import com.harmony.dto.request.SearchUserRequestDto;
 import com.harmony.global.annotation.CurrentUserId;
@@ -51,7 +50,6 @@ public class UserController {
     );
   }
 
-  // TODO: userId 처리, Password 암호화
   @PostMapping("/register")
   @Operation(summary="회원가입", description="회원가입 API")
   @ApiResponses(value={
@@ -60,7 +58,6 @@ public class UserController {
   })
   public ResponseEntity<Object> registerUser(@RequestBody @Valid RegisterRequestDto registerRequestDto, BindingResult bindingResult){
     log.info("user Controller 진입");
-    // TODO: Role 설정 어떻게 하지?
 
     // 입력 형식이 올바르지 않다면 에러
     if(bindingResult.hasErrors()){

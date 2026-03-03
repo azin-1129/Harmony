@@ -17,7 +17,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -60,15 +59,16 @@ public class AuthService {
 
   // TODO: Refresh Token을 Redis에서 관리
   public ReissueResponseDto reissue(ReissueDto reissueDto){
+    String refreshTokenString=reissueDto.getRefreshToken();
     // Refresh Token 검증
-    if(!tokenProvider.isValidToken(reissueDto.getRefreshToken())){ // Refresh Token이 유효하지 않을 시, 재 로그인 필요
+    if(!tokenProvider.isValidToken(refreshTokenString)){ // Refresh Token이 유효하지 않을 시, 재 로그인 필요
       throw new AuthFailedException(
           ErrorCode.AUTH_INVALID_TOKEN
       );
     }
 
     // Refresh Token에서 ID 가져오기
-    Authentication authentication=tokenProvider.getAuthentication(reissueDto.getRefreshToken());
+    Authentication authentication=tokenProvider.getAuthentication(refreshTokenString);
 
     // ID를 기반으로 Server의 Refresh Token 값 가져오기
     RefreshToken refreshToken=refreshTokenRepository.findByUserEmail(authentication.getName())
@@ -77,7 +77,7 @@ public class AuthService {
         ));
 
     // Refresh Token 값이 Server와 일치하는지 검사
-    if(!refreshToken.getRefreshToken().equals(reissueDto.getRefreshToken())){
+    if(!refreshToken.getRefreshToken().equals(refreshTokenString)){
       throw new AuthFailedException(
           ErrorCode.AUTH_INVALID_TOKEN
       );
