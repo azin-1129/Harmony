@@ -29,7 +29,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
   private final String[] allowedUrls=
-      {"/login", "/ws/**", "/v3/api-docs/**", "/swagger/**", "/swagger-ui/**", "/swagger-resources/**", "/user/register", "/auth/login", "/auth/reissue", "/error"};
+      {"/login", "/ws/**", "/v3/api-docs/**", "/swagger/**", "/swagger-ui/**", "/swagger-resources/**", "/user/register", "/auth/login", "/auth/reissue", "/error", "/user/validate/**"};
   private final CustomExceptionFilter customExceptionFilter;
   private final AuthenticationFilter authenticationFilter;
   private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;

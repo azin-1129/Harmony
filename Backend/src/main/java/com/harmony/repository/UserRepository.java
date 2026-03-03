@@ -19,8 +19,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
   Optional<User> findByNickname(String nickname);
   List<User> findByWithdrawnAtBefore(LocalDateTime cutoffDate);
   List<User> findByWithdraw(Boolean withdraw);
-
   List<User> findByNicknameContainsOrUserIdentifierContains(String nickname, String userIdentifier);
+
+  boolean existsByEmail(String email);
+  boolean existsByNickname(String nickname);
+  boolean existsByUserIdentifier(String userIdentifier);
 
   @Transactional
   @Modifying(clearAutomatically = true)
