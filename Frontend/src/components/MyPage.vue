@@ -7,6 +7,8 @@ import ArticleDetail from './ArticleDetail.vue'
 const router = useRouter()
 const route = useRoute()
 
+const DEFAULT_PROFILE_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjRTBFMEUwIi8+CjxjaXJjbGUgY3g9IjUwIiBjeT0iMzUiIHI9IjE1IiBmaWxsPSIjOTk5Ii8+CjxwYXRoIGQ9Ik0yMCA2NSBDMjAgNjAgMzAgNTAgNTAgNTAgQzcwIDUwIDgwIDYwIDgwIDY1IiBmaWxsPSIjOTk5Ii8+Cjwvc3ZnPg=='
+
 // 내 프로필 정보
 const myProfile = ref({
   userId: null,
@@ -27,6 +29,18 @@ const activeTab = ref('post')
 
 // 선택된 게시물 (상세 팝업용)
 const selectedArticle = ref(null)
+
+const profileImageSrc = computed(() => {
+  const imageUrl = myProfile.value.profileImage
+  if (!imageUrl || (typeof imageUrl === 'string' && !imageUrl.trim())) {
+    return DEFAULT_PROFILE_IMAGE
+  }
+  return imageUrl
+})
+
+const handleProfileImageError = (event) => {
+  event.target.src = DEFAULT_PROFILE_IMAGE
+}
 
 // 좋아요 목록 조회
 const fetchLikedArticles = async () => {
@@ -213,9 +227,10 @@ watch(() => route.path, async (newPath, oldPath) => {
     <!-- 프로필 헤더 -->
     <div class="profile-header">
       <img 
-        :src="myProfile.profileImage || 'https://via.placeholder.com/80'" 
+        :src="profileImageSrc"
         alt="프로필" 
         class="profile-img" 
+        @error="handleProfileImageError"
       />
       <div class="profile-info">
         <h2>{{ myProfile.nickname }}</h2>
