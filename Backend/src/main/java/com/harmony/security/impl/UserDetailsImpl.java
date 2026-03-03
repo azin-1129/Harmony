@@ -1,11 +1,8 @@
 package com.harmony.security.impl;
 
 import com.harmony.entity.User;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,16 +10,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Slf4j
 public class UserDetailsImpl implements UserDetails {
-  @Getter
+  // TODO: final이어야 하는가?
   private Long userId;
   private String email;
   private String userIdentifier;
-  @Getter
   private String profileImageName;
   private String password;
   private String nickname;
   private boolean withdraw;
 
+  // TODO: ROLE_~~~ 형태가 role임. authorities는 허용된 행위(ex. READ, ..)이므로 수정해야 함
   private Collection<? extends GrantedAuthority> authorities;
 
   public UserDetailsImpl(User user) {
@@ -78,6 +75,10 @@ public class UserDetailsImpl implements UserDetails {
 
   public long getUserId(){
     return userId;
+  }
+
+  public String getProfileImageName(){
+    return profileImageName;
   }
 
   private Collection<GrantedAuthority> createAuthorities(String role){
