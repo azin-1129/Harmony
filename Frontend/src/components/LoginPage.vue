@@ -15,6 +15,7 @@
           </button>
         </form>
         <p v-if="error" class="error-msg">{{ error }}</p>
+        <button class="secondary-btn" @click="goToRegister">회원가입</button>
       </div>
     </div>
   </div>
@@ -61,6 +62,10 @@ const handleLogin = async () => {
   }
 }
 
+const goToRegister = () => {
+  router.push('/register')
+}
+
 // 배경 이미지 설정
 onMounted(() => {
   backgroundImage.value = 'https://images.unsplash.com/photo-1557821552-17105176677c?w=1200&h=1200&fit=crop'
@@ -80,5 +85,6 @@ onMounted(() => {
 .login-container input { width:100%; max-width:250px; padding:8px; margin-bottom:12px; border:1px solid #ccc; border-radius:4px; }
 .login-container button { width:100%; max-width:250px; padding:10px; background:#007aff; color:white; border:none; border-radius:4px; cursor:pointer; margin-top:8px; }
 .login-container button:disabled { background:#aaa; cursor:default; }
+.secondary-btn { background:#f3f4f6 !important; color:#374151 !important; }
 .error-msg { color:red; margin-top:12px; font-size:0.85rem; }
 </style>

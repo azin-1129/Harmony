@@ -38,6 +38,7 @@ const tryReissue = async () => {
 
 import MainLayout from '@/layouts/MainLayout.vue'
 import LoginPage from '@/components/LoginPage.vue'
+import RegisterPage from '@/components/RegisterPage.vue'
 import HomeFeed from '@/components/HomeFeed.vue'
 import Reels from '@/components/Reels.vue'
 import Chat from '@/components/Chat.vue'
@@ -54,6 +55,12 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: LoginPage,
+    meta: { guestOnly: true }
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: RegisterPage,
     meta: { guestOnly: true }
   },
   {
