@@ -12,7 +12,7 @@
       >
         <div class="room-avatar">
           <template v-if="getDisplayParticipants(room).length > 0">
-            <template v-for="(participant, idx) in getDisplayParticipants(room)" :key="participant.userId">
+            <template v-for="(participant, idx) in getDisplayParticipants(room)" :key="participant.userId || participant.userIdentifier || `${room.chatRoomId}-${idx}`">
               <div
                 v-if="!participant.profileImageUrl"
                 class="avatar default-profile"
@@ -60,16 +60,111 @@ onMounted(async () => {
   await loadChatRooms()
 })
 
+const normalizeParticipant = (participant) => {
+  if (!participant) {
+    return {
+      userId: null,
+      userIdentifier: '',
+      nickname: '',
+      profileImageUrl: ''
+    }
+  }
+
+  const nestedUser = participant.user || {}
+
+  return {
+    ...participant,
+    userId:
+      participant.userId ??
+      participant.id ??
+      participant.participantUserId ??
+      participant.memberUserId ??
+      participant.senderId ??
+      nestedUser.userId ??
+      nestedUser.id ??
+      null,
+    userIdentifier:
+      participant.userIdentifier ??
+      participant.friendIdentifier ??
+      participant.participantIdentifier ??
+      nestedUser.userIdentifier ??
+      '',
+    nickname:
+      participant.nickname ??
+      participant.userNickname ??
+      participant.friendNickname ??
+      nestedUser.nickname ??
+      '',
+    profileImageUrl:
+      participant.profileImageUrl ??
+      participant.profileImage ??
+      participant.userProfileImageUrl ??
+      participant.friendProfileImageUrl ??
+      nestedUser.profileImageUrl ??
+      ''
+  }
+}
+
+const getRoomParticipants = (room) => {
+  const participants = Array.isArray(room?.chatRoomParticipants) ? room.chatRoomParticipants : []
+  return participants.map(normalizeParticipant)
+}
+
+const isSameUser = (participant) => {
+  if (!participant || !currentUser.value) return false
+
+  const normalized = normalizeParticipant(participant)
+
+  const currentUserId = currentUser.value.userId
+  const currentIdentifier = currentUser.value.userIdentifier
+  const currentNickname = currentUser.value.nickname
+
+  const participantUserId = normalized.userId
+  const participantIdentifier = normalized.userIdentifier
+  const participantNickname = normalized.nickname
+
+  if (currentUserId && participantUserId && Number(participantUserId) === Number(currentUserId)) {
+    return true
+  }
+
+  if (currentIdentifier && participantIdentifier && participantIdentifier === currentIdentifier) {
+    return true
+  }
+
+  if (currentNickname && participantNickname && participantNickname.trim() === currentNickname.trim()) {
+    return true
+  }
+
+  return false
+}
+
+const getPersonalOpponent = (room) => {
+  const participants = getRoomParticipants(room)
+  return participants.find(participant => !isSameUser(participant)) || null
+}
+
 // 로그인한 사용자를 제외한 참가자 필터링
 const getDisplayParticipants = (room) => {
-  if (!room.chatRoomParticipants) return []
-  return room.chatRoomParticipants.filter(
-    p => p.userId !== currentUser.value.userId
-  ).slice(0, 4) // 최대 4명까지만 표시
+  const participants = getRoomParticipants(room)
+  if (participants.length === 0) return []
+
+  if (room.chatRoomType === 'PERSONAL_CHATROOM') {
+    const opponent = getPersonalOpponent(room)
+    return opponent ? [opponent] : []
+  }
+
+  return participants
+    .filter(participant => !isSameUser(participant))
+    .slice(0, 4)
 }
 
 // 채팅방 이름 생성 (참가자 닉네임을 쉼표로 구분)
 const getRoomName = (room) => {
+  if (room.chatRoomType === 'PERSONAL_CHATROOM') {
+    const opponent = getPersonalOpponent(room)
+    return opponent?.nickname || '탈퇴한 사용자'
+  }
+
   const participants = getDisplayParticipants(room)
   
   // 참가자가 나밖에 없을 때 (상대방 탈퇴)
@@ -77,8 +172,9 @@ const getRoomName = (room) => {
     return '탈퇴한 사용자'
   }
   
-  const names = participants.map(p => p.nickname).join(', ')
-  const remaining = room.chatRoomCount - 1 - participants.length
+  const names = participants.map(p => p.nickname || p.userIdentifier || '알 수 없는 사용자').join(', ')
+  const totalCount = Number(room.chatRoomCount || 0)
+  const remaining = Math.max(totalCount - 1 - participants.length, 0)
   
   if (remaining > 0) {
     return `${names} 외 ${remaining}명`
