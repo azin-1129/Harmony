@@ -20,6 +20,12 @@ jobs:
           cache: npm
           cache-dependency-path: Frontend/package-lock.json
 
+      - name: Set environment values
+        run: |
+          cd Frontend
+          touch ./.env
+          echo "${{secrets.FE_ENV}}" > ./.env
+
       - name: Install Dependencies
         run: npm install
 
