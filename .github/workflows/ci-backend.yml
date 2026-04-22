@@ -24,7 +24,7 @@ jobs:
           cd Backend/src/main/resources
           mkdir -p properties
           touch ./env.properties
-          echo "${{secrets.BE_ENV}}" >./env.properties
+          echo "${{secrets.BE_ENV}}" > ./env.properties
 
       - name: Build with Gradle
         run: ./gradlew clean build
