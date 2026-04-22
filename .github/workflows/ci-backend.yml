@@ -1,4 +1,4 @@
-name: CI
+name: CI-BE
 
 on:
   pull_request:
@@ -21,16 +21,10 @@ jobs:
 
       - name: Generate env file
         run: |
-          mkdir -p env
-          echo "${{secrets.DOCKER_COMPOSE_ENV}}"  >> env/docker-compose.env
-          echo "${{secrets.AWS_ENV}}" >> env/aws.env
-          echo "${{secrets.DB_ENV}}" >> env/db.env
-
-      - name: Run docker DB container
-        run: docker-compose -f ./docker-compose.yml up -d db
-
-      - name: Get execution permission to gradlew
-        run: chmod +x ./gradlew
+          cd Backend/src/main/resources
+          mkdir -p properties
+          touch ./env.properties
+          echo "${{secrets.APPLICATION_ENV}}" >./env.properties
 
       - name: Build with Gradle
         run: ./gradlew clean build
