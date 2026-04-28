@@ -22,8 +22,8 @@ import lombok.ToString;
 @NoArgsConstructor(access= AccessLevel.PROTECTED)
 public class RefreshToken {
   @Id
-  @Column(name="user_email")
-  private String userEmail;
+  @Column(name="email")
+  private String email;
   @Column(name="refresh_token")
   private String refreshToken;
 

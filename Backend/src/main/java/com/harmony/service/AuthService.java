@@ -43,7 +43,7 @@ public class AuthService {
 
       TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
       RefreshToken refreshToken = RefreshToken.builder()
-          .userEmail(loginDto.getEmail())
+          .email(loginDto.getEmail())
           .refreshToken(tokenDto.getRefreshToken())
           .build();
 
@@ -71,7 +71,7 @@ public class AuthService {
     Authentication authentication=tokenProvider.getAuthentication(refreshTokenString);
 
     // ID를 기반으로 Server의 Refresh Token 값 가져오기
-    RefreshToken refreshToken=refreshTokenRepository.findByUserEmail(authentication.getName())
+    RefreshToken refreshToken=refreshTokenRepository.findByEmail(authentication.getName())
         .orElseThrow(()->new AuthFailedException(
             ErrorCode.AUTH_INVALID_TOKEN
         ));

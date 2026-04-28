@@ -38,9 +38,9 @@ public class LogoutHandlerImpl implements LogoutHandler {
     log.info("Authentication Filter");
     if (StringUtils.isNotBlank(accessToken)) {
       if (tokenUtils.isValidToken(accessToken)) {
-        String userEmail=tokenUtils.getUsername(accessToken);
-       log.info("email은"+userEmail);
-       RefreshToken refreshToken=refreshTokenRepository.findByUserEmail(userEmail)
+        String email=tokenUtils.getUsername(accessToken);
+       log.info("email은"+email);
+       RefreshToken refreshToken=refreshTokenRepository.findByEmail(email)
            .orElseThrow(() -> new EntityNotFoundException(
                ErrorCode.AUTH_INVALID_TOKEN
            ));
