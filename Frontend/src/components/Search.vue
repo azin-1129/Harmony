@@ -204,26 +204,23 @@ const fetchCurrentUserInfo = async () => {
 
 // 사용자 프로필 페이지로 이동
 const goToUserProfile = (user) => {
-  const userIdentifier = user.userIdentifier
   const userId = user.userId
-  console.log('[Search] 검색 결과에서 프로필로 이동:', { userIdentifier, userId }, user)
+  console.log('[Search] 검색 결과에서 프로필로 이동:', { userId }, user)
+
+  if (!userId) {
+    console.error('[Search] userId가 없습니다:', user)
+    return
+  }
   
   // 자기 자신인 경우 마이페이지로 이동
-  if (userId === currentLoginUser.value.userId) {
+  if (String(userId) === String(currentLoginUser.value.userId)) {
     console.log('[Search] 자신의 프로필입니다. 마이페이지로 이동합니다.')
     router.push('/mypage')
     return
   }
   
-  if (userIdentifier && userId) {
-    // URL은 userIdentifier로 깔끔하게, userId는 state로 전달하여 정확한 프로필 조회
-    router.push({
-      path: `/profile/${userIdentifier}`,
-      state: { userId }
-    })
-  } else {
-    console.error('[Search] userIdentifier 또는 userId가 없습니다:', user)
-  }
+  // 검색 결과 userId 기반으로 프로필 페이지 이동
+  router.push(`/profile/${userId}`)
 }
 
 // 사용자 검색
