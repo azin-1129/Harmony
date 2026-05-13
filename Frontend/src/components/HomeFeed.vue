@@ -252,7 +252,11 @@ onUnmounted(() => {
 
 <style scoped>
 .page {
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
   padding: 20px;
+  box-sizing: border-box;
 }
 
 .loading-more {
@@ -263,5 +267,12 @@ onUnmounted(() => {
 
 .load-more-trigger {
   height: 1px;
+}
+
+@media (max-width: 768px) {
+  .page {
+    max-width: 100%;
+    padding: 16px;
+  }
 }
 </style>
