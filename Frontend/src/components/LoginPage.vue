@@ -1,6 +1,6 @@
 <template>
   <div class="login-page">
-    <div class="login-left" :style="{ backgroundImage: `url(${backgroundImage})` }">
+    <div class="login-left">
       <h1>Harmony</h1>
       <p>나만의 SNS 서비스</p>
     </div>
@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { apiFetch } from '@/utils/apiClient'
 import { setTokens } from '@/utils/tokenService'
@@ -32,7 +32,6 @@ const email = ref('')
 const password = ref('')
 const error = ref('')
 const loading = ref(false)
-const backgroundImage = ref('') // 이미지를 설정할 수 있는 ref
 
 const handleLogin = async () => {
   error.value = ''
@@ -65,17 +64,12 @@ const handleLogin = async () => {
 const goToRegister = () => {
   router.push('/register')
 }
-
-// 배경 이미지 설정
-onMounted(() => {
-  backgroundImage.value = 'https://images.unsplash.com/photo-1557821552-17105176677c?w=1200&h=1200&fit=crop'
-})
 </script>
 
 
 <style scoped>
 .login-page { display: flex; height: 100vh; background: #f0f2f5; }
-.login-left { flex:1; background-color:#007aff; background-size:cover; background-position:center; background-repeat:no-repeat; color:white; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:32px; }
+.login-left { flex:1; background-color:#6b6bff; color:white; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:32px; }
 .login-left h1 { font-size:48px; margin-bottom:16px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
 .login-left p { font-size:20px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
 .login-right { flex:1; display:flex; justify-content:center; align-items:center; }
@@ -83,7 +77,8 @@ onMounted(() => {
 .login-container h2 { margin-bottom:24px; }
 .login-container form { width:100%; display:flex; flex-direction:column; align-items:center; }
 .login-container input { width:100%; max-width:250px; padding:8px; margin-bottom:12px; border:1px solid #ccc; border-radius:4px; }
-.login-container button { width:100%; max-width:250px; padding:10px; background:#007aff; color:white; border:none; border-radius:4px; cursor:pointer; margin-top:8px; }
+.login-container button { width:100%; max-width:250px; padding:10px; background:#6b6bff; color:white; border:none; border-radius:4px; cursor:pointer; margin-top:8px; }
+.login-container button:hover:not(:disabled):not(.secondary-btn) { background:#5555ff; }
 .login-container button:disabled { background:#aaa; cursor:default; }
 .secondary-btn { background:#f3f4f6 !important; color:#374151 !important; }
 .error-msg { color:red; margin-top:12px; font-size:0.85rem; }
