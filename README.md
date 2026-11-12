@@ -104,4 +104,4 @@
 ### ERD
 <img src="exec/asset/ERD.png">
 
-### [API 명세서](명세서  링크)
+### [API 명세서](https://1drv.ms/x/c/ac1a29f8d6a1ad84/ASA8R-_qwA9MkAWhFjmfkNE?e=gu9PkY)
