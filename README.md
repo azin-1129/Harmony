@@ -1,6 +1,6 @@
 # 🐾 Harmony - 우리들의 이야기
 
-<img src="exec/asset/cover.jpg"/>
+<img src="exec/asset/cover.png"/>
 
 # 🌟 서비스 소개
 
@@ -11,54 +11,74 @@
 
 <br />
 <br />
-
-
 # 💡 주요 기능
-
-<img src="exec/asset/기능.gif" width="360" height="800"/>
-
-
  <br/>
 
- 
-### 차단
+### 검색
+<img src="exec/asset/검색.png" width="360" height="800"/>
+- 유저를 검색하는 기능입니다. :)
+- 해당 기능은 user identifier나 nickname을 기준으로 검색하며, 최적화를 고려하고 있습니다.
+
+### 차단(FE연동중)
+<img src="exec/asset/차단.png" width="360" height="800"/>
 - ⛔ SNS라면 빠질 수 없는 차단 기능입니다! 피드를 보고싶지 않다면 사용해 보세요.
 - 진행중인 친구 추가 요청이 있다면 수신 건은 거절되며, 발신 건은 취소됩니다.
 
 ### 삭제
+<img src="exec/asset/삭제.png" width="360" height="800"/>
 - 🤔 추가한 친구와의 관계를 다시 고려하고 계신다면.. 잠깐 삭제해 봅시다.
+- 친구 탭의 목록 아이템에 호버했을 때 뜨는 X 버튼으로 삭제할 수 있습니다.
 
 ### 친구
-- 🤝 홈 피드에서 친구들의 피드를 구경할 수 있습니다.
+<img src="exec/asset/친구목록.png" width="360" height="800"/>
+- 🤝 친구 탭에서 친구 목록을 관리할 수 있습니다!
+- 홈 피드에서 친구들의 피드를 구경할 수 있습니다.
 
 ### 친구 추가
+<img src="exec/asset/친구추가_보내기.png" width="360" height="800"/>
+<img src="exec/asset/친구추가_보낸요청.png" width="360" height="800"/>
+<img src="exec/asset/친구추가_받은요청.png" width="360" height="800"/>
 - ➕ 마음에 드는 사용자를 친구로 추가해 보세요.
+- 수신하거나 발신한 친구 추가 건은 친구 탭 내 친구 요청 목록에서 관리할 수 있습니다.
 
 ### 채팅방
-- 👥 채팅 메시지 보내기를 누르면, 채팅방이 개설됩니다.
+<img src="exec/asset/채팅방_메시지보내기버튼.png" width="360" height="800"/>
+<img src="exec/asset/채팅방_채팅방목록.png" width="360" height="800"/>
+- 👥 사용자 검색 결과를 클릭해 채팅 메시지 보내기를 누르면, 채팅방이 개설됩니다.
 - 현재 사이트는 1:1 개인 채팅이 구현되어 있습니다.
 
 ### 채팅 메시지
+<img src="exec/asset/채팅메시지.png" width="360" height="800"/>
 - 🗣️ 상대방과 실시간으로 텍스트를 통해 채팅할 수 있습니다.
 
 ### 게시물
+<img src="exec/asset/게시물_홈탭.png" width="360" height="800"/>
+<img src="exec/asset/마이페이지_상세.png" width="360" height="800"/>
+<img src="exec/asset/마이페이지_피드.png" width="360" height="800"/>
 - 📝 당신의 일상을 공유해 보세요. 친구들의 홈 피드 탭에 보여지게 됩니다.
 
 ### 보안
+<img src="exec/asset/보안.png" width="360" height="800"/>
 - 🛡️ Spring Security와 JWT를 적용했습니다.
 - 서비스 사용 시 사용자의 토큰을 확인합니다. 👀
 
 ### AWS S3
+<img src="exec/asset/AWSS3.png" width="360" height="800"/>
 - 🖼️ S3 버킷으로 업로드한 이미지를 관리합니다.
 - 파일명은 업로드할 때 랜덤으로 생성합니다!
 - 프로필과 게시물 사진을 보관합니다.
 
 ### 댓글
+<img src="exec/asset/댓글_작성전.png" width="360" height="800"/>
+<img src="exec/asset/댓글_작성후.png" width="360" height="800"/>
 - 💬 피드의 댓글란에 당신의 이야기를 들려 주세요!
+- 작성한 댓글에 호버하면, 삭제 버튼이 활성화됩니다.
 
 ### 좋아요
+<img src="exec/asset/좋아요.png" width="360" height="800"/>
 - 🩷 이 피드 최고..😭
 - 마음에 든 피드에 좋아요를 전송해 보세요. 🙂
+- 눌렀던 좋아요는 다시 눌러서 취소할 수 있습니다.
 
 <br />
 <br />
@@ -89,7 +109,7 @@
 <table>
     <tr>
         <td height="140px" align="center"> 
-            <img src="" width="140px" /> <br><br> 이아진 <br>(Full-Stack) </a> <br></td>  
+            <img src="exec/asset/팀원프사.png" width="140px" /> <br><br> 이아진 <br>(Full-Stack) </a> <br></td>  
     </tr>
     <tr>
         <td align="center">
