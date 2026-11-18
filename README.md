@@ -171,6 +171,7 @@
 ### [API 명세서](https://1drv.ms/x/c/ac1a29f8d6a1ad84/ASA8R-_qwA9MkAWhFjmfkNE?e=gu9PkY)
 
 ### 폴더 구조
+```
 📦harmony
  ┣ 📂controller
  ┃ ┣ 📜ArticleController.java
@@ -358,6 +359,7 @@
  ┃ ┣ 📜ParticipantService.java
  ┃ ┗ 📜UserService.java
  ┗ 📜HarmonyApplication.java
+```
  
 
 ### [Figma 초기 디자인](https://www.figma.com/design/s6AwZykl6bJxb02UeC9rLV/Harmony-UI?node-id=0-1&t=w57Ecj5fxFJFLGnE-1)
