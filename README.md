@@ -121,6 +121,14 @@
 
 # 🛠️ 주요 기술 스택
 
+기술 태그 테스트
+
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+
+<p>
+ <img alt="Java" src="https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white">
+</p>
+
 -   Infra : (Docker로 배포할 예정)
 -   BackEnd : Java, Spring Boot, JPA
 -   FrontEnd : Vue
@@ -364,7 +372,8 @@
  ┃ ┗ 📜UserService.java
  ┗ 📜HarmonyApplication.java
 ```
- 
+
+<br />
 
 ### [Figma 초기 디자인](https://www.figma.com/design/s6AwZykl6bJxb02UeC9rLV/Harmony-UI?node-id=0-1&t=w57Ecj5fxFJFLGnE-1)
 <img src="exec/asset/피그마디자인.png" width="360" height="800" />
