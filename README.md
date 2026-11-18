@@ -169,3 +169,196 @@
 <img src="exec/asset/ERD.png">
 
 ### [API 명세서](https://1drv.ms/x/c/ac1a29f8d6a1ad84/ASA8R-_qwA9MkAWhFjmfkNE?e=gu9PkY)
+
+### 폴더 구조
+📦harmony
+ ┣ 📂controller
+ ┃ ┣ 📜ArticleController.java
+ ┃ ┣ 📜AuthController.java
+ ┃ ┣ 📜AwsS3Controller.java
+ ┃ ┣ 📜BlockController.java
+ ┃ ┣ 📜ChatMessageController.java
+ ┃ ┣ 📜ChatRoomController.java
+ ┃ ┣ 📜CommentController.java
+ ┃ ┣ 📜FriendshipController.java
+ ┃ ┣ 📜FriendshipRequestController.java
+ ┃ ┣ 📜HeartController.java
+ ┃ ┣ 📜ParticipantController.java
+ ┃ ┗ 📜UserController.java
+ ┣ 📂dto
+ ┃ ┣ 📂form
+ ┃ ┃ ┣ 📜ArticleForm.java
+ ┃ ┃ ┣ 📜ChatRoomNameForm.java
+ ┃ ┃ ┣ 📜NicknameForm.java
+ ┃ ┃ ┣ 📜PasswordForm.java
+ ┃ ┃ ┗ 📜ProfileImageForm.java
+ ┃ ┣ 📂request
+ ┃ ┃ ┣ 📜BlockRequestDto.java
+ ┃ ┃ ┣ 📜CancelSentFriendshipRequestRequestDto.java
+ ┃ ┃ ┣ 📜ChatMessageRequestDto.java
+ ┃ ┃ ┣ 📜CreateAndParticipateGroupChatRoomRequestDto.java
+ ┃ ┃ ┣ 📜CreateAndParticipatePersonalChatRoomRequestDto.java
+ ┃ ┃ ┣ 📜CreateFriendshipRequestDto.java
+ ┃ ┃ ┣ 📜DeleteFriendshipRequestDto.java
+ ┃ ┃ ┣ 📜LeaveChatRoomForceRequestDto.java
+ ┃ ┃ ┣ 📜LeaveChatRoomRequestDto.java
+ ┃ ┃ ┣ 📜LoginDto.java
+ ┃ ┃ ┣ 📜ParticipateGroupChatRoomRequestDto.java
+ ┃ ┃ ┣ 📜RegisterRequestDto.java
+ ┃ ┃ ┣ 📜SearchUserRequestDto.java
+ ┃ ┃ ┣ 📜SelectChatRoomParticipantsRequestDto.java
+ ┃ ┃ ┣ 📜SelectProfileRequestDto.java
+ ┃ ┃ ┣ 📜UnBlockRequestDto.java
+ ┃ ┃ ┣ 📜UpdateReceivedFriendshipRequestStatusRequestDto.java
+ ┃ ┃ ┣ 📜WriteArticleRequestDto.java
+ ┃ ┃ ┗ 📜WriteCommentRequestDto.java
+ ┃ ┗ 📂response
+ ┃ ┃ ┣ 📜ChatMessageResponseDto.java
+ ┃ ┃ ┣ 📜ReceivedFriendshipRequestResponseDto.java
+ ┃ ┃ ┣ 📜ReissueResponseDto.java
+ ┃ ┃ ┣ 📜SearchUserResponseDto.java
+ ┃ ┃ ┣ 📜SelectAuthorArticlesResponseDto.java
+ ┃ ┃ ┣ 📜SelectBlockResponseDto.java
+ ┃ ┃ ┣ 📜SelectChatRoomMessagesResponseDto.java
+ ┃ ┃ ┣ 📜SelectChatRoomParticipantsResponseDto.java
+ ┃ ┃ ┣ 📜SelectCommentResponseDto.java
+ ┃ ┃ ┣ 📜SelectFollowingUserArticlesResponseDto.java
+ ┃ ┃ ┣ 📜SelectFriendshipResponseDto.java
+ ┃ ┃ ┣ 📜SelectMyArticleHeartsResponseDto.java
+ ┃ ┃ ┣ 📜SelectParticipatedChatRoomsResponseDto.java
+ ┃ ┃ ┣ 📜SelectProfileResponseDto.java
+ ┃ ┃ ┣ 📜SelectUserInfoResponseDto.java
+ ┃ ┃ ┣ 📜SentFriendshipRequestResponseDto.java
+ ┃ ┃ ┣ 📜SlicedResponseDto.java
+ ┃ ┃ ┗ 📜WriteCommentResponseDto.java
+ ┣ 📂entity
+ ┃ ┣ 📜Article.java
+ ┃ ┣ 📜ArticleMediaType.java
+ ┃ ┣ 📜Block.java
+ ┃ ┣ 📜BlockId.java
+ ┃ ┣ 📜ChatMessage.java
+ ┃ ┣ 📜ChatMessageType.java
+ ┃ ┣ 📜ChatRoom.java
+ ┃ ┣ 📜ChatRoomType.java
+ ┃ ┣ 📜Comment.java
+ ┃ ┣ 📜Friendship.java
+ ┃ ┣ 📜FriendshipRequest.java
+ ┃ ┣ 📜FriendshipRequestStatus.java
+ ┃ ┣ 📜FriendType.java
+ ┃ ┣ 📜Heart.java
+ ┃ ┣ 📜Participant.java
+ ┃ ┣ 📜ParticipantId.java
+ ┃ ┣ 📜RefreshToken.java
+ ┃ ┣ 📜Role.java
+ ┃ ┗ 📜User.java
+ ┣ 📂env
+ ┃ ┣ 📂util
+ ┃ ┃ ┗ 📜SchedulerUtil.java
+ ┃ ┣ 📜EnvConfig.java
+ ┃ ┣ 📜QueryDslConfig.java
+ ┃ ┣ 📜RedisCacheConfig.java
+ ┃ ┣ 📜RedisConfig.java
+ ┃ ┣ 📜SchedulerConfig.java
+ ┃ ┗ 📜SecurityConfig.java
+ ┣ 📂exception
+ ┃ ┣ 📜AlreadyCanceledFriendshipRequestException.java
+ ┃ ┣ 📜AuthFailedException.java
+ ┃ ┣ 📜DuplicatedUserInfoException.java
+ ┃ ┣ 📜DuplicatedUserNicknameException.java
+ ┃ ┣ 📜DuplicatedUserPasswordException.java
+ ┃ ┣ 📜ExpiredTokenException.java
+ ┃ ┣ 📜GroupChatRoomFullException.java
+ ┃ ┣ 📜InvalidTokenException.java
+ ┃ ┣ 📜LoginFailedException.java
+ ┃ ┣ 📜SecurityContextNotFoundException.java
+ ┃ ┗ 📜UserAlreadyWithdrawException.java
+ ┣ 📂global
+ ┃ ┣ 📂annotation
+ ┃ ┃ ┣ 📜CurrentUserId.java
+ ┃ ┃ ┗ 📜CurrentUserIdArgumentResolver.java
+ ┃ ┣ 📂config
+ ┃ ┃ ┣ 📜AwsS3Config.java
+ ┃ ┃ ┣ 📜JpaAuditingConfig.java
+ ┃ ┃ ┣ 📜StompConfig.java
+ ┃ ┃ ┣ 📜SwaggerConfig.java
+ ┃ ┃ ┣ 📜WebConfig.java
+ ┃ ┃ ┗ 📜WebSocketMessageBrokerStatsConfig.java
+ ┃ ┣ 📂response
+ ┃ ┃ ┣ 📂code
+ ┃ ┃ ┃ ┣ 📜ErrorCode.java
+ ┃ ┃ ┃ ┣ 📜ResponseCode.java
+ ┃ ┃ ┃ ┗ 📜SuccessCode.java
+ ┃ ┃ ┣ 📂exception
+ ┃ ┃ ┃ ┣ 📜BusinessException.java
+ ┃ ┃ ┃ ┣ 📜EntityAlreadyExistException.java
+ ┃ ┃ ┃ ┣ 📜EntityNotFoundException.java
+ ┃ ┃ ┃ ┣ 📜FormValidationException.java
+ ┃ ┃ ┃ ┣ 📜InvalidArgumentException.java
+ ┃ ┃ ┃ ┗ 📜UploadFailedException.java
+ ┃ ┃ ┣ 📂handler
+ ┃ ┃ ┃ ┣ 📜GlobalExceptionHandler.java
+ ┃ ┃ ┃ ┗ 📜StompExceptionHandler.java
+ ┃ ┃ ┗ 📂structure
+ ┃ ┃ ┃ ┣ 📜ErrorResponse.java
+ ┃ ┃ ┃ ┗ 📜SuccessResponse.java
+ ┃ ┗ 📜BaseTime.java
+ ┣ 📂interceptor
+ ┃ ┗ 📜ChannelInboundInterceptor.java
+ ┣ 📂repository
+ ┃ ┣ 📂querydsl
+ ┃ ┃ ┣ 📂impl
+ ┃ ┃ ┃ ┣ 📜DslArticleRepositoryImpl.java
+ ┃ ┃ ┃ ┣ 📜DslChatMessageRepositoryImpl.java
+ ┃ ┃ ┃ ┣ 📜DslFriendshipRepositoryImpl.java
+ ┃ ┃ ┃ ┗ 📜DslFriendshipRequestRepositoryImpl.java
+ ┃ ┃ ┣ 📜DslArticleRepository.java
+ ┃ ┃ ┣ 📜DslChatMessageRepository.java
+ ┃ ┃ ┣ 📜DslFriendshipRepository.java
+ ┃ ┃ ┗ 📜DslFriendshipRequestRepository.java
+ ┃ ┣ 📜ArticleRepository.java
+ ┃ ┣ 📜BlockRepository.java
+ ┃ ┣ 📜ChatMessageRepository.java
+ ┃ ┣ 📜ChatRoomRepository.java
+ ┃ ┣ 📜CommentRepository.java
+ ┃ ┣ 📜FriendshipRepository.java
+ ┃ ┣ 📜FriendshipRequestRepository.java
+ ┃ ┣ 📜HeartRepository.java
+ ┃ ┣ 📜ParticipantRepository.java
+ ┃ ┣ 📜RefreshTokenRepository.java
+ ┃ ┗ 📜UserRepository.java
+ ┣ 📂security
+ ┃ ┣ 📂filter
+ ┃ ┃ ┣ 📜AuthenticationFilter.java
+ ┃ ┃ ┗ 📜CustomExceptionFilter.java
+ ┃ ┣ 📂handler
+ ┃ ┃ ┣ 📜JwtAccessDeniedHandler.java
+ ┃ ┃ ┣ 📜JwtAuthenticationEntryPoint.java
+ ┃ ┃ ┣ 📜LogoutHandlerImpl.java
+ ┃ ┃ ┗ 📜LogoutSuccessHandlerImpl.java
+ ┃ ┣ 📂impl
+ ┃ ┃ ┣ 📜UserDetailsImpl.java
+ ┃ ┃ ┗ 📜UserDetailsServiceImpl.java
+ ┃ ┣ 📂utils
+ ┃ ┃ ┣ 📜SecurityUtil.java
+ ┃ ┃ ┗ 📜TokenProvider.java
+ ┃ ┣ 📜ReissueDto.java
+ ┃ ┣ 📜TokenDto.java
+ ┃ ┗ 📜UserDetailsDto.java
+ ┣ 📂service
+ ┃ ┣ 📜ArticleService.java
+ ┃ ┣ 📜AuthService.java
+ ┃ ┣ 📜AwsS3Service.java
+ ┃ ┣ 📜BlockService.java
+ ┃ ┣ 📜ChatMessageService.java
+ ┃ ┣ 📜ChatRoomService.java
+ ┃ ┣ 📜CommentService.java
+ ┃ ┣ 📜FriendshipRequestService.java
+ ┃ ┣ 📜FriendshipService.java
+ ┃ ┣ 📜HeartService.java
+ ┃ ┣ 📜ParticipantService.java
+ ┃ ┗ 📜UserService.java
+ ┗ 📜HarmonyApplication.java
+ 
+
+### [Figma 초기 디자인](https://www.figma.com/design/s6AwZykl6bJxb02UeC9rLV/Harmony-UI?node-id=0-1&t=w57Ecj5fxFJFLGnE-1)
+<img src="exec/asset/피그마디자인.png">
