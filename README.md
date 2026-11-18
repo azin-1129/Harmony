@@ -16,7 +16,7 @@
  <br/>
 
 ### 검색
-<img src="exec/asset/검색.png" width="360" height="800"/>
+<img src="exec/asset/검색.png" width="600" height="800"/>
 
 - 유저를 검색하는 기능입니다. :)
 - 해당 기능은 user identifier나 nickname을 기준으로 검색하며, 최적화를 고려하고 있습니다.
@@ -24,7 +24,7 @@
  <br/>
  
 ### 차단(FE연동중)
-<img src="exec/asset/차단.png" width="360" height="800"/>
+<img src="exec/asset/차단.png" width="700" height="800"/>
 
 - ⛔ SNS라면 빠질 수 없는 차단 기능입니다! 피드를 보고싶지 않다면 사용해 보세요.
 - 진행중인 친구 추가 요청이 있다면 수신 건은 거절되며, 발신 건은 취소됩니다.
