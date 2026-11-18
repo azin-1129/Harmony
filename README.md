@@ -363,4 +363,4 @@
  
 
 ### [Figma 초기 디자인](https://www.figma.com/design/s6AwZykl6bJxb02UeC9rLV/Harmony-UI?node-id=0-1&t=w57Ecj5fxFJFLGnE-1)
-<img src="exec/asset/피그마디자인.png">
+<img src="exec/asset/피그마디자인.png" width="360" height="800" />
